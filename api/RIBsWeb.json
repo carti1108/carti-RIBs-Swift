@@ -1,0 +1,623 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "RIBsWeb",
+    "printedName": "RIBsWeb",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "RIBs",
+        "printedName": "RIBs",
+        "declKind": "Import",
+        "moduleName": "RIBsWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftOnoneSupport",
+        "printedName": "SwiftOnoneSupport",
+        "declKind": "Import",
+        "moduleName": "RIBsWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "_Concurrency",
+        "printedName": "_Concurrency",
+        "declKind": "Import",
+        "moduleName": "RIBsWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "_StringProcessing",
+        "printedName": "_StringProcessing",
+        "declKind": "Import",
+        "moduleName": "RIBsWeb"
+      },
+      {
+        "kind": "Import",
+        "name": "_SwiftConcurrencyShims",
+        "printedName": "_SwiftConcurrencyShims",
+        "declKind": "Import",
+        "moduleName": "RIBsWeb"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "WebScreenSlot",
+        "printedName": "WebScreenSlot",
+        "children": [
+          {
+            "kind": "TypeAlias",
+            "name": "ChangeHandler",
+            "printedName": "ChangeHandler",
+            "children": [
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "((any RIBs.ViewControllable)?) -> Swift.Void",
+                "children": [
+                  {
+                    "kind": "TypeNameAlias",
+                    "name": "Void",
+                    "printedName": "Swift.Void",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Void",
+                        "printedName": "()"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "(any RIBs.ViewControllable)?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ViewControllable",
+                        "printedName": "any RIBs.ViewControllable",
+                        "usr": "s:4RIBs16ViewControllableP"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ]
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:7RIBsWeb0B10ScreenSlotC13ChangeHandlera",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotC13ChangeHandlera",
+            "moduleName": "RIBsWeb"
+          },
+          {
+            "kind": "Var",
+            "name": "current",
+            "printedName": "current",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "(any RIBs.ViewControllable)?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "ViewControllable",
+                    "printedName": "any RIBs.ViewControllable",
+                    "usr": "s:4RIBs16ViewControllableP"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:7RIBsWeb0B10ScreenSlotC7current0A016ViewControllable_pSgvp",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotC7current0A016ViewControllable_pSgvp",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "SetterAccess",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "(any RIBs.ViewControllable)?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "ViewControllable",
+                        "printedName": "any RIBs.ViewControllable",
+                        "usr": "s:4RIBs16ViewControllableP"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:7RIBsWeb0B10ScreenSlotC7current0A016ViewControllable_pSgvg",
+                "mangledName": "$s7RIBsWeb0B10ScreenSlotC7current0A016ViewControllable_pSgvg",
+                "moduleName": "RIBsWeb",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WebScreenSlot",
+                "printedName": "RIBsWeb.WebScreenSlot",
+                "usr": "s:7RIBsWeb0B10ScreenSlotC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:7RIBsWeb0B10ScreenSlotCACycfc",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotCACycfc",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B10ScreenSlotC4showyy0A016ViewControllable_pF",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotC4showyy0A016ViewControllable_pF",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B10ScreenSlotC4hideyy0A016ViewControllable_pF",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotC4hideyy0A016ViewControllable_pF",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "observe",
+            "printedName": "observe(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WebSlotSubscription",
+                "printedName": "RIBsWeb.WebSlotSubscription",
+                "usr": "s:7RIBsWeb0B16SlotSubscriptionC"
+              },
+              {
+                "kind": "TypeNameAlias",
+                "name": "ChangeHandler",
+                "printedName": "RIBsWeb.WebScreenSlot.ChangeHandler",
+                "children": [
+                  {
+                    "kind": "TypeFunc",
+                    "name": "Function",
+                    "printedName": "((any RIBs.ViewControllable)?) -> Swift.Void",
+                    "children": [
+                      {
+                        "kind": "TypeNameAlias",
+                        "name": "Void",
+                        "printedName": "Swift.Void",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "Void",
+                            "printedName": "()"
+                          }
+                        ]
+                      },
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Optional",
+                        "printedName": "(any RIBs.ViewControllable)?",
+                        "children": [
+                          {
+                            "kind": "TypeNominal",
+                            "name": "ViewControllable",
+                            "printedName": "any RIBs.ViewControllable",
+                            "usr": "s:4RIBs16ViewControllableP"
+                          }
+                        ],
+                        "usr": "s:Sq"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B10ScreenSlotC7observeyAA0bD12SubscriptionCy0A016ViewControllable_pSgYbScMYccF",
+            "mangledName": "$s7RIBsWeb0B10ScreenSlotC7observeyAA0bD12SubscriptionCy0A016ViewControllable_pSgYbScMYccF",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:7RIBsWeb0B10ScreenSlotC",
+        "mangledName": "$s7RIBsWeb0B10ScreenSlotC",
+        "moduleName": "RIBsWeb",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "WebSlotSubscription",
+        "printedName": "WebSlotSubscription",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "cancel",
+            "printedName": "cancel()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B16SlotSubscriptionC6cancelyyF",
+            "mangledName": "$s7RIBsWeb0B16SlotSubscriptionC6cancelyyF",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:7RIBsWeb0B16SlotSubscriptionC",
+        "mangledName": "$s7RIBsWeb0B16SlotSubscriptionC",
+        "moduleName": "RIBsWeb",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "hasMissingDesignatedInitializers": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "WebViewHost",
+        "printedName": "WebViewHost",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "slot",
+            "printedName": "slot",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WebScreenSlot",
+                "printedName": "RIBsWeb.WebScreenSlot",
+                "usr": "s:7RIBsWeb0B10ScreenSlotC"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:7RIBsWeb0B8ViewHostC4slotAA0B10ScreenSlotCvp",
+            "mangledName": "$s7RIBsWeb0B8ViewHostC4slotAA0B10ScreenSlotCvp",
+            "moduleName": "RIBsWeb",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "WebScreenSlot",
+                    "printedName": "RIBsWeb.WebScreenSlot",
+                    "usr": "s:7RIBsWeb0B10ScreenSlotC"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:7RIBsWeb0B8ViewHostC4slotAA0B10ScreenSlotCvg",
+                "mangledName": "$s7RIBsWeb0B8ViewHostC4slotAA0B10ScreenSlotCvg",
+                "moduleName": "RIBsWeb",
+                "genericSig": "<View where View : RIBs.ViewControllable>",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WebViewHost",
+                "printedName": "RIBsWeb.WebViewHost<View>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ],
+                "usr": "s:7RIBsWeb0B8ViewHostC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:7RIBsWeb0B8ViewHostCACyxGycfc",
+            "mangledName": "$s7RIBsWeb0B8ViewHostCACyxGycfc",
+            "moduleName": "RIBsWeb",
+            "genericSig": "<View where View : RIBs.ViewControllable>",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B8ViewHostC4showyyxF",
+            "mangledName": "$s7RIBsWeb0B8ViewHostC4showyyxF",
+            "moduleName": "RIBsWeb",
+            "genericSig": "<View where View : RIBs.ViewControllable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:7RIBsWeb0B8ViewHostC4hideyyxF",
+            "mangledName": "$s7RIBsWeb0B8ViewHostC4hideyyxF",
+            "moduleName": "RIBsWeb",
+            "genericSig": "<View where View : RIBs.ViewControllable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "TypeAlias",
+            "name": "View",
+            "printedName": "View",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:7RIBsWeb0B8ViewHostC0C0a",
+            "mangledName": "$s7RIBsWeb0B8ViewHostC0C0a",
+            "moduleName": "RIBsWeb",
+            "genericSig": "<View where View : RIBs.ViewControllable>",
+            "implicit": true
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:7RIBsWeb0B8ViewHostC",
+        "mangledName": "$s7RIBsWeb0B8ViewHostC",
+        "moduleName": "RIBsWeb",
+        "genericSig": "<View where View : RIBs.ViewControllable>",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewHost",
+            "printedName": "ViewHost",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "View",
+                "printedName": "View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:4RIBs8ViewHostP",
+            "mangledName": "$s4RIBs8ViewHostP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  }
+}

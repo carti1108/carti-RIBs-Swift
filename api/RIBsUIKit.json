@@ -1,0 +1,780 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "RIBsUIKit",
+    "printedName": "RIBsUIKit",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "RIBs",
+        "printedName": "RIBs",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftOnoneSupport",
+        "printedName": "SwiftOnoneSupport",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "Import",
+        "name": "UIKit",
+        "printedName": "UIKit",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "Import",
+        "name": "_Concurrency",
+        "printedName": "_Concurrency",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "Import",
+        "name": "_StringProcessing",
+        "printedName": "_StringProcessing",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "Import",
+        "name": "_SwiftConcurrencyShims",
+        "printedName": "_SwiftConcurrencyShims",
+        "declKind": "Import",
+        "moduleName": "RIBsUIKit"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "RIBContainerViewController",
+        "printedName": "RIBContainerViewController",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "currentScreen",
+            "printedName": "currentScreen",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "UIKit.UIViewController?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIViewController",
+                    "printedName": "UIKit.UIViewController",
+                    "usr": "c:objc(cs)UIViewController"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:9RIBsUIKit26RIBContainerViewControllerC13currentScreenSo06UIViewE0CSgvp",
+            "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC13currentScreenSo06UIViewE0CSgvp",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "HasInitialValue",
+              "SetterAccess",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "UIKit.UIViewController?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "UIViewController",
+                        "printedName": "UIKit.UIViewController",
+                        "usr": "c:objc(cs)UIViewController"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9RIBsUIKit26RIBContainerViewControllerC13currentScreenSo06UIViewE0CSgvg",
+                "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC13currentScreenSo06UIViewE0CSgvg",
+                "moduleName": "RIBsUIKit",
+                "implicit": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "showScreen",
+            "printedName": "showScreen(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9RIBsUIKit26RIBContainerViewControllerC10showScreenyy0A00D12Controllable_pF",
+            "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC10showScreenyy0A00D12Controllable_pF",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hideScreen",
+            "printedName": "hideScreen(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9RIBsUIKit26RIBContainerViewControllerC10hideScreenyy0A00D12Controllable_pF",
+            "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC10hideScreenyy0A00D12Controllable_pF",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(nibName:bundle:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "RIBContainerViewController",
+                "printedName": "RIBsUIKit.RIBContainerViewController",
+                "usr": "c:@M@RIBsUIKit@objc(cs)RIBContainerViewController"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Swift.String?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "Foundation.Bundle?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bundle",
+                    "printedName": "Foundation.Bundle",
+                    "usr": "c:objc(cs)NSBundle"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@RIBsUIKit@objc(cs)RIBContainerViewController(im)initWithNibName:bundle:",
+            "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC7nibName6bundleACSSSg_So8NSBundleCSgtcfc",
+            "moduleName": "RIBsUIKit",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "initWithNibName:bundle:",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Override",
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(coder:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "RIBsUIKit.RIBContainerViewController?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "RIBContainerViewController",
+                    "printedName": "RIBsUIKit.RIBContainerViewController",
+                    "usr": "c:@M@RIBsUIKit@objc(cs)RIBContainerViewController"
+                  }
+                ],
+                "usr": "s:Sq"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "NSCoder",
+                "printedName": "Foundation.NSCoder",
+                "usr": "c:objc(cs)NSCoder"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "c:@M@RIBsUIKit@objc(cs)RIBContainerViewController(im)initWithCoder:",
+            "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC5coderACSgSo7NSCoderC_tcfc",
+            "moduleName": "RIBsUIKit",
+            "overriding": true,
+            "implicit": true,
+            "objc_name": "initWithCoder:",
+            "declAttributes": [
+              "Dynamic",
+              "ObjC",
+              "Required",
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "c:@M@RIBsUIKit@objc(cs)RIBContainerViewController",
+        "mangledName": "$s9RIBsUIKit26RIBContainerViewControllerC",
+        "moduleName": "RIBsUIKit",
+        "isOpen": true,
+        "declAttributes": [
+          "Custom",
+          "ObjC"
+        ],
+        "superclassUsr": "c:objc(cs)UIViewController",
+        "inheritsConvenienceInitializers": true,
+        "superclassNames": [
+          "UIKit.UIViewController",
+          "UIKit.UIResponder",
+          "ObjectiveC.NSObject"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewControllable",
+            "printedName": "ViewControllable",
+            "usr": "s:4RIBs16ViewControllableP",
+            "mangledName": "$s4RIBs16ViewControllableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "UIKitViewControllable",
+            "printedName": "UIKitViewControllable",
+            "usr": "s:9RIBsUIKit0B16ViewControllableP",
+            "mangledName": "$s9RIBsUIKit0B16ViewControllableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "UITraitChangeObservable",
+            "printedName": "UITraitChangeObservable",
+            "usr": "s:5UIKit23UITraitChangeObservableP",
+            "mangledName": "$s5UIKit23UITraitChangeObservableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "UIKitViewControllable",
+        "printedName": "UIKitViewControllable",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "uiviewController",
+            "printedName": "uiviewController",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UIViewController",
+                "printedName": "UIKit.UIViewController",
+                "usr": "c:objc(cs)UIViewController"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:9RIBsUIKit0B16ViewControllableP16uiviewControllerSo06UIViewF0Cvp",
+            "mangledName": "$s9RIBsUIKit0B16ViewControllableP16uiviewControllerSo06UIViewF0Cvp",
+            "moduleName": "RIBsUIKit",
+            "protocolReq": true,
+            "declAttributes": [
+              "Custom"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIViewController",
+                    "printedName": "UIKit.UIViewController",
+                    "usr": "c:objc(cs)UIViewController"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9RIBsUIKit0B16ViewControllableP16uiviewControllerSo06UIViewF0Cvg",
+                "mangledName": "$s9RIBsUIKit0B16ViewControllableP16uiviewControllerSo06UIViewF0Cvg",
+                "moduleName": "RIBsUIKit",
+                "genericSig": "<Self where Self : RIBsUIKit.UIKitViewControllable>",
+                "protocolReq": true,
+                "reqNewWitnessTableEntry": true,
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "uiviewController",
+            "printedName": "uiviewController",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UIViewController",
+                "printedName": "UIKit.UIViewController",
+                "usr": "c:objc(cs)UIViewController"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:9RIBsUIKit0B16ViewControllablePAASo16UIViewControllerCRbzrlE06uiviewF0AEvp",
+            "mangledName": "$s9RIBsUIKit0B16ViewControllablePAASo16UIViewControllerCRbzrlE06uiviewF0AEvp",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "Custom"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIViewController",
+                    "printedName": "UIKit.UIViewController",
+                    "usr": "c:objc(cs)UIViewController"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9RIBsUIKit0B16ViewControllablePAASo16UIViewControllerCRbzrlE06uiviewF0AEvg",
+                "mangledName": "$s9RIBsUIKit0B16ViewControllablePAASo16UIViewControllerCRbzrlE06uiviewF0AEvg",
+                "moduleName": "RIBsUIKit",
+                "genericSig": "<Self where Self : UIKit.UIViewController, Self : RIBsUIKit.UIKitViewControllable>",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:9RIBsUIKit0B16ViewControllableP",
+        "mangledName": "$s9RIBsUIKit0B16ViewControllableP",
+        "moduleName": "RIBsUIKit",
+        "genericSig": "<Self : RIBs.ViewControllable>",
+        "declAttributes": [
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ViewControllable",
+            "printedName": "ViewControllable",
+            "usr": "s:4RIBs16ViewControllableP",
+            "mangledName": "$s4RIBs16ViewControllableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "WindowViewHost",
+        "printedName": "WindowViewHost",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "window",
+            "printedName": "window",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UIWindow",
+                "printedName": "UIKit.UIWindow",
+                "usr": "c:objc(cs)UIWindow"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:9RIBsUIKit14WindowViewHostC6windowSo8UIWindowCvp",
+            "mangledName": "$s9RIBsUIKit14WindowViewHostC6windowSo8UIWindowCvp",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIWindow",
+                    "printedName": "UIKit.UIWindow",
+                    "usr": "c:objc(cs)UIWindow"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:9RIBsUIKit14WindowViewHostC6windowSo8UIWindowCvg",
+                "mangledName": "$s9RIBsUIKit14WindowViewHostC6windowSo8UIWindowCvg",
+                "moduleName": "RIBsUIKit",
+                "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(window:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "WindowViewHost",
+                "printedName": "RIBsUIKit.WindowViewHost<View>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ],
+                "usr": "s:9RIBsUIKit14WindowViewHostC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "UIWindow",
+                "printedName": "UIKit.UIWindow",
+                "usr": "c:objc(cs)UIWindow"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:9RIBsUIKit14WindowViewHostC6windowACyxGSo8UIWindowC_tcfc",
+            "mangledName": "$s9RIBsUIKit14WindowViewHostC6windowACyxGSo8UIWindowC_tcfc",
+            "moduleName": "RIBsUIKit",
+            "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9RIBsUIKit14WindowViewHostC4showyyxF",
+            "mangledName": "$s9RIBsUIKit14WindowViewHostC4showyyxF",
+            "moduleName": "RIBsUIKit",
+            "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:9RIBsUIKit14WindowViewHostC4hideyyxF",
+            "mangledName": "$s9RIBsUIKit14WindowViewHostC4hideyyxF",
+            "moduleName": "RIBsUIKit",
+            "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "TypeAlias",
+            "name": "View",
+            "printedName": "View",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:9RIBsUIKit14WindowViewHostC0D0a",
+            "mangledName": "$s9RIBsUIKit14WindowViewHostC0D0a",
+            "moduleName": "RIBsUIKit",
+            "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+            "implicit": true
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:9RIBsUIKit14WindowViewHostC",
+        "mangledName": "$s9RIBsUIKit14WindowViewHostC",
+        "moduleName": "RIBsUIKit",
+        "genericSig": "<View where View : RIBsUIKit.UIKitViewControllable>",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewHost",
+            "printedName": "ViewHost",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "View",
+                "printedName": "View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:4RIBs8ViewHostP",
+            "mangledName": "$s4RIBs8ViewHostP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "ViewControllable",
+        "printedName": "ViewControllable",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "uiviewController",
+            "printedName": "uiviewController",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "UIViewController",
+                "printedName": "UIKit.UIViewController",
+                "usr": "c:objc(cs)UIViewController"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:4RIBs16ViewControllableP0A5UIKitE16uiviewControllerSo06UIViewF0Cvp",
+            "mangledName": "$s4RIBs16ViewControllableP0A5UIKitE16uiviewControllerSo06UIViewF0Cvp",
+            "moduleName": "RIBsUIKit",
+            "declAttributes": [
+              "Custom"
+            ],
+            "isFromExtension": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UIViewController",
+                    "printedName": "UIKit.UIViewController",
+                    "usr": "c:objc(cs)UIViewController"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:4RIBs16ViewControllableP0A5UIKitE16uiviewControllerSo06UIViewF0Cvg",
+                "mangledName": "$s4RIBs16ViewControllableP0A5UIKitE16uiviewControllerSo06UIViewF0Cvg",
+                "moduleName": "RIBsUIKit",
+                "genericSig": "<Self where Self : RIBs.ViewControllable>",
+                "isFromExtension": true,
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:4RIBs16ViewControllableP",
+        "mangledName": "$s4RIBs16ViewControllableP",
+        "moduleName": "RIBs",
+        "genericSig": "<Self : AnyObject>",
+        "declAttributes": [
+          "Custom"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  }
+}

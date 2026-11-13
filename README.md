@@ -1,1 +1,121 @@
 # carti-RIBs-Swift
+
+[uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)를 순수 Swift로 옮긴 크로스플랫폼 RIBs 코어입니다. 자매 프로젝트 carti-RIBs-KMP와 같은 API 모양과 생명주기 순서를 따릅니다.
+
+- Swift 6 언어 모드, 엄격한 동시성, 생명주기 타입은 `@MainActor`
+- 최소 툴체인: 호스트(macOS)·Linux는 Swift 6.2 이상. Wasm·Android는 swift.org 툴체인 6.4.2와 해당 Swift SDK(`swift-6.4.2-RELEASE_wasm`, `swift-6.4.2-RELEASE_android`)
+- Swift Concurrency만 사용(Rx·Combine 없음). 비동기 작업은 `Interactor.task(_:)`로 활성 구간에 묶음
+- 코어 타깃 `RIBs`는 Foundation 없이 표준 라이브러리만 사용 → Linux·Wasm·Android 대상 빌드를 염두에 둠
+- 수동 DI(`Component<Dependency>`), 불투명한 `ViewControllable`
+
+## 사용
+
+```swift
+.package(url: "<repo-url>", branch: "main")
+// target dependencies: ["RIBs"]
+```
+
+## 빌드
+
+```sh
+swift build
+swift test
+```
+
+### 공개 API 검사
+
+공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). KMP의 `checkKotlinAbi`/`updateKotlinAbi`와 같은 흐름입니다. macOS·Xcode에서만 돕니다.
+
+```sh
+scripts/check-api.sh            # 덤프와 비교. 다르면 깨지는 변경과 diff를 출력하고 실패
+scripts/check-api.sh --update   # 공개 API를 의도적으로 바꿨을 때 덤프 갱신(api/를 함께 커밋)
+scripts/check-api.sh --baseline <태그>   # 태그가 생긴 뒤: swift package diagnose-api-breaking-changes도 실행
+```
+
+`RIBsUIKit`은 iOS 시뮬레이터 SDK로 빌드해 덤프합니다. 덤프 표현은 Xcode의 Swift 버전에 따라 달라질 수 있습니다.
+
+### 문서(DocC)
+
+```sh
+swift package generate-documentation --target RIBs --warnings-as-errors
+swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 미리보기
+```
+
+`Sources/RIBs/RIBs.docc`의 한국어 랜딩 문서가 생명주기, 라우팅, Worker, 상태 저장·복원, 플랫폼 어댑터를 설명합니다. `swift-docc-plugin`은 문서 생성에만 쓰는 의존이라 라이브러리 산출물(Wasm·Android 포함)에 들어가지 않습니다(ADR-0012).
+
+### 플랫폼별 상태
+
+| 플랫폼 | 상태 |
+|---|---|
+| macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
+| Linux | 코어는 Foundation 없이 작성됐지만 빌드는 미확인 |
+| Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
+| Windows | 미확인 |
+
+## 진행 상황
+
+| 단계 | 내용 | 상태 |
+|---|---|---|
+| M0 | 패키지 구성, ADR | 완료 |
+| M1 | 코어: Interactor, Router, Builder, Component, Worker, LaunchRouter, RibState, KMP 코어 테스트 스위트 이식 | 완료 |
+| M2 | 어댑터: `RIBsSwiftUI`(슬롯·호스트), `RIBsUIKit`(`uiviewController`, `UIWindow` 호스트, 컨테이너) | 완료 |
+| M3 | `LoginShared` 샘플(Foundation 없음): 로그인·실패·취소, 할 일 목록·상세, 세션 Worker, 테스트 | 완료 (macOS 테스트, Wasm·Android SDK 빌드로 확인) |
+| M4 | `RibState` 저장·복원 연결, `new-rib` 스캐폴딩 플러그인, iOS 앱(Tuist)·XCUITest | 완료 (iOS 시뮬레이터 UI 테스트로 확인) |
+| M5 | 웹: `RIBsWeb`(화면 슬롯·호스트), Wasm 로그인 샘플(JavaScriptKit DOM), 헤드리스 Chrome E2E | 완료 (호스트 단위 테스트, Puppeteer E2E로 확인) |
+| M6 | Android: `RIBsAndroid`(화면 트리 렌더러·슬롯·호스트, 메인 큐↔메인 Looper 연결), 손으로 쓴 JNI + Jetpack Compose 로그인 샘플, 계측 UI 테스트 | 완료 (호스트 단위 테스트, 에뮬레이터 `connectedAndroidTest`로 확인) |
+| M7 | 문서·배포 | 완료 |
+| M8 | 공개 API 덤프 검사, DocC, 웹 상태 복원 | 완료 |
+
+## 샘플
+
+```sh
+swift test --filter LoginSharedTests        # 공유 로직
+cd Samples/iOSLogin && tuist generate --no-open
+xcodebuild test -workspace LoginSample.xcworkspace -scheme LoginSample \
+  -destination 'platform=iOS Simulator,name=iPhone 17'
+```
+
+## 웹(Wasm)
+
+swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다. 화면은 Swift가 JavaScriptKit으로 DOM을 직접 그립니다(ADR-0009).
+
+```sh
+TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin   # Linux는 툴체인 경로의 bin
+swift test --filter RIBsWebTests                      # 슬롯 로직(호스트)
+cd Samples/WebLogin
+$TC/swift package --swift-sdk swift-6.4.2-RELEASE_wasm js   # .build/plugins/PackageToJS/outputs/Package 생성
+npm ci                                                # WASI shim, Puppeteer(Chrome 포함)
+npm run test:e2e                                      # 헤드리스 Chrome으로 로그인 흐름 확인
+python3 -m http.server 8080                           # 브라우저에서 http://localhost:8080 열기
+```
+
+`?loginDelayMillis=<ms>`로 로그인 지연을 바꿀 수 있습니다. 상태는 탭의 `sessionStorage`(`ribs.login.savedState`)에 `pagehide`와 `visibilitychange`(hidden) 때 저장되고, 새로고침하면 `LoginApp.start(savedState:)`로 같은 화면(예: 할 일 상세와 완료 여부)이 돌아옵니다(ADR-0013). E2E가 이 새로고침 복원도 확인합니다. 이름을 `fail`로 넣으면 로그인 실패를 확인할 수 있습니다.
+
+## Android
+
+swift.org 툴체인 6.4.2, Swift SDK `swift-6.4.2-RELEASE_android`(NDK r30에 연결), Android SDK(API 37), JDK 21(Android Studio JBR)이 필요합니다. Swift가 화면 트리를 `RibState` JSON으로 그려 JNI로 Kotlin에 넘기고, Compose가 그 JSON을 그립니다. 입력은 `(화면 id, 동작, 인자)`로 Swift에 돌아갑니다. Swift `@MainActor` 작업은 libdispatch 메인 큐를 메인 Looper에 붙여 Android 메인 스레드에서 돕니다(ADR-0010).
+
+```sh
+export ANDROID_NDK_HOME=~/Library/Android/android-ndk-r30
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin
+swift test --filter RIBsAndroidTests                  # 렌더러·슬롯 로직(호스트)
+cd Samples/AndroidLogin
+(cd app/src/main/swift && swift test)                 # 화면 객체 + LoginShared 흐름(호스트)
+(cd app/src/main/swift && $TC/swift build --swift-sdk aarch64-unknown-linux-android28 --static-swift-stdlib)
+./gradlew :app:assembleDebug                          # Swift .so(arm64-v8a) + libc++_shared.so를 APK에 넣음
+./gradlew :app:connectedDebugAndroidTest              # 에뮬레이터/기기에서 Compose 로그인 흐름 테스트
+```
+
+Gradle은 `SWIFT_EXEC`(swift 경로, 기본값은 위 툴체인), `SWIFT_ANDROID_API`(기본 28, `minSdk`와 같음), `-PswiftAbis=arm64-v8a,x86_64`(기본 arm64-v8a)를 받습니다. 인텐트 값 `loginDelayMillis`로 로그인 지연을 바꿀 수 있습니다.
+
+## 새 RIB 만들기
+
+```sh
+swift package --allow-writing-to-package-directory new-rib \
+  --name Profile --sources Sources/App --tests Tests/AppTests --module App [--swiftui Sources/AppUI]
+```
+
+뷰 계약, Dependency, Listener, Builder, Interactor, Router와 Interactor 테스트, 선택적으로 SwiftUI 화면을 만듭니다. 이미 있는 파일은 덮어쓰지 않습니다.
+
+설계 결정은 [docs/adr](docs/adr/README.md)에 있습니다.

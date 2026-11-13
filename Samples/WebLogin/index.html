@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RIBs Web Login</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    [hidden] { display: none !important; }
+    #errorLabel { color: #c00; }
+    ul { list-style: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <!-- PackageToJS 출력이 bare import하는 WASI shim을 npm으로 받은 로컬 파일에 연결한다(CDN 없이 재현). -->
+  <script type="importmap">
+    { "imports": { "@bjorn3/browser_wasi_shim": "./node_modules/@bjorn3/browser_wasi_shim/dist/index.js" } }
+  </script>
+  <script type="module">
+    import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
+    init();
+  </script>
+</body>
+</html>

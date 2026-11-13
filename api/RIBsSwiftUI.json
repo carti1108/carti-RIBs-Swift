@@ -1,0 +1,767 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "RIBsSwiftUI",
+    "printedName": "RIBsSwiftUI",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "Observation",
+        "printedName": "Observation",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "RIBs",
+        "printedName": "RIBs",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftOnoneSupport",
+        "printedName": "SwiftOnoneSupport",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftUI",
+        "printedName": "SwiftUI",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "_Concurrency",
+        "printedName": "_Concurrency",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "_StringProcessing",
+        "printedName": "_StringProcessing",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "Import",
+        "name": "_SwiftConcurrencyShims",
+        "printedName": "_SwiftConcurrencyShims",
+        "declKind": "Import",
+        "moduleName": "RIBsSwiftUI"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "RIBScreenSlot",
+        "printedName": "RIBScreenSlot",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "current",
+            "printedName": "current",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "(any RIBsSwiftUI.SwiftUIRenderable)?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "SwiftUIRenderable",
+                    "printedName": "any RIBsSwiftUI.SwiftUIRenderable",
+                    "usr": "s:11RIBsSwiftUI0B12UIRenderableP"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotC7currentAA0B12UIRenderable_pSgvp",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC7currentAA0B12UIRenderable_pSgvp",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "SetterAccess",
+              "Custom"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "(any RIBsSwiftUI.SwiftUIRenderable)?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "SwiftUIRenderable",
+                        "printedName": "any RIBsSwiftUI.SwiftUIRenderable",
+                        "usr": "s:11RIBsSwiftUI0B12UIRenderableP"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsSwiftUI13RIBScreenSlotC7currentAA0B12UIRenderable_pSgvg",
+                "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC7currentAA0B12UIRenderable_pSgvg",
+                "moduleName": "RIBsSwiftUI",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "RIBScreenSlot",
+                "printedName": "RIBsSwiftUI.RIBScreenSlot",
+                "usr": "s:11RIBsSwiftUI13RIBScreenSlotC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotCACycfc",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotCACycfc",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "SwiftUIRenderable",
+                "printedName": "any RIBsSwiftUI.SwiftUIRenderable",
+                "usr": "s:11RIBsSwiftUI0B12UIRenderableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotC4showyyAA0B12UIRenderable_pF",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC4showyyAA0B12UIRenderable_pF",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "SwiftUIRenderable",
+                "printedName": "any RIBsSwiftUI.SwiftUIRenderable",
+                "usr": "s:11RIBsSwiftUI0B12UIRenderableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotC4hideyyAA0B12UIRenderable_pF",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC4hideyyAA0B12UIRenderable_pF",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotC4showyy0A016ViewControllable_pF",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC4showyy0A016ViewControllable_pF",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI13RIBScreenSlotC4hideyy0A016ViewControllable_pF",
+            "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC4hideyy0A016ViewControllable_pF",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsSwiftUI13RIBScreenSlotC",
+        "mangledName": "$s11RIBsSwiftUI13RIBScreenSlotC",
+        "moduleName": "RIBsSwiftUI",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Observable",
+            "printedName": "Observable",
+            "usr": "s:11Observation10ObservableP",
+            "mangledName": "$s11Observation10ObservableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "RIBSlotView",
+        "printedName": "RIBSlotView",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(slot:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "RIBSlotView",
+                "printedName": "RIBsSwiftUI.RIBSlotView",
+                "usr": "s:11RIBsSwiftUI11RIBSlotViewV"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "RIBScreenSlot",
+                "printedName": "RIBsSwiftUI.RIBScreenSlot",
+                "usr": "s:11RIBsSwiftUI13RIBScreenSlotC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsSwiftUI11RIBSlotViewV4slotAcA13RIBScreenSlotC_tcfc",
+            "mangledName": "$s11RIBsSwiftUI11RIBSlotViewV4slotAcA13RIBScreenSlotC_tcfc",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Preconcurrency",
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Var",
+            "name": "body",
+            "printedName": "body",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "OpaqueTypeArchetype",
+                "printedName": "some SwiftUI.View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "View",
+                    "printedName": "SwiftUI.View",
+                    "usr": "s:7SwiftUI4ViewP"
+                  }
+                ]
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsSwiftUI11RIBSlotViewV4bodyQrvp",
+            "mangledName": "$s11RIBsSwiftUI11RIBSlotViewV4bodyQrvp",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "Preconcurrency",
+              "Custom"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "OpaqueTypeArchetype",
+                    "printedName": "some SwiftUI.View",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "View",
+                        "printedName": "SwiftUI.View",
+                        "usr": "s:7SwiftUI4ViewP"
+                      }
+                    ]
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsSwiftUI11RIBSlotViewV4bodyQrvg",
+                "mangledName": "$s11RIBsSwiftUI11RIBSlotViewV4bodyQrvg",
+                "moduleName": "RIBsSwiftUI",
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "TypeAlias",
+            "name": "Body",
+            "printedName": "Body",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "OpaqueTypeArchetype",
+                "printedName": "some SwiftUI.View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "View",
+                    "printedName": "SwiftUI.View",
+                    "usr": "s:7SwiftUI4ViewP"
+                  }
+                ]
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:11RIBsSwiftUI11RIBSlotViewV4Bodya",
+            "mangledName": "$s11RIBsSwiftUI11RIBSlotViewV4Bodya",
+            "moduleName": "RIBsSwiftUI",
+            "implicit": true
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:11RIBsSwiftUI11RIBSlotViewV",
+        "mangledName": "$s11RIBsSwiftUI11RIBSlotViewV",
+        "moduleName": "RIBsSwiftUI",
+        "declAttributes": [
+          "Preconcurrency",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "View",
+            "printedName": "View",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Body",
+                "printedName": "Body",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "OpaqueTypeArchetype",
+                    "printedName": "some SwiftUI.View",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "View",
+                        "printedName": "SwiftUI.View",
+                        "usr": "s:7SwiftUI4ViewP"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ],
+            "usr": "s:7SwiftUI4ViewP",
+            "mangledName": "$s7SwiftUI4ViewP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "SwiftUIRenderable",
+        "printedName": "SwiftUIRenderable",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "makeView",
+            "printedName": "makeView()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AnyView",
+                "printedName": "SwiftUI.AnyView",
+                "usr": "s:7SwiftUI7AnyViewV"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI0B12UIRenderableP8makeView0bC003AnyF0VyF",
+            "mangledName": "$s11RIBsSwiftUI0B12UIRenderableP8makeView0bC003AnyF0VyF",
+            "moduleName": "RIBsSwiftUI",
+            "genericSig": "<Self where Self : RIBsSwiftUI.SwiftUIRenderable>",
+            "protocolReq": true,
+            "declAttributes": [
+              "Custom"
+            ],
+            "reqNewWitnessTableEntry": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Protocol",
+        "usr": "s:11RIBsSwiftUI0B12UIRenderableP",
+        "mangledName": "$s11RIBsSwiftUI0B12UIRenderableP",
+        "moduleName": "RIBsSwiftUI",
+        "genericSig": "<Self : RIBs.ViewControllable>",
+        "declAttributes": [
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ViewControllable",
+            "printedName": "ViewControllable",
+            "usr": "s:4RIBs16ViewControllableP",
+            "mangledName": "$s4RIBs16ViewControllableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "SwiftUIViewHost",
+        "printedName": "SwiftUIViewHost",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "slot",
+            "printedName": "slot",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "RIBScreenSlot",
+                "printedName": "RIBsSwiftUI.RIBScreenSlot",
+                "usr": "s:11RIBsSwiftUI13RIBScreenSlotC"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsSwiftUI0B10UIViewHostC4slotAA13RIBScreenSlotCvp",
+            "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC4slotAA13RIBScreenSlotCvp",
+            "moduleName": "RIBsSwiftUI",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "RIBScreenSlot",
+                    "printedName": "RIBsSwiftUI.RIBScreenSlot",
+                    "usr": "s:11RIBsSwiftUI13RIBScreenSlotC"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsSwiftUI0B10UIViewHostC4slotAA13RIBScreenSlotCvg",
+                "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC4slotAA13RIBScreenSlotCvg",
+                "moduleName": "RIBsSwiftUI",
+                "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "SwiftUIViewHost",
+                "printedName": "RIBsSwiftUI.SwiftUIViewHost<View>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ],
+                "usr": "s:11RIBsSwiftUI0B10UIViewHostC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsSwiftUI0B10UIViewHostCACyxGycfc",
+            "mangledName": "$s11RIBsSwiftUI0B10UIViewHostCACyxGycfc",
+            "moduleName": "RIBsSwiftUI",
+            "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI0B10UIViewHostC4showyyxF",
+            "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC4showyyxF",
+            "moduleName": "RIBsSwiftUI",
+            "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsSwiftUI0B10UIViewHostC4hideyyxF",
+            "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC4hideyyxF",
+            "moduleName": "RIBsSwiftUI",
+            "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "TypeAlias",
+            "name": "View",
+            "printedName": "View",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:11RIBsSwiftUI0B10UIViewHostC4Viewa",
+            "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC4Viewa",
+            "moduleName": "RIBsSwiftUI",
+            "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+            "implicit": true
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsSwiftUI0B10UIViewHostC",
+        "mangledName": "$s11RIBsSwiftUI0B10UIViewHostC",
+        "moduleName": "RIBsSwiftUI",
+        "genericSig": "<View where View : RIBsSwiftUI.SwiftUIRenderable>",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewHost",
+            "printedName": "ViewHost",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "View",
+                "printedName": "View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:4RIBs8ViewHostP",
+            "mangledName": "$s4RIBs8ViewHostP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  }
+}
