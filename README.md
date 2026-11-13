@@ -56,7 +56,7 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 
 | 단계 | 내용 | 상태 |
 |---|---|---|
-| M0 | 패키지 구성, CI(macOS·Linux), ADR | 완료 |
+| M0 | 패키지 구성, ADR | 완료 |
 | M1 | 코어: Interactor, Router, Builder, Component, Worker, LaunchRouter, RibState, KMP 코어 테스트 스위트 이식 | 완료 |
 | M2 | 어댑터: `RIBsSwiftUI`(슬롯·호스트), `RIBsUIKit`(`uiviewController`, `UIWindow` 호스트, 컨테이너) | 완료 |
 | M3 | `LoginShared` 샘플(Foundation 없음): 로그인·실패·취소, 할 일 목록·상세, 세션 Worker, 테스트 | 완료 (macOS 테스트, Wasm·Android SDK 빌드로 확인) |
