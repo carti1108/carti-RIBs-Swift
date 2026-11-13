@@ -24,7 +24,7 @@ swift test
 
 ### 공개 API 검사
 
-공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). KMP의 `checkKotlinAbi`/`updateKotlinAbi`와 같은 흐름이고, CI macOS 작업이 실행합니다. macOS·Xcode에서만 돕니다.
+공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). KMP의 `checkKotlinAbi`/`updateKotlinAbi`와 같은 흐름입니다. macOS·Xcode에서만 돕니다.
 
 ```sh
 scripts/check-api.sh            # 덤프와 비교. 다르면 깨지는 변경과 diff를 출력하고 실패
@@ -47,10 +47,10 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 
 | 플랫폼 | 상태 |
 |---|---|
-| macOS·iOS | CI 빌드·테스트, iOS 샘플 UI 테스트 |
-| Linux | CI 빌드·테스트(Swift 6.2 컨테이너) |
+| macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
+| Linux | 코어는 Foundation 없이 작성됐지만 빌드는 미확인 |
 | Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
-| Windows | CI(`windows-latest`, swift.org 6.4.2를 `compnerd/gha-setup-swift`로 설치)에서 `swift build --target RIBs`, `swift test --filter RIBsTests`. 로컬에서는 확인하지 못했고 CI 첫 실행 결과로 확정한다. 종료 테스트는 `#if os(macOS) \|\| os(Linux)`라 빠진다 |
+| Windows | 미확인 |
 
 ## 진행 상황
 
@@ -64,7 +64,7 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 | M5 | 웹: `RIBsWeb`(화면 슬롯·호스트), Wasm 로그인 샘플(JavaScriptKit DOM), 헤드리스 Chrome E2E | 완료 (호스트 단위 테스트, Puppeteer E2E로 확인) |
 | M6 | Android: `RIBsAndroid`(화면 트리 렌더러·슬롯·호스트, 메인 큐↔메인 Looper 연결), 손으로 쓴 JNI + Jetpack Compose 로그인 샘플, 계측 UI 테스트 | 완료 (호스트 단위 테스트, 에뮬레이터 `connectedAndroidTest`로 확인) |
 | M7 | 문서·배포 | 완료 |
-| M8 | 공개 API 덤프 검사, DocC, 웹 상태 복원, Windows CI | 완료 (Windows는 CI에서만 실행, 로컬 미확인) |
+| M8 | 공개 API 덤프 검사, DocC, 웹 상태 복원 | 완료 |
 
 ## 샘플
 
