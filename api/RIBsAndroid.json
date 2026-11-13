@@ -1,0 +1,1035 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "RIBsAndroid",
+    "printedName": "RIBsAndroid",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "CRIBsAndroid",
+        "printedName": "CRIBsAndroid",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "Import",
+        "name": "RIBs",
+        "printedName": "RIBs",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "Import",
+        "name": "SwiftOnoneSupport",
+        "printedName": "SwiftOnoneSupport",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "Import",
+        "name": "_Concurrency",
+        "printedName": "_Concurrency",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "Import",
+        "name": "_StringProcessing",
+        "printedName": "_StringProcessing",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "Import",
+        "name": "_SwiftConcurrencyShims",
+        "printedName": "_SwiftConcurrencyShims",
+        "declKind": "Import",
+        "moduleName": "RIBsAndroid"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AndroidMainLooper",
+        "printedName": "AndroidMainLooper",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "attach",
+            "printedName": "attach()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B10MainLooperO6attachSbyFZ",
+            "mangledName": "$s11RIBsAndroid0B10MainLooperO6attachSbyFZ",
+            "moduleName": "RIBsAndroid",
+            "static": true,
+            "declAttributes": [
+              "DiscardableResult",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Enum",
+        "usr": "s:11RIBsAndroid0B10MainLooperO",
+        "mangledName": "$s11RIBsAndroid0B10MainLooperO",
+        "moduleName": "RIBsAndroid",
+        "isEnumExhaustive": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AndroidRenderer",
+        "printedName": "AndroidRenderer",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "emptyTree",
+            "printedName": "emptyTree",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B8RendererC9emptyTreeSSvpZ",
+            "mangledName": "$s11RIBsAndroid0B8RendererC9emptyTreeSSvpZ",
+            "moduleName": "RIBsAndroid",
+            "static": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B8RendererC9emptyTreeSSvgZ",
+                "mangledName": "$s11RIBsAndroid0B8RendererC9emptyTreeSSvgZ",
+                "moduleName": "RIBsAndroid",
+                "static": true,
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(sink:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidRenderer",
+                "printedName": "RIBsAndroid.AndroidRenderer",
+                "usr": "s:11RIBsAndroid0B8RendererC"
+              },
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(Swift.String) -> Swift.Void",
+                "children": [
+                  {
+                    "kind": "TypeNameAlias",
+                    "name": "Void",
+                    "printedName": "Swift.Void",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Void",
+                        "printedName": "()"
+                      }
+                    ]
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsAndroid0B8RendererC4sinkACySSc_tcfc",
+            "mangledName": "$s11RIBsAndroid0B8RendererC4sinkACySSc_tcfc",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Var",
+            "name": "encodedTree",
+            "printedName": "encodedTree",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B8RendererC11encodedTreeSSvp",
+            "mangledName": "$s11RIBsAndroid0B8RendererC11encodedTreeSSvp",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B8RendererC11encodedTreeSSvg",
+                "mangledName": "$s11RIBsAndroid0B8RendererC11encodedTreeSSvg",
+                "moduleName": "RIBsAndroid",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Function",
+            "name": "render",
+            "printedName": "render()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B8RendererC6renderyyF",
+            "mangledName": "$s11RIBsAndroid0B8RendererC6renderyyF",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "dispatch",
+            "printedName": "dispatch(screenID:action:argument:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "Int64",
+                "printedName": "Swift.Int64",
+                "usr": "s:s5Int64V"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B8RendererC8dispatch8screenID6action8argumentSbs5Int64V_S2StF",
+            "mangledName": "$s11RIBsAndroid0B8RendererC8dispatch8screenID6action8argumentSbs5Int64V_S2StF",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "DiscardableResult",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsAndroid0B8RendererC",
+        "mangledName": "$s11RIBsAndroid0B8RendererC",
+        "moduleName": "RIBsAndroid",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AndroidScreen",
+        "printedName": "AndroidScreen",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "kind",
+            "printedName": "kind",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B6ScreenC4kindSSvp",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC4kindSSvp",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B6ScreenC4kindSSvg",
+                "mangledName": "$s11RIBsAndroid0B6ScreenC4kindSSvg",
+                "moduleName": "RIBsAndroid",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Var",
+            "name": "id",
+            "printedName": "id",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int64",
+                "printedName": "Swift.Int64",
+                "usr": "s:s5Int64V"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B6ScreenC2ids5Int64Vvp",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC2ids5Int64Vvp",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "HasStorage",
+              "Custom"
+            ],
+            "isLet": true,
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int64",
+                    "printedName": "Swift.Int64",
+                    "usr": "s:s5Int64V"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B6ScreenC2ids5Int64Vvg",
+                "mangledName": "$s11RIBsAndroid0B6ScreenC2ids5Int64Vvg",
+                "moduleName": "RIBsAndroid",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(kind:renderer:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidScreen",
+                "printedName": "RIBsAndroid.AndroidScreen",
+                "usr": "s:11RIBsAndroid0B6ScreenC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidRenderer",
+                "printedName": "RIBsAndroid.AndroidRenderer",
+                "usr": "s:11RIBsAndroid0B8RendererC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsAndroid0B6ScreenC4kind8rendererACSS_AA0B8RendererCtcfc",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC4kind8rendererACSS_AA0B8RendererCtcfc",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "state",
+            "printedName": "state()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Dictionary",
+                "printedName": "[Swift.String : RIBs.RibValue]",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "RibValue",
+                    "printedName": "RIBs.RibValue",
+                    "usr": "s:4RIBs8RibValueO"
+                  }
+                ],
+                "usr": "s:SD"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B6ScreenC5stateSDySS0A08RibValueOGyF",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC5stateSDySS0A08RibValueOGyF",
+            "moduleName": "RIBsAndroid",
+            "isOpen": true,
+            "declAttributes": [
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "handle",
+            "printedName": "handle(action:argument:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B6ScreenC6handle6action8argumentySS_SStF",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC6handle6action8argumentySS_SStF",
+            "moduleName": "RIBsAndroid",
+            "isOpen": true,
+            "declAttributes": [
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "setNeedsRender",
+            "printedName": "setNeedsRender()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B6ScreenC14setNeedsRenderyyF",
+            "mangledName": "$s11RIBsAndroid0B6ScreenC14setNeedsRenderyyF",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsAndroid0B6ScreenC",
+        "mangledName": "$s11RIBsAndroid0B6ScreenC",
+        "moduleName": "RIBsAndroid",
+        "isOpen": true,
+        "declAttributes": [
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewControllable",
+            "printedName": "ViewControllable",
+            "usr": "s:4RIBs16ViewControllableP",
+            "mangledName": "$s4RIBs16ViewControllableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AndroidScreenSlot",
+        "printedName": "AndroidScreenSlot",
+        "children": [
+          {
+            "kind": "Var",
+            "name": "current",
+            "printedName": "current",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Optional",
+                "printedName": "RIBsAndroid.AndroidScreen?",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "AndroidScreen",
+                    "printedName": "RIBsAndroid.AndroidScreen",
+                    "usr": "s:11RIBsAndroid0B6ScreenC"
+                  }
+                ],
+                "usr": "s:Sq"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B10ScreenSlotC7currentAA0bC0CSgvp",
+            "mangledName": "$s11RIBsAndroid0B10ScreenSlotC7currentAA0bC0CSgvp",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "HasInitialValue",
+              "Final",
+              "SetterAccess",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Optional",
+                    "printedName": "RIBsAndroid.AndroidScreen?",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "AndroidScreen",
+                        "printedName": "RIBsAndroid.AndroidScreen",
+                        "usr": "s:11RIBsAndroid0B6ScreenC"
+                      }
+                    ],
+                    "usr": "s:Sq"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B10ScreenSlotC7currentAA0bC0CSgvg",
+                "mangledName": "$s11RIBsAndroid0B10ScreenSlotC7currentAA0bC0CSgvg",
+                "moduleName": "RIBsAndroid",
+                "implicit": true,
+                "declAttributes": [
+                  "Final",
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(owner:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidScreenSlot",
+                "printedName": "RIBsAndroid.AndroidScreenSlot",
+                "usr": "s:11RIBsAndroid0B10ScreenSlotC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidScreen",
+                "printedName": "RIBsAndroid.AndroidScreen",
+                "usr": "s:11RIBsAndroid0B6ScreenC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsAndroid0B10ScreenSlotC5ownerAcA0bC0C_tcfc",
+            "mangledName": "$s11RIBsAndroid0B10ScreenSlotC5ownerAcA0bC0C_tcfc",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B10ScreenSlotC4showyy0A016ViewControllable_pF",
+            "mangledName": "$s11RIBsAndroid0B10ScreenSlotC4showyy0A016ViewControllable_pF",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "ViewControllable",
+                "printedName": "any RIBs.ViewControllable",
+                "usr": "s:4RIBs16ViewControllableP"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B10ScreenSlotC4hideyy0A016ViewControllable_pF",
+            "mangledName": "$s11RIBsAndroid0B10ScreenSlotC4hideyy0A016ViewControllable_pF",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Var",
+            "name": "renderedValue",
+            "printedName": "renderedValue",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "RibValue",
+                "printedName": "RIBs.RibValue",
+                "usr": "s:4RIBs8RibValueO"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B10ScreenSlotC13renderedValue0A003RibF0Ovp",
+            "mangledName": "$s11RIBsAndroid0B10ScreenSlotC13renderedValue0A003RibF0Ovp",
+            "moduleName": "RIBsAndroid",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "RibValue",
+                    "printedName": "RIBs.RibValue",
+                    "usr": "s:4RIBs8RibValueO"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B10ScreenSlotC13renderedValue0A003RibF0Ovg",
+                "mangledName": "$s11RIBsAndroid0B10ScreenSlotC13renderedValue0A003RibF0Ovg",
+                "moduleName": "RIBsAndroid",
+                "declAttributes": [
+                  "Final"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsAndroid0B10ScreenSlotC",
+        "mangledName": "$s11RIBsAndroid0B10ScreenSlotC",
+        "moduleName": "RIBsAndroid",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "AndroidViewHost",
+        "printedName": "AndroidViewHost",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init(renderer:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidViewHost",
+                "printedName": "RIBsAndroid.AndroidViewHost<View>",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ],
+                "usr": "s:11RIBsAndroid0B8ViewHostC"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "AndroidRenderer",
+                "printedName": "RIBsAndroid.AndroidRenderer",
+                "usr": "s:11RIBsAndroid0B8RendererC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:11RIBsAndroid0B8ViewHostC8rendererACyxGAA0B8RendererC_tcfc",
+            "mangledName": "$s11RIBsAndroid0B8ViewHostC8rendererACyxGAA0B8RendererC_tcfc",
+            "moduleName": "RIBsAndroid",
+            "genericSig": "<View where View : RIBsAndroid.AndroidScreen>",
+            "declAttributes": [
+              "Custom"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "show",
+            "printedName": "show(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B8ViewHostC4showyyxF",
+            "mangledName": "$s11RIBsAndroid0B8ViewHostC4showyyxF",
+            "moduleName": "RIBsAndroid",
+            "genericSig": "<View where View : RIBsAndroid.AndroidScreen>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "hide",
+            "printedName": "hide(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:11RIBsAndroid0B8ViewHostC4hideyyxF",
+            "mangledName": "$s11RIBsAndroid0B8ViewHostC4hideyyxF",
+            "moduleName": "RIBsAndroid",
+            "genericSig": "<View where View : RIBsAndroid.AndroidScreen>",
+            "declAttributes": [
+              "Final",
+              "Custom"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "TypeAlias",
+            "name": "View",
+            "printedName": "View",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "GenericTypeParam",
+                "printedName": "View"
+              }
+            ],
+            "declKind": "TypeAlias",
+            "usr": "s:11RIBsAndroid0B8ViewHostC0C0a",
+            "mangledName": "$s11RIBsAndroid0B8ViewHostC0C0a",
+            "moduleName": "RIBsAndroid",
+            "genericSig": "<View where View : RIBsAndroid.AndroidScreen>",
+            "implicit": true
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:11RIBsAndroid0B8ViewHostC",
+        "mangledName": "$s11RIBsAndroid0B8ViewHostC",
+        "moduleName": "RIBsAndroid",
+        "genericSig": "<View where View : RIBsAndroid.AndroidScreen>",
+        "declAttributes": [
+          "Final",
+          "Custom"
+        ],
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "ViewHost",
+            "printedName": "ViewHost",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "View",
+                "printedName": "View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "GenericTypeParam",
+                    "printedName": "View"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:4RIBs8ViewHostP",
+            "mangledName": "$s4RIBs8ViewHostP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Copyable",
+            "printedName": "Copyable",
+            "usr": "s:s8CopyableP",
+            "mangledName": "$ss8CopyableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Escapable",
+            "printedName": "Escapable",
+            "usr": "s:s9EscapableP",
+            "mangledName": "$ss9EscapableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "SendableMetatype",
+            "printedName": "SendableMetatype",
+            "usr": "s:s16SendableMetatypeP",
+            "mangledName": "$ss16SendableMetatypeP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  }
+}
