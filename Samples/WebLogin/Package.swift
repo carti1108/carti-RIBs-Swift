@@ -7,15 +7,15 @@ let package = Package(
     name: "WebLogin",
     platforms: [.macOS(.v14)],
     dependencies: [
-        .package(path: "../.."),
+        .package(name: "RIBs", path: "../.."),
         .package(url: "https://github.com/swiftwasm/JavaScriptKit.git", exact: "0.63.0"),
     ],
     targets: [
         .executableTarget(
             name: "WebLogin",
             dependencies: [
-                .product(name: "RIBsWeb", package: "carti-RIBs-Swift"),
-                .product(name: "LoginShared", package: "carti-RIBs-Swift"),
+                .product(name: "RIBsWeb", package: "RIBs"),
+                .product(name: "LoginShared", package: "RIBs"),
                 .product(name: "JavaScriptKit", package: "JavaScriptKit"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ]
