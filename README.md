@@ -2,6 +2,8 @@
 
 [uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)를 순수 Swift로 옮긴 크로스플랫폼 RIBs 코어입니다. 자매 프로젝트 carti-RIBs-KMP와 같은 API 모양과 생명주기 순서를 따릅니다.
 
+RIBs-iOS에 없는 확장이 두 가지 있습니다. 루트를 붙였다 떼는 `Router.mount`/`RibMount`, 트리 상태를 저장·복원하는 `RibState`입니다. RIBs-Android와 KMP 판에서 가져왔고, 쓰지 않으면 RIBs-iOS와 같게 동작합니다(ADR-0016).
+
 - Swift 6 언어 모드, 엄격한 동시성, 생명주기 타입은 `@MainActor`
 - 최소 툴체인: 호스트(macOS)·Linux는 Swift 6.2 이상. Wasm·Android는 swift.org 툴체인 6.4.2와 해당 Swift SDK(`swift-6.4.2-RELEASE_wasm`, `swift-6.4.2-RELEASE_android`)
 - Swift Concurrency만 사용(Rx·Combine 없음). 비동기 작업은 `Interactor.task(_:)`로 활성 구간에 묶음

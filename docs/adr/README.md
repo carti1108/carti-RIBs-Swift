@@ -16,3 +16,4 @@
 | [0012](ADR-0012-docc-plugin-dependency.md) | 문서는 swift-docc-plugin과 RIBs.docc 카탈로그로 만든다 | 채택 |
 | [0013](ADR-0013-web-session-storage-restore.md) | 웹 샘플은 sessionStorage에 RibState를 저장하고 새로고침 때 복원한다 | 채택 |
 | [0015](ADR-0015-sample-root-package-name.md) | 샘플 패키지는 루트 패키지를 디렉터리 이름이 아닌 `RIBs` 이름으로 참조한다 | 채택 |
+| [0016](ADR-0016-mount-and-ribstate-as-extensions.md) | `mount`/`RibMount`와 `RibState`를 RIBs-iOS 밖의 확장으로 유지한다 | 채택 |
