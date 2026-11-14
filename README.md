@@ -52,7 +52,7 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 | macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
 | Linux | Static Linux SDK(musl, x86_64·aarch64)로 `RIBs`·`LoginShared`·`RIBsWeb` 교차 빌드 확인. Linux 호스트가 없어 테스트는 실행하지 않음 |
 | Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
-| Windows | 빌드·테스트 미확인 |
+| Windows | 6.4.2 툴체인으로 `swift build`·`swift test` 통과. Windows 호스트에서 Android `.so` 교차 빌드, x86_64 APK 빌드, 에뮬레이터 계측 테스트 통과 |
 
 ## 진행 상황
 
@@ -111,7 +111,28 @@ cd Samples/AndroidLogin
 ./gradlew :app:connectedDebugAndroidTest              # 에뮬레이터/기기에서 Compose 로그인 흐름 테스트
 ```
 
-Gradle은 `SWIFT_EXEC`(swift 경로, 기본값은 위 툴체인), `SWIFT_ANDROID_API`(기본 28, `minSdk`와 같음), `-PswiftAbis=arm64-v8a,x86_64`(기본 arm64-v8a)를 받습니다. 인텐트 값 `loginDelayMillis`로 로그인 지연을 바꿀 수 있습니다.
+Gradle은 `SWIFT_CLI`(swift 경로, 기본값은 위 툴체인, 없으면 PATH의 `swift`), `SWIFT_ANDROID_API`(기본 28, `minSdk`와 같음), `-PswiftAbis=arm64-v8a,x86_64`(기본 arm64-v8a)를 받습니다. 인텐트 값 `loginDelayMillis`로 로그인 지연을 바꿀 수 있습니다. `SWIFT_EXEC`는 SwiftPM이 `swiftc` 경로로 읽으므로 `swift`를 넣으면 manifest 컴파일이 깨집니다. 설정하지 마세요.
+
+## Windows
+
+swift.org 툴체인 6.4.2(`winget install Swift.Toolchain --version 6.4.2`), Visual Studio Build Tools 2022(C++ 도구, Windows SDK)가 필요합니다. 의존성 체크아웃에 심볼릭 링크가 있어 **개발자 모드**를 켜야 합니다. 명령은 `vcvars64.bat`를 부른 셸에서 실행하고, 설치 직후 새 환경 변수를 못 받은 셸이면 `SDKROOT`를 직접 잡습니다.
+
+```bat
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+set SDKROOT=%LOCALAPPDATA%\Programs\Swift\Platforms\6.4.2\Windows.platform\Developer\SDKs\Windows.sdk\
+swift build && swift test
+```
+
+Android도 Windows 호스트에서 빌드됩니다. Swift SDK를 설치한 뒤 번들의 `setup-android-sdk.sh`를 Git Bash에서 복사 모드로 돌려 NDK에 연결합니다. x86_64 PC의 에뮬레이터는 x86_64 ABI로 빌드합니다.
+
+```sh
+swift sdk install https://download.swift.org/swift-6.4.2-release/android-sdk/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_android.artifactbundle.tar.gz \
+  --checksum 4d6ad63ea74becd58e123ff58b1b48c3be5ec0db0dff0ea5abe37ac007dd3233
+ANDROID_NDK_HOME=$LOCALAPPDATA/Android/Sdk/ndk/30.0.16248370 SWIFT_ANDROID_NDK_LINK=0 \
+  bash ~/.swiftpm/swift-sdks/swift-6.4.2-RELEASE_android.artifactbundle/swift-android/scripts/setup-android-sdk.sh
+cd Samples/AndroidLogin
+gradlew.bat :app:connectedDebugAndroidTest -PswiftAbis=x86_64   # vcvars64 셸, ANDROID_NDK_HOME·JAVA_HOME 설정
+```
 
 ## Linux(교차 빌드)
 

@@ -4,8 +4,9 @@ plugins {
 }
 
 // Swift 라이브러리 빌드 설정(ADR-0010). 기본값은 swift.org 6.4.2 툴체인과 같은 버전의 Swift SDK for Android다.
-// 환경 변수로 바꿀 수 있다: SWIFT_EXEC(swift 실행 파일), SWIFT_ANDROID_API(트리플의 API 수준).
-val swiftExecutable: String = System.getenv("SWIFT_EXEC")
+// 환경 변수로 바꿀 수 있다: SWIFT_CLI(swift 실행 파일), SWIFT_ANDROID_API(트리플의 API 수준).
+// SWIFT_EXEC는 쓰지 않는다. SwiftPM이 그 이름을 swiftc 경로로 읽어서, swift를 넣으면 manifest 컴파일이 깨진다.
+val swiftExecutable: String = System.getenv("SWIFT_CLI")
     ?: "${System.getProperty("user.home")}/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin/swift"
         .takeIf { file(it).exists() }
     ?: "swift"
