@@ -89,7 +89,7 @@ npm run test:e2e                                      # 헤드리스 Chrome으�
 python3 -m http.server 8080                           # 브라우저에서 http://localhost:8080 열기
 ```
 
-`Package.swift`는 루트 패키지를 `.package(name: "RIBs", path: "../..")`로 참조하므로 저장소를 어떤 디렉터리 이름으로 받아도 빌드됩니다(ADR-0014).
+`Package.swift`는 루트 패키지를 `.package(name: "RIBs", path: "../..")`로 참조하므로 저장소를 어떤 디렉터리 이름으로 받아도 빌드됩니다(ADR-0015).
 
 `?loginDelayMillis=<ms>`로 로그인 지연을 바꿀 수 있습니다. 상태는 탭의 `sessionStorage`(`ribs.login.savedState`)에 `pagehide`와 `visibilitychange`(hidden) 때 저장되고, 새로고침하면 `LoginApp.start(savedState:)`로 같은 화면(예: 할 일 상세와 완료 여부)이 돌아옵니다(ADR-0013). E2E가 이 새로고침 복원도 확인합니다. 이름을 `fail`로 넣으면 로그인 실패를 확인할 수 있습니다.
 

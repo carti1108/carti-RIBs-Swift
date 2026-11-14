@@ -6,18 +6,27 @@ import SwiftUI
 @main
 struct LoginSampleApp: App {
     @State private var launcher = AppLauncher()
+
+    var body: some Scene {
+        WindowGroup {
+            LoginRootView(launcher: launcher)
+        }
+    }
+}
+
+/// 장면의 루트 뷰. `@SceneStorage`는 `App`이 아니라 장면 안의 `View`에 있어야 시스템이 값을 저장·복원한다.
+private struct LoginRootView: View {
+    let launcher: AppLauncher
     /// 공유 코드가 만든 `RibState` 문자열. 시스템이 장면을 되살릴 때 돌려준다.
     @SceneStorage("ribState") private var savedState = ""
     @Environment(\.scenePhase) private var scenePhase
 
-    var body: some Scene {
-        WindowGroup {
-            RIBSlotView(slot: launcher.host.slot)
-                .onAppear { launcher.start(savedState: savedState) }
-                .onChange(of: scenePhase) { _, phase in
-                    if phase == .background { savedState = launcher.saveState() }
-                }
-        }
+    var body: some View {
+        RIBSlotView(slot: launcher.host.slot)
+            .onAppear { launcher.start(savedState: savedState) }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .background { savedState = launcher.saveState() }
+            }
     }
 }
 
