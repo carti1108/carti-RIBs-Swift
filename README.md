@@ -2,6 +2,8 @@
 
 [uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)를 순수 Swift로 옮긴 크로스플랫폼 RIBs 코어입니다. 자매 프로젝트 carti-RIBs-KMP와 같은 API 모양과 생명주기 순서를 따릅니다.
 
+RIBs-iOS에 없는 확장이 두 가지 있습니다. 루트를 붙였다 떼는 `Router.mount`/`RibMount`, 트리 상태를 저장·복원하는 `RibState`입니다. RIBs-Android와 KMP 판에서 가져왔고, 쓰지 않으면 RIBs-iOS와 같게 동작합니다(ADR-0016).
+
 - Swift 6 언어 모드, 엄격한 동시성, 생명주기 타입은 `@MainActor`
 - 최소 툴체인: 호스트(macOS)·Linux는 Swift 6.2 이상. Wasm·Android는 swift.org 툴체인 6.4.2와 해당 Swift SDK(`swift-6.4.2-RELEASE_wasm`, `swift-6.4.2-RELEASE_android`)
 - Swift Concurrency만 사용(Rx·Combine 없음). 비동기 작업은 `Interactor.task(_:)`로 활성 구간에 묶음
@@ -48,9 +50,9 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 | 플랫폼 | 상태 |
 |---|---|
 | macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
-| Linux | 코어는 Foundation 없이 작성됐지만 빌드는 미확인 |
+| Linux | Static Linux SDK(musl, x86_64·aarch64)로 `RIBs`·`LoginShared`·`RIBsWeb` 교차 빌드 확인. Linux 호스트가 없어 테스트는 실행하지 않음 |
 | Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
-| Windows | 미확인 |
+| Windows | 빌드·테스트 미확인 |
 
 ## 진행 상황
 
@@ -89,6 +91,8 @@ npm run test:e2e                                      # 헤드리스 Chrome으�
 python3 -m http.server 8080                           # 브라우저에서 http://localhost:8080 열기
 ```
 
+`Package.swift`는 루트 패키지를 `.package(name: "RIBs", path: "../..")`로 참조하므로 저장소를 어떤 디렉터리 이름으로 받아도 빌드됩니다(ADR-0015).
+
 `?loginDelayMillis=<ms>`로 로그인 지연을 바꿀 수 있습니다. 상태는 탭의 `sessionStorage`(`ribs.login.savedState`)에 `pagehide`와 `visibilitychange`(hidden) 때 저장되고, 새로고침하면 `LoginApp.start(savedState:)`로 같은 화면(예: 할 일 상세와 완료 여부)이 돌아옵니다(ADR-0013). E2E가 이 새로고침 복원도 확인합니다. 이름을 `fail`로 넣으면 로그인 실패를 확인할 수 있습니다.
 
 ## Android
@@ -108,6 +112,19 @@ cd Samples/AndroidLogin
 ```
 
 Gradle은 `SWIFT_EXEC`(swift 경로, 기본값은 위 툴체인), `SWIFT_ANDROID_API`(기본 28, `minSdk`와 같음), `-PswiftAbis=arm64-v8a,x86_64`(기본 arm64-v8a)를 받습니다. 인텐트 값 `loginDelayMillis`로 로그인 지연을 바꿀 수 있습니다.
+
+## Linux(교차 빌드)
+
+macOS에서 swift.org 툴체인 6.4.2와 Static Linux SDK로 Linux용 정적 바이너리 타깃을 빌드합니다. Linux 호스트에서 테스트를 돌린 적은 없습니다.
+
+```sh
+TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin
+$TC/swift sdk install https://download.swift.org/swift-6.4.2-release/static-sdk/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_static-linux-0.1.0.artifactbundle.tar.gz \
+  --checksum 3786b179936d9cc9e266dd506bd1654176358d7b25288e243359f4d17cc4dc5a
+for sdk in x86_64-swift-linux-musl aarch64-swift-linux-musl; do
+  for t in RIBs LoginShared RIBsWeb; do $TC/swift build --swift-sdk $sdk --target $t; done
+done
+```
 
 ## 새 RIB 만들기
 
