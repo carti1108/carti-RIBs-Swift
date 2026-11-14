@@ -108,5 +108,6 @@ struct AndroidRendererTests {
 
     @Test func mainLooperAttachIsNoOpOffAndroid() {
         #expect(AndroidMainLooper.attach() == false)
+        #expect(AndroidMainLooper.isMainQueueDraining == false)
     }
 }
