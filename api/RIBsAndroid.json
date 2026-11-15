@@ -52,6 +52,56 @@
         "printedName": "AndroidMainLooper",
         "children": [
           {
+            "kind": "Var",
+            "name": "isMainQueueDraining",
+            "printedName": "isMainQueueDraining",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Bool",
+                "printedName": "Swift.Bool",
+                "usr": "s:Sb"
+              }
+            ],
+            "declKind": "Var",
+            "usr": "s:11RIBsAndroid0B10MainLooperO02isC13QueueDrainingSbvpZ",
+            "mangledName": "$s11RIBsAndroid0B10MainLooperO02isC13QueueDrainingSbvpZ",
+            "moduleName": "RIBsAndroid",
+            "static": true,
+            "declAttributes": [
+              "HasInitialValue",
+              "SetterAccess",
+              "HasStorage",
+              "Custom"
+            ],
+            "hasStorage": true,
+            "accessors": [
+              {
+                "kind": "Accessor",
+                "name": "Get",
+                "printedName": "Get()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Bool",
+                    "printedName": "Swift.Bool",
+                    "usr": "s:Sb"
+                  }
+                ],
+                "declKind": "Accessor",
+                "usr": "s:11RIBsAndroid0B10MainLooperO02isC13QueueDrainingSbvgZ",
+                "mangledName": "$s11RIBsAndroid0B10MainLooperO02isC13QueueDrainingSbvgZ",
+                "moduleName": "RIBsAndroid",
+                "static": true,
+                "implicit": true,
+                "declAttributes": [
+                  "Transparent"
+                ],
+                "accessorKind": "get"
+              }
+            ]
+          },
+          {
             "kind": "Function",
             "name": "attach",
             "printedName": "attach()",

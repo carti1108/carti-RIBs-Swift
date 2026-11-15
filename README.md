@@ -97,7 +97,7 @@ python3 -m http.server 8080                           # 브라우저에서 http:
 
 ## Android
 
-swift.org 툴체인 6.4.2, Swift SDK `swift-6.4.2-RELEASE_android`(NDK r30에 연결), Android SDK(API 37), JDK 21(Android Studio JBR)이 필요합니다. Swift가 화면 트리를 `RibState` JSON으로 그려 JNI로 Kotlin에 넘기고, Compose가 그 JSON을 그립니다. 입력은 `(화면 id, 동작, 인자)`로 Swift에 돌아갑니다. Swift `@MainActor` 작업은 libdispatch 메인 큐를 메인 Looper에 붙여 Android 메인 스레드에서 돕니다(ADR-0010).
+swift.org 툴체인 6.4.2, Swift SDK `swift-6.4.2-RELEASE_android`(NDK r30에 연결), Android SDK(API 37), JDK 21(Android Studio JBR)이 필요합니다. Swift가 화면 트리를 `RibState` JSON으로 그려 JNI로 Kotlin에 넘기고, Compose가 그 JSON을 그립니다. 입력은 `(화면 id, 동작, 인자)`로 Swift에 돌아갑니다. Swift `@MainActor` 작업은 libdispatch 메인 큐를 메인 Looper에 붙여 Android 메인 스레드에서 돕니다(ADR-0010). Swift 6.4.2에는 사용자 정의 메인 실행기 공개 API가 없어 libdispatch SPI를 쓰며, 시작 시 자체검사가 연결이 끊기면 원인을 담아 실패시킵니다(ADR-0014). 계측 테스트는 로그인 흐름 외에 구성 변경(회전)과 프로세스 종료 뒤 상태 복원을 확인합니다.
 
 ```sh
 export ANDROID_NDK_HOME=~/Library/Android/android-ndk-r30

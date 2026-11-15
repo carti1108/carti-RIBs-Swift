@@ -1,5 +1,6 @@
 package com.carti.ribs.samples.swiftandroid
 
+import android.os.Handler
 import android.os.Looper
 
 /**
@@ -23,7 +24,20 @@ object SwiftBridge {
         System.loadLibrary("AndroidLogin")
         // Swift @MainActor 작업(Task, 타이머)이 메인 Looper에서 돌도록 libdispatch 메인 큐를 붙인다.
         check(nativeAttachMainLooper()) { "Failed to attach the Swift main queue to the main Looper" }
+        // 자체검사(ADR-0014): 연결은 libdispatch SPI에 기대므로, Swift가 넣은 확인 Task가 실제로 돌았는지 본다.
+        Handler(Looper.getMainLooper()).postDelayed({
+            check(nativeIsMainQueueDraining()) {
+                "Swift @MainActor work did not run on the main Looper within ${SELF_CHECK_DELAY_MILLIS} ms; " +
+                    "the libdispatch main queue SPI no longer drains (see ADR-0014)"
+            }
+        }, SELF_CHECK_DELAY_MILLIS)
     }
+
+    /** 메인 큐 자체검사까지 기다리는 시간. 첫 Looper 순회는 이보다 훨씬 빨리 끝난다. */
+    private const val SELF_CHECK_DELAY_MILLIS = 2_000L
+
+    /** 메인 큐 자체검사 Task가 실행됐는지. 테스트에서도 쓴다. */
+    fun isMainQueueDraining(): Boolean = nativeIsMainQueueDraining()
 
     /** 트리를 시작한다. `onRender`는 화면 트리(JSON)가 바뀔 때마다 메인 스레드에서 불린다. 저장값으로 되살렸으면 true. */
     fun start(savedState: String?, loginDelayMillis: Long, onRender: (String) -> Unit): Boolean {
@@ -50,6 +64,7 @@ object SwiftBridge {
     }
 
     private external fun nativeAttachMainLooper(): Boolean
+    private external fun nativeIsMainQueueDraining(): Boolean
     private external fun nativeStart(savedState: ByteArray?, loginDelayMillis: Long): Boolean
     private external fun nativeDispatch(screenId: Long, action: ByteArray, argument: ByteArray): Boolean
     private external fun nativeHandleBackPress(): Boolean

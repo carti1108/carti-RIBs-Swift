@@ -35,6 +35,11 @@ public func nativeAttachMainLooper(env: Env, thiz: jobject) -> jboolean {
     MainActor.assumeIsolated { AndroidMainLooper.attach() } ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
 }
 
+@_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeIsMainQueueDraining")
+public func nativeIsMainQueueDraining(env: Env, thiz: jobject) -> jboolean {
+    MainActor.assumeIsolated { AndroidMainLooper.isMainQueueDraining } ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
+}
+
 @_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeStart")
 public func nativeStart(env: Env, thiz: jobject, savedState: jbyteArray?, loginDelayMillis: jlong) -> jboolean {
     let saved = savedState.map { string(env, from: $0) }
