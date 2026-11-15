@@ -157,3 +157,9 @@ swift package --allow-writing-to-package-directory new-rib \
 뷰 계약, Dependency, Listener, Builder, Interactor, Router와 Interactor 테스트, 선택적으로 SwiftUI 화면을 만듭니다. 이미 있는 파일은 덮어쓰지 않습니다.
 
 설계 결정은 [docs/adr](docs/adr/README.md)에 있습니다.
+
+## 라이선스
+
+carti-RIBs-Swift는 [uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)(Copyright (c) 2017 Uber Technologies)의 설계와 API를 바탕으로 Swift Concurrency와 여러 플랫폼용으로 다시 구현한 파생 프로젝트이며, 원본과 같은 Apache License 2.0으로 배포합니다. 원본과 달라진 점은 [docs/upstream-comparison.md](docs/upstream-comparison.md)에 정리했습니다. 전문은 [LICENSE.txt](LICENSE.txt)를 참고하세요.
+
+carti-RIBs-Swift는 Uber의 공식 프로젝트가 아닙니다.
