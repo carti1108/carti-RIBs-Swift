@@ -18,3 +18,5 @@
 | [0014](ADR-0014-android-main-queue-spi-self-check.md) | Android 메인 큐 연결은 libdispatch SPI를 유지하고 시작 시 자체검사한다 | 채택 |
 | [0015](ADR-0015-sample-root-package-name.md) | 샘플 패키지는 루트 패키지를 디렉터리 이름이 아닌 `RIBs` 이름으로 참조한다 | 채택 |
 | [0016](ADR-0016-mount-and-ribstate-as-extensions.md) | `mount`/`RibMount`와 `RibState`를 RIBs-iOS 밖의 확장으로 유지한다 | 채택 |
+| [0017](ADR-0017-allow-foundation-essentials.md) | 코어와 공유 모듈에서 FoundationEssentials를 허용한다 | 제안 |
+| [0018](ADR-0018-rib-snapshot.md) | 트리 저장·복원을 `Codable` 기반 `RibSnapshot`으로 바꾼다 | 제안 |
