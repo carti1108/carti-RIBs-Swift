@@ -37,7 +37,7 @@ final class LoggedOutScreen: LoggedOutViewContract, DOMScreen {
         loadingIndicator = dom.element("p", id: "loadingIndicator", text: "로그인 중…")
         let loginButton = dom.button(id: "loginButton", text: "로그인") { [weak self] in
             guard let self else { return }
-            listener?.didTapLogin(rawName: nameField.value.string ?? "")
+            listener?.handle(.loginTapped(rawName: nameField.value.string ?? ""))
         }
         self.loginButton = loginButton
         errorLabel.setHidden(true)
@@ -45,15 +45,12 @@ final class LoggedOutScreen: LoggedOutViewContract, DOMScreen {
         element.append(dom.element("h1", text: "로그인"), nameField, errorLabel, loadingIndicator, loginButton)
     }
 
-    func showError(_ message: String?) {
-        errorLabel.setText(message ?? "")
-        errorLabel.setHidden(message == nil)
-    }
-
-    func showLoading(_ isLoading: Bool) {
-        loadingIndicator.setHidden(!isLoading)
-        nameField.setDisabled(isLoading)
-        loginButton?.setDisabled(isLoading)
+    func render(_ state: LoggedOutViewState) {
+        errorLabel.setText(state.errorMessage ?? "")
+        errorLabel.setHidden(state.errorMessage == nil)
+        loadingIndicator.setHidden(!state.isLoading)
+        nameField.setDisabled(state.isLoading)
+        loginButton?.setDisabled(state.isLoading)
     }
 }
 

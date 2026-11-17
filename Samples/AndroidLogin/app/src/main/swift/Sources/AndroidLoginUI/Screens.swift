@@ -49,28 +49,23 @@ public final class RootScreen: AndroidScreen, RootViewControllable {
 /// 이름 입력값은 Kotlin(Compose) 화면이 들고 있다가 로그인 입력 때 인자로 넘긴다.
 final class LoggedOutScreen: AndroidScreen, LoggedOutViewContract {
     weak var listener: (any LoggedOutPresentableListener)?
-    private var errorMessage: String?
-    private var isLoading = false
+    private var viewState = LoggedOutViewState()
 
     init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.loggedOut, renderer: renderer) }
 
-    func showError(_ message: String?) {
-        errorMessage = message
-        setNeedsRender()
-    }
-
-    func showLoading(_ isLoading: Bool) {
-        self.isLoading = isLoading
+    /// 공유 코드가 상태를 한 번에 넘기므로 갱신 한 번에 렌더도 한 번이다.
+    func render(_ state: LoggedOutViewState) {
+        viewState = state
         setNeedsRender()
     }
 
     override func state() -> [String: RibValue] {
-        ["error": errorMessage.map(RibValue.string) ?? .null, "loading": .bool(isLoading)]
+        ["error": viewState.errorMessage.map(RibValue.string) ?? .null, "loading": .bool(viewState.isLoading)]
     }
 
     override func handle(action: String, argument: String) {
         guard action == ScreenAction.login else { return }
-        listener?.didTapLogin(rawName: argument)
+        listener?.handle(.loginTapped(rawName: argument))
     }
 }
 

@@ -96,10 +96,12 @@ final class FakeRootView: RootViewControllable {
 @MainActor
 final class FakeLoggedOutView: LoggedOutViewContract {
     weak var listener: (any LoggedOutPresentableListener)?
-    var error: String?
-    var isLoading = false
-    func showError(_ message: String?) { error = message }
-    func showLoading(_ isLoading: Bool) { self.isLoading = isLoading }
+    /// 받은 상태를 순서대로 기록한다. 한 번의 갱신이 한 번의 렌더인지 확인할 때 쓴다.
+    private(set) var renders: [LoggedOutViewState] = []
+    var state: LoggedOutViewState { renders.last ?? LoggedOutViewState() }
+    var error: String? { state.errorMessage }
+    var isLoading: Bool { state.isLoading }
+    func render(_ state: LoggedOutViewState) { renders.append(state) }
 }
 
 @MainActor

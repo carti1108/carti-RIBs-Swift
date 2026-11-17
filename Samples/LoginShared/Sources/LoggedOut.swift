@@ -1,9 +1,28 @@
 import RIBs
 
+/// 화면에 그릴 값 전체. 플랫폼은 이 값만 보고 그린다.
+///
+/// 샘플에서 `ViewState`/`ViewAction` 패턴을 보여 주는 RIB이다. 라이브러리는 이 패턴을 요구하지 않는다.
+/// 다른 RIB(`LoggedIn` 등)은 명령형 메서드를 쓴다. 화면에 맞는 쪽을 고르면 된다.
+/// 상태를 한 값으로 넘기면 에러와 로딩이 한 번에 바뀌어 중간 상태가 화면에 나오지 않는다.
+public struct LoggedOutViewState: Equatable, Sendable {
+    public var errorMessage: String?
+    public var isLoading: Bool
+
+    public init(errorMessage: String? = nil, isLoading: Bool = false) {
+        self.errorMessage = errorMessage
+        self.isLoading = isLoading
+    }
+}
+
 /// 뷰 → 공유 코드: 사용자 입력.
+public enum LoggedOutViewAction: Equatable, Sendable {
+    case loginTapped(rawName: String)
+}
+
 @MainActor
 public protocol LoggedOutPresentableListener: AnyObject {
-    func didTapLogin(rawName: String)
+    func handle(_ action: LoggedOutViewAction)
 }
 
 /// 공유 코드 → 뷰: 플랫폼이 구현하는 뷰 계약.
@@ -11,8 +30,7 @@ public protocol LoggedOutPresentableListener: AnyObject {
 public protocol LoggedOutPresentable: Presentable {
     /// 활성 구간에만 설정된다. 비활성이면 nil이라 입력이 무시된다. 플랫폼은 `weak`로 둔다.
     var listener: (any LoggedOutPresentableListener)? { get set }
-    func showError(_ message: String?)
-    func showLoading(_ isLoading: Bool)
+    func render(_ state: LoggedOutViewState)
 }
 
 /// Router → 뷰. 붙일 자식 화면이 없어 비어 있다.
@@ -50,6 +68,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
     private let authService: any AuthService
     private weak var listener: (any LoggedOutListener)?
     private var isLoggingIn = false
+    private var viewState = LoggedOutViewState()
 
     init(presenter: any LoggedOutPresentable, authService: any AuthService, listener: any LoggedOutListener) {
         self.authService = authService
@@ -59,6 +78,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
 
     override func didBecomeActive() {
         presenter.listener = self
+        presenter.render(viewState)
     }
 
     override func willResignActive() {
@@ -66,14 +86,28 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
         isLoggingIn = false
     }
 
-    func didTapLogin(rawName: String) {
+    func handle(_ action: LoggedOutViewAction) {
+        switch action {
+        case .loginTapped(let rawName): didTapLogin(rawName: rawName)
+        }
+    }
+
+    private func didTapLogin(rawName: String) {
         let name = Self.trimmed(rawName)
         guard !name.isEmpty else {
-            presenter.showError(Self.emptyNameError)
+            update { $0.errorMessage = Self.emptyNameError }
             return
         }
-        presenter.showError(nil)
         login(name)
+    }
+
+    /// 상태를 고치고 한 번만 그린다.
+    private func update(_ change: (inout LoggedOutViewState) -> Void) {
+        var next = viewState
+        change(&next)
+        guard next != viewState else { return }
+        viewState = next
+        presenter.render(next)
     }
 
     private func login(_ userName: String) {
@@ -81,7 +115,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
         isLoggingIn = true
         startTask { [weak self] in
             guard let self else { return }
-            presenter.showLoading(true)
+            update { $0 = LoggedOutViewState(errorMessage: nil, isLoading: true) }
             let result: AuthResult
             do {
                 result = try await authService.signIn(userName: userName)
@@ -89,10 +123,12 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
                 return  // 비활성화로 취소됐다. 뷰는 이미 떨어졌다.
             }
             isLoggingIn = false
-            presenter.showLoading(false)
             switch result {
-            case .success(let name): listener?.didLogin(userName: name)
-            case .failure(let message): presenter.showError(message)
+            case .success(let name):
+                update { $0.isLoading = false }
+                listener?.didLogin(userName: name)
+            case .failure(let message):
+                update { $0 = LoggedOutViewState(errorMessage: message, isLoading: false) }
             }
         }
     }
