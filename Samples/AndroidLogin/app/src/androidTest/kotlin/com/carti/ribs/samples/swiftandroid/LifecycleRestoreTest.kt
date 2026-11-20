@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -64,13 +65,18 @@ class LifecycleRestoreTest {
     fun processDeathRestoresTodoDetailFromSavedState() {
         openDoneTodoDetail()
 
-        // 1) 백그라운드로 보내 onSaveInstanceState가 Swift 상태를 Bundle에 쓰게 한다(API 28+는 onStop에서 저장).
-        scenario.moveToState(Lifecycle.State.CREATED)
-        // 2) 프로세스 종료처럼 메모리 상태를 버린다: ViewModel을 지우면 onCleared → SwiftBridge.stop()으로 Swift 트리가 사라진다.
-        scenario.onActivity { it.viewModelStore.clear() }
-        // 3) 시스템이 저장된 Bundle로 Activity를 다시 만드는 경로. 새 ViewModel이 SavedStateHandle의 값으로 트리를 되살린다.
+        // 프로세스 종료처럼 메모리 상태를 버린다: 옛 Activity가 파괴될 때 ViewModel을 지우면
+        // onCleared → SwiftBridge.stop()으로 Swift 트리가 사라진다.
+        // recreate()보다 먼저 지우면 안 된다. recreate()가 onSaveInstanceState를 다시 부르는데,
+        // 그때 트리가 없으면 저장값이 null로 덮인다.
+        scenario.onActivity { old ->
+            old.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_DESTROY) old.viewModelStore.clear()
+            })
+        }
+        // recreate()가 옛 Activity를 멈추며 Swift 상태를 Bundle에 쓰고, 그 Bundle로 Activity를 다시 만든다.
+        // 새 ViewModel이 SavedStateHandle의 값으로 트리를 되살린다.
         scenario.recreate()
-        scenario.moveToState(Lifecycle.State.RESUMED)
 
         waitForTag(Tags.DETAIL_TITLE)
         compose.onNodeWithTag(Tags.DETAIL_TITLE).assertTextEquals("우유 사기")
