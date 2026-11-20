@@ -1,12 +1,7 @@
 // LoggedOut 화면의 웹 뷰. Swift `LoggedOutViewBridge`(Sources/WebLogin/LoggedOutBridge.swift)를 구현한다.
 // 타입은 BridgeJS가 만든 bridge-js.d.ts의 `LoggedOutViewBridge`, `LoggedOutScreenHandle`을 따른다.
 
-function element(tag, id, text) {
-  const node = document.createElement(tag);
-  if (id) node.id = id;
-  if (text) node.textContent = text;
-  return node;
-}
+import { element } from "./dom.js";
 
 export class LoggedOutView {
   /** 가장 최근에 mount한 화면의 요소들. */

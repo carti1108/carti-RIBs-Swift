@@ -3,7 +3,7 @@ import JavaScriptKit
 import LoginShared
 import RIBsWeb
 
-/// 공유 코드의 `LoginApp`을 시작하고 루트 화면을 `#app`에 붙인다. JS가 `startLoginApp`(LoggedOutBridge.swift)으로 부른다.
+/// 공유 코드의 `LoginApp`을 시작하고 루트 화면을 `#app`에 붙인다. JS가 `startLoginApp`으로 부른다.
 /// E2E 테스트는 `?loginDelayMillis=<ms>`로 로그인 지연을 늘려 로딩 상태를 확실히 잡는다.
 @MainActor
 enum WebLoginMain {
@@ -20,12 +20,12 @@ enum WebLoginMain {
         return .milliseconds(millis)
     }
 
-    static func start(loggedOutView: any LoggedOutViewBridge) {
+    static func start(views: WebViews) {
         precondition(app == nil, "startLoginApp called twice")
         let host = WebViewHost<RootScreen>()
         let container = JSObject.global.document.getElementById("app").object!
         renderer = SlotRenderer(slot: host.slot, container: container)
-        let app = LoginApp(viewFactory: WebViewFactory(loggedOutView: loggedOutView), authService: DelayedAuthService(delay: loginDelay()))
+        let app = LoginApp(viewFactory: WebViewFactory(views: views), authService: DelayedAuthService(delay: loginDelay()))
         do {
             try app.start(host: host, savedState: SavedStateStore.load())
         } catch {
@@ -67,6 +67,22 @@ enum SavedStateStore {
         _ = JSObject.global.addEventListener!("pagehide", onPageHide)
         _ = JSObject.global.document.object!.addEventListener!("visibilitychange", onVisibilityChange)
     }
+}
+
+/// 브라우저 쪽 진입점. 화면별 웹 뷰 구현을 넘겨 앱을 시작한다.
+@JS func startLoginApp(
+    loggedOutView: any LoggedOutViewBridge,
+    loggedInView: any LoggedInViewBridge,
+    todoListView: any TodoListViewBridge,
+    todoDetailView: any TodoDetailViewBridge
+) {
+    nonisolated(unsafe) let views = WebViews(
+        loggedOut: loggedOutView,
+        loggedIn: loggedInView,
+        todoList: todoListView,
+        todoDetail: todoDetailView
+    )
+    MainActor.assumeIsolated { WebLoginMain.start(views: views) }
 }
 
 JavaScriptEventLoop.installGlobalExecutor()

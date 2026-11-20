@@ -3,15 +3,15 @@ import LoginShared
 import RIBs
 import RIBsWeb
 
-/// 루트 화면. 자식 RIB 화면(로그아웃·로그인) 하나를 담는다.
+/// 루트 화면. 자식 RIB 화면(로그아웃·로그인) 하나를 담는다. 그릴 것이 없어 JS 뷰를 두지 않는다.
 @MainActor
 final class RootScreen: RootViewControllable, DOMScreen {
     let element: JSObject
     private let slot = WebScreenSlot()
     private let renderer: SlotRenderer
 
-    init(dom: DOMBuilder) {
-        element = dom.element("div", id: "root")
+    init() {
+        element = DOMBuilder.element("div", id: "root")
         renderer = SlotRenderer(slot: slot, container: element)
     }
 
@@ -28,7 +28,7 @@ final class LoggedOutScreen: LoggedOutViewContract, DOMScreen {
 
     init(view: any LoggedOutViewBridge) {
         self.view = view
-        element = DOMBuilder().element("section", id: "loggedOut")
+        element = DOMBuilder.element("section", id: "loggedOut")
         let handle = LoggedOutScreenHandle { [weak self] rawName in
             self?.listener?.handle(.loginTapped(rawName: rawName))
         }
@@ -40,55 +40,59 @@ final class LoggedOutScreen: LoggedOutViewContract, DOMScreen {
     }
 }
 
+/// 화면 자리와 자식 화면 자리(`content`)를 만들고, 안쪽 배치는 JS 뷰(`LoggedInViewBridge`)에 맡긴다.
 @MainActor
 final class LoggedInScreen: LoggedInViewContract, DOMScreen {
     weak var listener: (any LoggedInPresentableListener)?
     let element: JSObject
-    private let dom = DOMBuilder()
-    private let welcomeLabel: JSObject
-    private let sessionLabel: JSObject
+    private let view: any LoggedInViewBridge
     private let slot = WebScreenSlot()
-    private var renderer: SlotRenderer?
+    private let renderer: SlotRenderer
+    private var userName = ""
+    private var sessionSeconds: Int64 = 0
 
-    init() {
-        element = dom.element("section", id: "loggedIn")
-        welcomeLabel = dom.element("h2", id: "welcomeLabel")
-        sessionLabel = dom.element("p", id: "sessionLabel")
-        let content = dom.element("div", id: "loggedInContent")
-        let logoutButton = dom.button(id: "logoutButton", text: "로그아웃") { [weak self] in
-            self?.listener?.didTapLogout()
-        }
-        element.append(welcomeLabel, sessionLabel, logoutButton, content)
+    init(view: any LoggedInViewBridge) {
+        self.view = view
+        element = DOMBuilder.element("section", id: "loggedIn")
+        let content = DOMBuilder.element("div", id: "loggedInContent")
         renderer = SlotRenderer(slot: slot, container: content)
+        let handle = LoggedInScreenHandle { [weak self] in self?.listener?.didTapLogout() }
+        view.mount(host: element, content: content, handle: handle)
     }
 
-    func showUserName(_ name: String) { welcomeLabel.setText("\(name)님, 환영합니다") }
-    func showSessionSeconds(_ seconds: Int64) { sessionLabel.setText("로그인 \(seconds)초") }
+    func showUserName(_ name: String) {
+        userName = name
+        render()
+    }
+
+    func showSessionSeconds(_ seconds: Int64) {
+        sessionSeconds = seconds
+        render()
+    }
+
     func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
     func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
+
+    private func render() {
+        view.render(userName: userName, sessionSeconds: Int(sessionSeconds))
+    }
 }
 
 @MainActor
 final class TodoListScreen: TodoListViewContract, DOMScreen {
     weak var listener: (any TodoListPresentableListener)?
     let element: JSObject
-    private var dom = DOMBuilder()
+    private let view: any TodoListViewBridge
 
-    init() {
-        element = DOMBuilder().element("ul", id: "todoList")
+    init(view: any TodoListViewBridge) {
+        self.view = view
+        element = DOMBuilder.element("ul", id: "todoList")
+        let handle = TodoListScreenHandle { [weak self] id in self?.listener?.didTapTodo(id: Int64(id)) }
+        view.mount(host: element, handle: handle)
     }
 
     func showTodos(_ todos: [Todo]) {
-        // 이전 행의 클릭 클로저를 함께 버린다.
-        dom = DOMBuilder()
-        _ = element.replaceChildren!()
-        for todo in todos {
-            let row = dom.element("li")
-            row.append(dom.button(id: "todoRow-\(todo.id)", text: (todo.isDone ? "✓ " : "") + todo.title) { [weak self] in
-                self?.listener?.didTapTodo(id: todo.id)
-            })
-            element.append(row)
-        }
+        view.render(rows: todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) })
     }
 }
 
@@ -96,38 +100,42 @@ final class TodoListScreen: TodoListViewContract, DOMScreen {
 final class TodoDetailScreen: TodoDetailViewContract, DOMScreen {
     weak var listener: (any TodoDetailPresentableListener)?
     let element: JSObject
-    private let dom = DOMBuilder()
-    private let titleLabel: JSObject
-    private var toggleButton: JSObject?
+    private let view: any TodoDetailViewBridge
 
-    init() {
-        element = dom.element("section", id: "todoDetail")
-        titleLabel = dom.element("h3", id: "detailTitle")
-        let backButton = dom.button(id: "backButton", text: "← 목록") { [weak self] in self?.listener?.didTapBack() }
-        let toggleButton = dom.button(id: "toggleDoneButton", text: "") { [weak self] in
-            self?.listener?.didTapToggleDone()
-        }
-        self.toggleButton = toggleButton
-        element.append(backButton, titleLabel, toggleButton)
+    init(view: any TodoDetailViewBridge) {
+        self.view = view
+        element = DOMBuilder.element("section", id: "todoDetail")
+        let handle = TodoDetailScreenHandle(
+            onToggleDoneTapped: { [weak self] in self?.listener?.didTapToggleDone() },
+            onBackTapped: { [weak self] in self?.listener?.didTapBack() }
+        )
+        view.mount(host: element, handle: handle)
     }
 
     func showTodo(title: String, isDone: Bool) {
-        titleLabel.setText(title)
-        toggleButton?.setText(isDone ? "완료 취소" : "완료로 표시")
+        view.render(title: title, isDone: isDone)
     }
+}
+
+/// JS가 `startLoginApp`으로 넘긴 화면별 웹 뷰.
+struct WebViews {
+    let loggedOut: any LoggedOutViewBridge
+    let loggedIn: any LoggedInViewBridge
+    let todoList: any TodoListViewBridge
+    let todoDetail: any TodoDetailViewBridge
 }
 
 @MainActor
 final class WebViewFactory: LoginViewFactory {
-    private let loggedOutView: any LoggedOutViewBridge
+    private let views: WebViews
 
-    init(loggedOutView: any LoggedOutViewBridge) {
-        self.loggedOutView = loggedOutView
+    init(views: WebViews) {
+        self.views = views
     }
 
-    func makeRootView() -> RootScreen { RootScreen(dom: DOMBuilder()) }
-    func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen(view: loggedOutView) }
-    func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen() }
-    func makeTodoListView() -> any TodoListViewContract { TodoListScreen() }
-    func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailScreen() }
+    func makeRootView() -> RootScreen { RootScreen() }
+    func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen(view: views.loggedOut) }
+    func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen(view: views.loggedIn) }
+    func makeTodoListView() -> any TodoListViewContract { TodoListScreen(view: views.todoList) }
+    func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailScreen(view: views.todoDetail) }
 }

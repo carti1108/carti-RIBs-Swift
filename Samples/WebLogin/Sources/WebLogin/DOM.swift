@@ -8,39 +8,14 @@ protocol DOMScreen: ViewControllable {
     var element: JSObject { get }
 }
 
-/// 작은 DOM 헬퍼. 이벤트 클로저는 요소가 살아 있는 동안 Swift 쪽에서 붙잡아 둔다.
+/// 화면 자리(빈 요소)를 만든다. 안쪽은 JS 뷰가 그린다.
 @MainActor
-final class DOMBuilder {
-    private static var document: JSObject { JSObject.global.document.object! }
-    private var closures: [JSClosure] = []
-
-    func element(_ tag: String, id: String? = nil, text: String? = nil) -> JSObject {
-        let node = Self.document.createElement!(tag).object!
-        if let id { node.id = .string(id) }
-        if let text { node.textContent = .string(text) }
+enum DOMBuilder {
+    static func element(_ tag: String, id: String) -> JSObject {
+        let node = JSObject.global.document.object!.createElement!(tag).object!
+        node.id = .string(id)
         return node
     }
-
-    func button(id: String, text: String, onClick: @escaping @MainActor () -> Void) -> JSObject {
-        let node = element("button", id: id, text: text)
-        let closure = JSClosure { _ in
-            MainActor.assumeIsolated { onClick() }
-            return .undefined
-        }
-        closures.append(closure)
-        node.onclick = .object(closure)
-        return node
-    }
-}
-
-extension JSObject {
-    func append(_ children: JSObject...) {
-        children.forEach { _ = self.appendChild!($0) }
-    }
-
-    func setText(_ text: String) { self["textContent"] = .string(text) }
-    func setHidden(_ hidden: Bool) { self["hidden"] = .boolean(hidden) }
-    func setDisabled(_ disabled: Bool) { self["disabled"] = .boolean(disabled) }
 }
 
 /// `WebScreenSlot`을 구독해 지금 화면의 요소만 `container` 안에 둔다.

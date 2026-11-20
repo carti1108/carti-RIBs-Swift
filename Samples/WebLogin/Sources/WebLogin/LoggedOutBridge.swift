@@ -5,7 +5,8 @@ import LoginShared
 // Wasm은 단일 스레드라 모든 호출이 메인에서 온다. `MainActor.assumeIsolated`로 확인한다.
 
 /// 웹 뷰가 구현한다. 뷰를 무엇으로 만들지는 정하지 않는다. 이 샘플은 `views/logged-out-view.js`가 구현한다.
-/// 객체 하나가 LoggedOut 화면 여러 개를 차례로 맡는다(로그아웃할 때마다 새 화면이 생긴다).
+/// 화면 종류마다 뷰 객체는 하나이고, 그 객체가 같은 종류의 화면 여러 개를 차례로 맡는다(로그아웃할 때마다 새 화면이 생긴다).
+/// 다른 화면의 브리지(`LoggedInBridge.swift` 등)도 같은 규칙을 따른다.
 @JS protocol LoggedOutViewBridge {
     /// 새 LoggedOut 화면이 생길 때 불린다. `host` 안에 화면을 그리고 `handle`로 입력을 보낸다.
     func mount(host: JSObject, handle: LoggedOutScreenHandle)
@@ -24,10 +25,4 @@ import LoginShared
     @JS func loginTapped(rawName: String) {
         MainActor.assumeIsolated { onLoginTapped(rawName) }
     }
-}
-
-/// 브라우저 쪽 진입점. 웹 뷰 구현을 넘겨 앱을 시작한다.
-@JS func startLoginApp(loggedOutView: any LoggedOutViewBridge) {
-    nonisolated(unsafe) let loggedOutView = loggedOutView
-    MainActor.assumeIsolated { WebLoginMain.start(loggedOutView: loggedOutView) }
 }
