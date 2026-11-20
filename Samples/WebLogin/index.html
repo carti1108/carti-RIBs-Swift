@@ -19,7 +19,10 @@
   </script>
   <script type="module">
     import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-    init();
+    import { LoggedOutView } from "./views/logged-out-view.js";
+    // LoggedOut 화면은 JS 뷰가 그린다. Swift가 정의한 LoggedOutViewBridge를 구현한 객체를 넘겨 앱을 시작한다.
+    const { exports } = await init();
+    exports.startLoginApp(new LoggedOutView());
   </script>
 </body>
 </html>

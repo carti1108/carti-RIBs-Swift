@@ -19,38 +19,24 @@ final class RootScreen: RootViewControllable, DOMScreen {
     func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
 }
 
+/// 화면 자리(`element`)만 만들고, 안쪽은 JS 뷰(`LoggedOutViewBridge`)가 그린다.
 @MainActor
 final class LoggedOutScreen: LoggedOutViewContract, DOMScreen {
     weak var listener: (any LoggedOutPresentableListener)?
     let element: JSObject
-    private let dom = DOMBuilder()
-    private let nameField: JSObject
-    private let errorLabel: JSObject
-    private let loadingIndicator: JSObject
-    private var loginButton: JSObject?
+    private let view: any LoggedOutViewBridge
 
-    init() {
-        element = dom.element("section", id: "loggedOut")
-        nameField = dom.element("input", id: "nameField")
-        nameField.placeholder = .string("이름")
-        errorLabel = dom.element("p", id: "errorLabel")
-        loadingIndicator = dom.element("p", id: "loadingIndicator", text: "로그인 중…")
-        let loginButton = dom.button(id: "loginButton", text: "로그인") { [weak self] in
-            guard let self else { return }
-            listener?.handle(.loginTapped(rawName: nameField.value.string ?? ""))
+    init(view: any LoggedOutViewBridge) {
+        self.view = view
+        element = DOMBuilder().element("section", id: "loggedOut")
+        let handle = LoggedOutScreenHandle { [weak self] rawName in
+            self?.listener?.handle(.loginTapped(rawName: rawName))
         }
-        self.loginButton = loginButton
-        errorLabel.setHidden(true)
-        loadingIndicator.setHidden(true)
-        element.append(dom.element("h1", text: "로그인"), nameField, errorLabel, loadingIndicator, loginButton)
+        view.mount(host: element, handle: handle)
     }
 
     func render(_ state: LoggedOutViewState) {
-        errorLabel.setText(state.errorMessage ?? "")
-        errorLabel.setHidden(state.errorMessage == nil)
-        loadingIndicator.setHidden(!state.isLoading)
-        nameField.setDisabled(state.isLoading)
-        loginButton?.setDisabled(state.isLoading)
+        view.render(errorMessage: state.errorMessage, isLoading: state.isLoading)
     }
 }
 
@@ -133,8 +119,14 @@ final class TodoDetailScreen: TodoDetailViewContract, DOMScreen {
 
 @MainActor
 final class WebViewFactory: LoginViewFactory {
+    private let loggedOutView: any LoggedOutViewBridge
+
+    init(loggedOutView: any LoggedOutViewBridge) {
+        self.loggedOutView = loggedOutView
+    }
+
     func makeRootView() -> RootScreen { RootScreen(dom: DOMBuilder()) }
-    func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen() }
+    func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen(view: loggedOutView) }
     func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen() }
     func makeTodoListView() -> any TodoListViewContract { TodoListScreen() }
     func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailScreen() }
