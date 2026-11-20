@@ -1,8 +1,8 @@
 # carti-RIBs-Swift
 
-[uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)를 순수 Swift로 옮긴 크로스플랫폼 RIBs 코어입니다. 자매 프로젝트 carti-RIBs-KMP와 같은 API 모양과 생명주기 순서를 따릅니다.
+[uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)를 순수 Swift로 옮긴 크로스플랫폼 RIBs 코어입니다.
 
-RIBs-iOS에 없는 확장이 두 가지 있습니다. 루트를 붙였다 떼는 `Router.mount`/`RibMount`, 트리 상태를 저장·복원하는 `RibState`입니다. RIBs-Android와 KMP 판에서 가져왔고, 쓰지 않으면 RIBs-iOS와 같게 동작합니다(ADR-0016).
+RIBs-iOS에 없는 확장이 두 가지 있습니다. 루트를 붙였다 떼는 `Router.mount`/`RibMount`, 트리 상태를 저장·복원하는 `RibState`입니다. RIBs-Android에서 가져왔고, 쓰지 않으면 RIBs-iOS와 같게 동작합니다(ADR-0016).
 
 - Swift 6 언어 모드, 엄격한 동시성, 생명주기 타입은 `@MainActor`
 - 최소 툴체인: 호스트(macOS)·Linux는 Swift 6.2 이상. Wasm·Android는 swift.org 툴체인 6.4.2와 해당 Swift SDK(`swift-6.4.2-RELEASE_wasm`, `swift-6.4.2-RELEASE_android`)
@@ -26,7 +26,7 @@ swift test
 
 ### 공개 API 검사
 
-공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). KMP의 `checkKotlinAbi`/`updateKotlinAbi`와 같은 흐름입니다. macOS·Xcode에서만 돕니다.
+공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). macOS·Xcode에서만 돕니다.
 
 ```sh
 scripts/check-api.sh            # 덤프와 비교. 다르면 깨지는 변경과 diff를 출력하고 실패
@@ -59,7 +59,7 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 | 단계 | 내용 | 상태 |
 |---|---|---|
 | M0 | 패키지 구성, ADR | 완료 |
-| M1 | 코어: Interactor, Router, Builder, Component, Worker, LaunchRouter, RibState, KMP 코어 테스트 스위트 이식 | 완료 |
+| M1 | 코어: Interactor, Router, Builder, Component, Worker, LaunchRouter, RibState, 코어 테스트 스위트 | 완료 |
 | M2 | 어댑터: `RIBsSwiftUI`(슬롯·호스트), `RIBsUIKit`(`uiviewController`, `UIWindow` 호스트, 컨테이너) | 완료 |
 | M3 | `LoginShared` 샘플(Foundation 없음): 로그인·실패·취소, 할 일 목록·상세, 세션 Worker, 테스트 | 완료 (macOS 테스트, Wasm·Android SDK 빌드로 확인) |
 | M4 | `RibState` 저장·복원 연결, `new-rib` 스캐폴딩 플러그인, iOS 앱(Tuist)·XCUITest | 완료 (iOS 시뮬레이터 UI 테스트로 확인) |
