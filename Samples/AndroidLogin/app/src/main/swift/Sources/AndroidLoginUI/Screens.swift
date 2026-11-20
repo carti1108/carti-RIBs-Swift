@@ -12,7 +12,6 @@ public enum ScreenKind {
 }
 
 public enum ScreenAction {
-    public static let login = "login"
     public static let logout = "logout"
     public static let selectTodo = "selectTodo"
     public static let toggleDone = "toggleDone"
@@ -23,13 +22,23 @@ public enum ScreenAction {
 @MainActor
 public final class AndroidLoginViewFactory: LoginViewFactory {
     private let renderer: AndroidRenderer
+    private var loggedOutScreens: [WeakLoggedOutScreen] = []
 
     public init(renderer: AndroidRenderer) {
         self.renderer = renderer
     }
 
+    /// 살아 있는 LoggedOut 화면을 화면 id로 찾는다. 다른 종류의 화면이거나 이미 내려갔으면 nil.
+    func loggedOutScreen(id: Int64) -> LoggedOutScreen? {
+        loggedOutScreens.lazy.compactMap(\.screen).first { $0.id == id }
+    }
+
     public func makeRootView() -> RootScreen { RootScreen(renderer: renderer) }
-    public func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen(renderer: renderer) }
+    public func makeLoggedOutView() -> any LoggedOutViewContract {
+        let screen = LoggedOutScreen(renderer: renderer)
+        loggedOutScreens = loggedOutScreens.filter { $0.screen != nil } + [WeakLoggedOutScreen(screen: screen)]
+        return screen
+    }
     public func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen(renderer: renderer) }
     public func makeTodoListView() -> any TodoListViewContract { TodoListScreen(renderer: renderer) }
     public func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailScreen(renderer: renderer) }
@@ -46,26 +55,36 @@ public final class RootScreen: AndroidScreen, RootViewControllable {
     override public func state() -> [String: RibValue] { ["child": slot.renderedValue] }
 }
 
+private struct WeakLoggedOutScreen {
+    weak var screen: LoggedOutScreen?
+}
+
+/// 화면 트리에는 `kind`와 `id`만 싣는다. 상태와 입력은 문자열 키 대신 타입 있는 통로(`attach`/`send`)로 오간다.
 /// 이름 입력값은 Kotlin(Compose) 화면이 들고 있다가 로그인 입력 때 인자로 넘긴다.
-final class LoggedOutScreen: AndroidScreen, LoggedOutViewContract {
-    weak var listener: (any LoggedOutPresentableListener)?
+public final class LoggedOutScreen: AndroidScreen, LoggedOutViewContract {
+    public weak var listener: (any LoggedOutPresentableListener)?
     private var viewState = LoggedOutViewState()
+    private var onRender: ((LoggedOutViewState) -> Void)?
 
     init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.loggedOut, renderer: renderer) }
 
-    /// 공유 코드가 상태를 한 번에 넘기므로 갱신 한 번에 렌더도 한 번이다.
-    func render(_ state: LoggedOutViewState) {
+    public func render(_ state: LoggedOutViewState) {
         viewState = state
-        setNeedsRender()
+        onRender?(state)
     }
 
-    override func state() -> [String: RibValue] {
-        ["error": viewState.errorMessage.map(RibValue.string) ?? .null, "loading": .bool(viewState.isLoading)]
+    /// 플랫폼 뷰를 붙인다. 붙는 즉시 현재 상태를 한 번 그리게 한다.
+    public func attach(onRender: @escaping (LoggedOutViewState) -> Void) {
+        self.onRender = onRender
+        onRender(viewState)
     }
 
-    override func handle(action: String, argument: String) {
-        guard action == ScreenAction.login else { return }
-        listener?.handle(.loginTapped(rawName: argument))
+    public func detach() {
+        onRender = nil
+    }
+
+    public func send(_ action: LoggedOutViewAction) {
+        listener?.handle(action)
     }
 }
 

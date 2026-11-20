@@ -12,16 +12,22 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.carti.ribs.samples.swiftandroid.bridge.LoggedOutScreenHandle
+import com.carti.ribs.samples.swiftandroid.bridge.LoggedOutViewBridge
+import java.util.Optional
 import org.json.JSONObject
+import org.swift.swiftkit.core.SwiftArena
 
 /** 테스트와 화면이 같이 쓰는 태그. iOS·KMP 샘플과 이름을 맞췄다. */
 object Tags {
@@ -48,7 +54,6 @@ private object Kind {
 }
 
 private object Action {
-    const val LOGIN = "login"
     const val LOGOUT = "logout"
     const val SELECT_TODO = "selectTodo"
     const val TOGGLE_DONE = "toggleDone"
@@ -68,7 +73,7 @@ fun RibNode(node: JSONObject?, send: Send) {
     key(id) {
         when (node.getString("kind")) {
             Kind.ROOT -> RibNode(node.optJSONObject("child"), send)
-            Kind.LOGGED_OUT -> LoggedOutScreen(node) { send(id, Action.LOGIN, it) }
+            Kind.LOGGED_OUT -> LoggedOutScreen(id)
             Kind.LOGGED_IN -> LoggedInScreen(node, send) { send(id, Action.LOGOUT, "") }
             Kind.TODO_LIST -> TodoListScreen(node) { send(id, Action.SELECT_TODO, it.toString()) }
             Kind.TODO_DETAIL -> TodoDetailScreen(
@@ -81,11 +86,38 @@ fun RibNode(node: JSONObject?, send: Send) {
     }
 }
 
+/** Swift `LoggedOutViewBridge`(AndroidLogin/LoggedOutBridge.swift)의 Compose 쪽 구현. Swift가 넘긴 값을 Compose 상태로 든다. */
+private class LoggedOutView : LoggedOutViewBridge {
+    var errorMessage: String? by mutableStateOf(null)
+        private set
+    var isLoading: Boolean by mutableStateOf(false)
+        private set
+
+    override fun render(errorMessage: Optional<String>, isLoading: Boolean) {
+        this.errorMessage = errorMessage.orElse(null)
+        this.isLoading = isLoading
+    }
+}
+
+/**
+ * 화면 트리에서는 `id`만 받는다. 상태와 입력은 swift-java가 만든 `LoggedOutScreenHandle`로 오간다.
+ * 핸들의 Swift 메모리는 화면이 컴포지션을 떠날 때 arena를 닫아 푼다.
+ */
 @Composable
-private fun LoggedOutScreen(node: JSONObject, onLogin: (String) -> Unit) {
+private fun LoggedOutScreen(screenId: Long) {
     var name by rememberSaveable { mutableStateOf("") }
-    val isLoading = node.getBoolean("loading")
-    val error = if (node.isNull("error")) null else node.getString("error")
+    val view = remember { LoggedOutView() }
+    val arena = remember { SwiftArena.ofConfined() }
+    val handle = remember { LoggedOutScreenHandle.init(screenId, arena) }
+    DisposableEffect(handle) {
+        handle.attach(view)
+        onDispose {
+            handle.detach()
+            arena.close()
+        }
+    }
+    val isLoading = view.isLoading
+    val error = view.errorMessage
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -102,7 +134,7 @@ private fun LoggedOutScreen(node: JSONObject, onLogin: (String) -> Unit) {
         )
         error?.let { Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(Tags.ERROR_LABEL)) }
         if (isLoading) CircularProgressIndicator(modifier = Modifier.testTag(Tags.LOADING_INDICATOR))
-        Button(onClick = { onLogin(name) }, enabled = !isLoading, modifier = Modifier.testTag(Tags.LOGIN_BUTTON)) {
+        Button(onClick = { handle.loginTapped(name) }, enabled = !isLoading, modifier = Modifier.testTag(Tags.LOGIN_BUTTON)) {
             Text("로그인")
         }
     }

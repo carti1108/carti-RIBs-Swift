@@ -23,6 +23,12 @@ private final class ManualClock: LoginClock {
     var hasWaiters: Bool { !waiters.isEmpty }
 }
 
+/// 화면이 그리라고 넘긴 상태 기록.
+@MainActor
+private final class RenderLog {
+    var states: [LoggedOutViewState] = []
+}
+
 @MainActor
 private func settle() async {
     for _ in 0..<20 { await Task.yield() }
@@ -51,22 +57,61 @@ struct AndroidLoginControllerTests {
         #expect(controller.dispatch(screenID: id, action: action, argument: argument))
     }
 
+    /// 지금 떠 있는 LoggedOut 화면에 붙어, 받은 상태를 순서대로 모은다.
+    private func attachLoggedOut() throws -> (screen: LoggedOutScreen, rendered: RenderLog) {
+        let id = try #require(child(try tree())?["id"]?.intValue)
+        let screen = try #require(controller.loggedOutScreen(id: id))
+        let rendered = RenderLog()
+        screen.attach { rendered.states.append($0) }
+        return (screen, rendered)
+    }
+
     @Test func startsOnLoggedOutScreen() throws {
         controller.start(savedState: nil)
         #expect(child(try tree())?["kind"] == .string(ScreenKind.loggedOut))
     }
 
+    @Test func attachReplaysCurrentLoggedOutState() throws {
+        controller.start(savedState: nil)
+        let (_, rendered) = try attachLoggedOut()
+        #expect(rendered.states == [LoggedOutViewState()])
+    }
+
+    @Test func loggedOutStateStaysOutOfTree() throws {
+        controller.start(savedState: nil)
+        let loggedOut = child(try tree())
+        #expect(loggedOut?["error"] == nil)
+        #expect(loggedOut?["loading"] == nil)
+    }
+
+    @Test func loggedOutScreenLookupRejectsOtherScreens() throws {
+        controller.start(savedState: nil)
+        let rootID = try #require(try tree()["id"]?.intValue)
+        #expect(controller.loggedOutScreen(id: rootID) == nil)
+        #expect(controller.loggedOutScreen(id: -1) == nil)
+    }
+
     @Test func blankNameShowsError() throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "   ")
-        #expect(child(try tree())?["error"] == .string("이름을 입력하세요"))
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: "   "))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: "이름을 입력하세요", isLoading: false))
+    }
+
+    @Test func detachStopsRendering() throws {
+        controller.start(savedState: nil)
+        let (screen, rendered) = try attachLoggedOut()
+        screen.detach()
+        screen.send(.loginTapped(rawName: "   "))
+        #expect(rendered.states.count == 1)
     }
 
     @Test func loginShowsLoadingThenLoggedInAndLogoutReturns() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, " carti ")
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: " carti "))
         await settle()
-        #expect(child(try tree())?["loading"] == .bool(true))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: nil, isLoading: true))
 
         await clock.advance()
         let loggedIn = child(try tree())
@@ -76,22 +121,21 @@ struct AndroidLoginControllerTests {
 
         try send(loggedIn, ScreenAction.logout)
         #expect(child(try tree())?["kind"] == .string(ScreenKind.loggedOut))
-        #expect(child(try tree())?["error"] == .null)
+        #expect(try attachLoggedOut().rendered.states == [LoggedOutViewState()])
     }
 
     @Test func failingNameShowsServerError() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "fail")
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: "fail"))
         await settle()
         await clock.advance()
-        let loggedOut = child(try tree())
-        #expect(loggedOut?["error"] == .string("로그인에 실패했습니다"))
-        #expect(loggedOut?["loading"] == .bool(false))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: "로그인에 실패했습니다", isLoading: false))
     }
 
     @Test func detailToggleAndBackPress() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "carti")
+        try attachLoggedOut().screen.send(.loginTapped(rawName: "carti"))
         await settle()
         await clock.advance()
         try send(child(child(try tree())), ScreenAction.selectTodo, "1")
@@ -112,7 +156,7 @@ struct AndroidLoginControllerTests {
 
     @Test func savedStateRestoresLoggedInUser() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "carti")
+        try attachLoggedOut().screen.send(.loginTapped(rawName: "carti"))
         await settle()
         await clock.advance()
         let saved = controller.saveState()

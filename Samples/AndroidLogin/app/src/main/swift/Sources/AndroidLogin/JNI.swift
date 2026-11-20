@@ -13,7 +13,6 @@ public typealias Env = UnsafeMutablePointer<JNIEnv?>
 private let bridgeClassName = "com/carti/ribs/samples/swiftandroid/SwiftBridge"
 
 /// 메인 스레드 전용 상태. `MainActor`로 격리한다.
-@MainActor private var controller: AndroidLoginController?
 @MainActor private var renderTarget: RenderTarget?
 nonisolated(unsafe) private var javaVM: UnsafeMutablePointer<JavaVM?>?
 

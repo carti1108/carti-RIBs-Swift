@@ -1,16 +1,19 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 import PackageDescription
 
 // Android 앱에 넣을 Swift 라이브러리(libAndroidLogin.so). Gradle이 Swift SDK for Android로 빌드한다(ADR-0010).
 // AndroidLoginUI는 JNI 없이 호스트(macOS/Linux)에서도 빌드·테스트된다.
+// AndroidLogin은 swift-java(JNI 모드)가 public 타입의 Java 바인딩을 만든다. 빌드에 JAVA_HOME(JDK 21)과
+// `swift build --disable-sandbox`가 필요하다. 플러그인이 내부에서 Gradle로 swiftkit-core를 만든다.
 let package = Package(
     name: "AndroidLoginSwift",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v15)],
     products: [
         .library(name: "AndroidLogin", type: .dynamic, targets: ["AndroidLogin"]),
     ],
     dependencies: [
         .package(name: "RIBs", path: "../../../../../.."),
+        .package(url: "https://github.com/swiftlang/swift-java", exact: "0.7.0"),
     ],
     targets: [
         .target(
@@ -21,7 +24,12 @@ let package = Package(
                 .product(name: "LoginShared", package: "RIBs"),
             ]
         ),
-        .target(name: "AndroidLogin", dependencies: ["AndroidLoginUI"]),
+        .target(
+            name: "AndroidLogin",
+            dependencies: ["AndroidLoginUI", .product(name: "SwiftJava", package: "swift-java")],
+            exclude: ["swift-java.config"],
+            plugins: [.plugin(name: "JExtractSwiftPlugin", package: "swift-java")]
+        ),
         .testTarget(name: "AndroidLoginUITests", dependencies: ["AndroidLoginUI"]),
     ],
     swiftLanguageModes: [.v6]
