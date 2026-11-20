@@ -58,16 +58,6 @@ public func nativeStart(env: Env, thiz: jobject, savedState: jbyteArray?, loginD
     return restored ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
 }
 
-@_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeDispatch")
-public func nativeDispatch(env: Env, thiz: jobject, screenID: jlong, action: jbyteArray, argument: jbyteArray) -> jboolean {
-    let action = string(env, from: action)
-    let argument = string(env, from: argument)
-    let handled = MainActor.assumeIsolated {
-        controller?.dispatch(screenID: screenID, action: action, argument: argument) ?? false
-    }
-    return handled ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
-}
-
 @_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeHandleBackPress")
 public func nativeHandleBackPress(env: Env, thiz: jobject) -> jboolean {
     MainActor.assumeIsolated { controller?.handleBackPress() ?? false } ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)

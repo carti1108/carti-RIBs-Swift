@@ -34,6 +34,6 @@ public final class LoggedOutScreenHandle: Sendable {
     }
 
     @MainActor private var screen: LoggedOutScreen? {
-        controller?.loggedOutScreen(id: screenID)
+        controller?.screen(id: screenID, as: LoggedOutScreen.self)
     }
 }
