@@ -24,3 +24,4 @@
 | [0020](ADR-0020-per-screen-view-bridge.md) | 플랫폼 뷰 경계는 화면마다 격리 없는 브리지 프로토콜 하나와 핸들 클래스 하나로 둔다 | 채택 |
 | [0021](ADR-0021-android-view-bridge-via-swift-java.md) | Android 뷰 브리지는 swift-java(JNI 모드)로 생성하고 Swift 런타임을 동적 라이브러리로 싣는다 | 채택 |
 | [0022](ADR-0022-web-view-bridge-via-bridgejs.md) | Web 뷰 브리지는 BridgeJS로 생성하고 뷰는 JS가 그린다 | 채택 |
+| [0023](ADR-0023-screen-structure-outside-view-bridge.md) | 화면 구조는 브리지 밖에 두고, 목록 항목은 경계용 값 타입으로 넘긴다 | 채택 |
