@@ -130,7 +130,7 @@ final class LoginAppTests {
         try await startLoggedIn()
         let loggedIn = try #require(factory.loggedIn.last)
 
-        loggedIn.listener?.didTapLogout()
+        loggedIn.listener?.handle(.logoutTapped)
 
         #expect(factory.loggedOut.count == 2)
         #expect(factory.root.screen === loggedOut)
@@ -148,7 +148,7 @@ final class LoginAppTests {
     @Test func selectingTodoPushesDetailAndBackPopsIt() async throws {
         try await startLoggedIn()
 
-        factory.todoLists.last?.listener?.didTapTodo(id: 2)
+        factory.todoLists.last?.listener?.handle(.todoTapped(id: 2))
         #expect(factory.loggedIn.last?.screen === factory.todoDetails.last)
         #expect(factory.todoDetails.last?.title == "RIB 문서 읽기")
 
@@ -167,10 +167,10 @@ final class LoginAppTests {
 
     @Test func togglingDoneInDetailUpdatesListThroughSharedStore() async throws {
         try await startLoggedIn()
-        factory.todoLists.last?.listener?.didTapTodo(id: 1)
+        factory.todoLists.last?.listener?.handle(.todoTapped(id: 1))
 
-        factory.todoDetails.last?.listener?.didTapToggleDone()
-        factory.todoDetails.last?.listener?.didTapBack()
+        factory.todoDetails.last?.listener?.handle(.toggleDoneTapped)
+        factory.todoDetails.last?.listener?.handle(.backTapped)
         await runCurrent()
 
         #expect(factory.todoDetails.last?.isDone == true)
@@ -186,7 +186,7 @@ final class LoginAppTests {
         await clock.advance(by: .milliseconds(2_500))
         #expect(view.sessionSeconds == 2)
 
-        view.listener?.didTapLogout()
+        view.listener?.handle(.logoutTapped)
         await runCurrent()
         await clock.advance(by: .seconds(5))
         #expect(view.sessionSeconds == 2)
@@ -194,8 +194,8 @@ final class LoginAppTests {
 
     @Test func savedStateRestoresUserOpenDetailAndDoneTodos() async throws {
         try await startLoggedIn()
-        factory.todoLists.last?.listener?.didTapTodo(id: 3)
-        factory.todoDetails.last?.listener?.didTapToggleDone()
+        factory.todoLists.last?.listener?.handle(.todoTapped(id: 3))
+        factory.todoDetails.last?.listener?.handle(.toggleDoneTapped)
         let saved = app.saveState()
         app.stop()
 

@@ -97,74 +97,45 @@ public final class LoggedOutScreen: BridgedScreen<LoggedOutViewState>, LoggedOut
     public func send(_ action: LoggedOutViewAction) { listener?.handle(action) }
 }
 
-public struct LoggedInScreenState: Equatable, Sendable {
-    public var userName: String
-    public var sessionSeconds: Int64
-
-    public init(userName: String = "", sessionSeconds: Int64 = 0) {
-        self.userName = userName
-        self.sessionSeconds = sessionSeconds
-    }
-}
-
 /// 자식 화면(할 일 목록·상세)은 화면 트리의 `child`로 내보낸다.
-public final class LoggedInScreen: BridgedScreen<LoggedInScreenState>, LoggedInViewContract {
+public final class LoggedInScreen: BridgedScreen<LoggedInViewState>, LoggedInViewContract {
     public weak var listener: (any LoggedInPresentableListener)?
     private lazy var slot = AndroidScreenSlot(owner: self)
 
     init(renderer: AndroidRenderer) {
-        super.init(kind: ScreenKind.loggedIn, renderer: renderer, initialState: LoggedInScreenState())
+        super.init(kind: ScreenKind.loggedIn, renderer: renderer, initialState: LoggedInViewState(userName: ""))
     }
 
-    public func showUserName(_ name: String) {
-        setViewState(LoggedInScreenState(userName: name, sessionSeconds: currentState.sessionSeconds))
-    }
-
-    public func showSessionSeconds(_ seconds: Int64) {
-        setViewState(LoggedInScreenState(userName: currentState.userName, sessionSeconds: seconds))
-    }
+    public func render(_ state: LoggedInViewState) { setViewState(state) }
 
     public func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
     public func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
 
-    public func tapLogout() { listener?.didTapLogout() }
+    public func send(_ action: LoggedInViewAction) { listener?.handle(action) }
 
     override public func state() -> [String: RibValue] { ["child": slot.renderedValue] }
 }
 
-public final class TodoListScreen: BridgedScreen<[Todo]>, TodoListViewContract {
+public final class TodoListScreen: BridgedScreen<TodoListViewState>, TodoListViewContract {
     public weak var listener: (any TodoListPresentableListener)?
 
     init(renderer: AndroidRenderer) {
-        super.init(kind: ScreenKind.todoList, renderer: renderer, initialState: [])
+        super.init(kind: ScreenKind.todoList, renderer: renderer, initialState: TodoListViewState())
     }
 
-    public func showTodos(_ todos: [Todo]) { setViewState(todos) }
+    public func render(_ state: TodoListViewState) { setViewState(state) }
 
-    public func tapTodo(id: Int64) { listener?.didTapTodo(id: id) }
+    public func send(_ action: TodoListViewAction) { listener?.handle(action) }
 }
 
-public struct TodoDetailScreenState: Equatable, Sendable {
-    public var title: String
-    public var isDone: Bool
-
-    public init(title: String = "", isDone: Bool = false) {
-        self.title = title
-        self.isDone = isDone
-    }
-}
-
-public final class TodoDetailScreen: BridgedScreen<TodoDetailScreenState>, TodoDetailViewContract {
+public final class TodoDetailScreen: BridgedScreen<TodoDetailViewState>, TodoDetailViewContract {
     public weak var listener: (any TodoDetailPresentableListener)?
 
     init(renderer: AndroidRenderer) {
-        super.init(kind: ScreenKind.todoDetail, renderer: renderer, initialState: TodoDetailScreenState())
+        super.init(kind: ScreenKind.todoDetail, renderer: renderer, initialState: TodoDetailViewState(title: "", isDone: false))
     }
 
-    public func showTodo(title: String, isDone: Bool) {
-        setViewState(TodoDetailScreenState(title: title, isDone: isDone))
-    }
+    public func render(_ state: TodoDetailViewState) { setViewState(state) }
 
-    public func tapToggleDone() { listener?.didTapToggleDone() }
-    public func tapBack() { listener?.didTapBack() }
+    public func send(_ action: TodoDetailViewAction) { listener?.handle(action) }
 }

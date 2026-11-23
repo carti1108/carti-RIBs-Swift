@@ -25,7 +25,7 @@ public final class LoggedInScreenHandle: Sendable {
     }
 
     public func logoutTapped() {
-        MainActor.assumeIsolated { screen?.tapLogout() }
+        MainActor.assumeIsolated { screen?.send(.logoutTapped) }
     }
 
     @MainActor private var screen: LoggedInScreen? {

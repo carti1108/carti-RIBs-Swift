@@ -107,11 +107,11 @@ final class FakeLoggedOutView: LoggedOutViewContract {
 @MainActor
 final class FakeLoggedInView: LoggedInViewContract {
     weak var listener: (any LoggedInPresentableListener)?
-    var userName: String?
-    var sessionSeconds: Int64?
+    private(set) var renders: [LoggedInViewState] = []
+    var userName: String? { renders.last?.userName }
+    var sessionSeconds: Int64? { renders.last?.sessionSeconds }
     var screen: (any ViewControllable)?
-    func showUserName(_ name: String) { userName = name }
-    func showSessionSeconds(_ seconds: Int64) { sessionSeconds = seconds }
+    func render(_ state: LoggedInViewState) { renders.append(state) }
     func showScreen(_ screen: any ViewControllable) { self.screen = screen }
     func hideScreen(_ screen: any ViewControllable) { if self.screen === screen { self.screen = nil } }
 }
@@ -119,19 +119,18 @@ final class FakeLoggedInView: LoggedInViewContract {
 @MainActor
 final class FakeTodoListView: TodoListViewContract {
     weak var listener: (any TodoListPresentableListener)?
-    var todos: [Todo] = []
-    func showTodos(_ todos: [Todo]) { self.todos = todos }
+    private(set) var renders: [TodoListViewState] = []
+    var todos: [Todo] { renders.last?.todos ?? [] }
+    func render(_ state: TodoListViewState) { renders.append(state) }
 }
 
 @MainActor
 final class FakeTodoDetailView: TodoDetailViewContract {
     weak var listener: (any TodoDetailPresentableListener)?
-    var title: String?
-    var isDone: Bool?
-    func showTodo(title: String, isDone: Bool) {
-        self.title = title
-        self.isDone = isDone
-    }
+    private(set) var renders: [TodoDetailViewState] = []
+    var title: String? { renders.last?.title }
+    var isDone: Bool? { renders.last?.isDone }
+    func render(_ state: TodoDetailViewState) { renders.append(state) }
 }
 
 @MainActor

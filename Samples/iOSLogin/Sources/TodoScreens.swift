@@ -9,10 +9,10 @@ final class TodoListScreen: TodoListViewContract, SwiftUIRenderable {
     weak var listener: (any TodoListPresentableListener)?
     let model = TodoListModel()
 
-    func showTodos(_ todos: [Todo]) { model.todos = todos }
+    func render(_ state: TodoListViewState) { model.state = state }
 
     func makeView() -> AnyView {
-        AnyView(TodoListView(model: model) { [weak self] id in self?.listener?.didTapTodo(id: id) })
+        AnyView(TodoListView(model: model) { [weak self] id in self?.listener?.handle(.todoTapped(id: id)) })
     }
 }
 
@@ -22,7 +22,7 @@ private struct TodoListView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            ForEach(model.todos) { todo in
+            ForEach(model.state.todos) { todo in
                 Button((todo.isDone ? "✓ " : "") + todo.title) { onSelect(todo.id) }
                     .accessibilityIdentifier("todoRow-\(todo.id)")
             }
@@ -36,16 +36,13 @@ final class TodoDetailScreen: TodoDetailViewContract, SwiftUIRenderable {
     weak var listener: (any TodoDetailPresentableListener)?
     let model = TodoDetailModel()
 
-    func showTodo(title: String, isDone: Bool) {
-        model.title = title
-        model.isDone = isDone
-    }
+    func render(_ state: TodoDetailViewState) { model.state = state }
 
     func makeView() -> AnyView {
         AnyView(TodoDetailView(
             model: model,
-            onBack: { [weak self] in self?.listener?.didTapBack() },
-            onToggle: { [weak self] in self?.listener?.didTapToggleDone() }
+            onBack: { [weak self] in self?.listener?.handle(.backTapped) },
+            onToggle: { [weak self] in self?.listener?.handle(.toggleDoneTapped) }
         ))
     }
 }
@@ -58,8 +55,8 @@ private struct TodoDetailView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Button("← 목록", action: onBack).accessibilityIdentifier("backButton")
-            Text(model.title).font(.title3.bold()).accessibilityIdentifier("detailTitle")
-            Button(model.isDone ? "완료 취소" : "완료로 표시", action: onToggle)
+            Text(model.state.title).font(.title3.bold()).accessibilityIdentifier("detailTitle")
+            Button(model.state.isDone ? "완료 취소" : "완료로 표시", action: onToggle)
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("toggleDoneButton")
         }
