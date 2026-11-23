@@ -1,5 +1,5 @@
 ### ADR-0008 로그인 샘플을 Foundation 없는 공유 타깃과 플랫폼 앱으로 나눈다
-- 상태: 채택
+- 상태: 채택 (뷰 계약의 메서드 모양은 ADR-0025로 대체됨)
 - 날짜: 2026-11-13
 - 배경: carti-RIBs-KMP의 `login-shared`(Root → LoggedOut ⇄ LoggedIn, TodoList/TodoDetail 스택, 세션 Worker, `RibState` 저장·복원)를 옮긴다. 같은 공유 코드가 iOS 앱과 이후 Wasm·Android 앱에서 돌아야 한다.
 - 결정:
