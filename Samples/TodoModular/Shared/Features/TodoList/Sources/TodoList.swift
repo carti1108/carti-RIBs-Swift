@@ -35,7 +35,7 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
         let updates = todoStore.updates
         startTask { [presenter] in
             for await todos in updates {
-                presenter.showTodos(todos)
+                presenter.render(TodoListViewState(todos: todos))
             }
         }
     }
@@ -44,5 +44,9 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
         presenter.listener = nil
     }
 
-    func didTapTodo(id: Int64) { listener?.didSelectTodo(id: id) }
+    func handle(_ action: TodoListViewAction) {
+        switch action {
+        case .todoTapped(let id): listener?.didSelectTodo(id: id)
+        }
+    }
 }

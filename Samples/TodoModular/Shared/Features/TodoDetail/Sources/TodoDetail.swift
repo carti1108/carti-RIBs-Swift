@@ -42,18 +42,21 @@ final class TodoDetailInteractor: PresentableInteractor<any TodoDetailPresentabl
         presenter.listener = nil
     }
 
-    func didTapToggleDone() {
-        todoStore.toggle(todoID)
-        render()
+    func handle(_ action: TodoDetailViewAction) {
+        switch action {
+        case .toggleDoneTapped:
+            todoStore.toggle(todoID)
+            render()
+        case .backTapped:
+            listener?.didRequestCloseDetail()
+        }
     }
-
-    func didTapBack() { listener?.didRequestCloseDetail() }
 
     private func render() {
         guard let todo = todoStore.find(todoID) else {
             preconditionFailure("Todo \(todoID) disappeared while its detail was open")
         }
-        presenter.showTodo(title: todo.title, isDone: todo.isDone)
+        presenter.render(TodoDetailViewState(title: todo.title, isDone: todo.isDone))
     }
 }
 

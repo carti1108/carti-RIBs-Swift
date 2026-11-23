@@ -29,18 +29,18 @@ final class TodoListTests {
     private var view: FakeTodoListView { views.views.last! }
 
     @Test func showsTodosFromStore() {
-        #expect(view.todos == TodoStore.sampleTodos)
+        #expect(view.state == TodoListViewState(todos: TodoStore.sampleTodos))
     }
 
     @Test func reflectsStoreChanges() async {
         store.toggle(3)
         await runCurrent()
 
-        #expect(view.todos.filter(\.isDone).map(\.id) == [3])
+        #expect(view.state?.todos.filter(\.isDone).map(\.id) == [3])
     }
 
     @Test func tapTellsListener() {
-        view.listener?.didTapTodo(id: 2)
+        view.listener?.handle(.todoTapped(id: 2))
 
         #expect(listener.selectedIDs == [2])
     }

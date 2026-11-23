@@ -64,7 +64,7 @@ final class TodoAppTests {
 
     private func startLoggedIn() async throws {
         try app.start(host: host)
-        loggedOut.listener?.didTapLogin(rawName: "carti")
+        loggedOut.listener?.handle(.loginTapped(rawName: "carti"))
         await runCurrent()
         auth.respond(.success(userName: "carti"))
         await runCurrent()
@@ -82,18 +82,18 @@ final class TodoAppTests {
 
         let loggedIn = try #require(factory.loggedIn.views.last)
         #expect(factory.root.screen === loggedIn)
-        #expect(loggedIn.userName == "carti")
+        #expect(loggedIn.state?.userName == "carti")
         #expect(loggedIn.screen === factory.todoList.views.last)
-        #expect(factory.todoList.views.last?.todos == TodoStore.sampleTodos)
+        #expect(factory.todoList.views.last?.state?.todos == TodoStore.sampleTodos)
     }
 
     @Test func detailToggleReachesListAndBackPopsDetail() async throws {
         try await startLoggedIn()
-        factory.todoList.views.last?.listener?.didTapTodo(id: 1)
+        factory.todoList.views.last?.listener?.handle(.todoTapped(id: 1))
 
-        factory.todoDetail.views.last?.listener?.didTapToggleDone()
+        factory.todoDetail.views.last?.listener?.handle(.toggleDoneTapped)
         await runCurrent()
-        #expect(factory.todoList.views.last?.todos.filter(\.isDone).map(\.id) == [1])
+        #expect(factory.todoList.views.last?.state?.todos.filter(\.isDone).map(\.id) == [1])
 
         #expect(app.handleBackPress())
         #expect(factory.loggedIn.views.last?.screen === factory.todoList.views.last)
@@ -103,7 +103,7 @@ final class TodoAppTests {
     @Test func logoutReturnsToFreshLoggedOut() async throws {
         try await startLoggedIn()
 
-        factory.loggedIn.views.last?.listener?.didTapLogout()
+        factory.loggedIn.views.last?.listener?.handle(.logoutTapped)
 
         #expect(factory.loggedOut.views.count == 2)
         #expect(factory.root.screen === loggedOut)
@@ -117,8 +117,8 @@ final class TodoAppTests {
 
     @Test func savedStateRestoresUserOpenDetailAndDoneTodos() async throws {
         try await startLoggedIn()
-        factory.todoList.views.last?.listener?.didTapTodo(id: 3)
-        factory.todoDetail.views.last?.listener?.didTapToggleDone()
+        factory.todoList.views.last?.listener?.handle(.todoTapped(id: 3))
+        factory.todoDetail.views.last?.listener?.handle(.toggleDoneTapped)
         let saved = app.saveState()
         app.stop()
 
@@ -128,10 +128,10 @@ final class TodoAppTests {
         await runCurrent()
 
         #expect(restoredFactory.loggedOut.views.isEmpty)
-        #expect(restoredFactory.loggedIn.views.last?.userName == "carti")
+        #expect(restoredFactory.loggedIn.views.last?.state?.userName == "carti")
         #expect(restoredFactory.loggedIn.views.last?.screen === restoredFactory.todoDetail.views.last)
-        #expect(restoredFactory.todoDetail.views.last?.title == "운동하기")
-        #expect(restoredFactory.todoDetail.views.last?.isDone == true)
+        #expect(restoredFactory.todoDetail.views.last?.state?.title == "운동하기")
+        #expect(restoredFactory.todoDetail.views.last?.state?.isDone == true)
         restored.stop()
     }
 

@@ -15,23 +15,15 @@ public final class TodoDetailAndroidViewFactory: TodoDetailViewFactory {
     public func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailAndroidScreen(context: context) }
 }
 
-public struct TodoDetailScreenState: Equatable, Sendable {
-    public var title = ""
-    public var isDone = false
-}
-
 @MainActor
-public final class TodoDetailAndroidScreen: BridgedScreen<TodoDetailScreenState>, TodoDetailViewContract {
+public final class TodoDetailAndroidScreen: BridgedScreen<TodoDetailViewState>, TodoDetailViewContract {
     public weak var listener: (any TodoDetailPresentableListener)?
 
     init(context: ScreenContext) {
-        super.init(kind: TodoDetailAndroidViewFactory.kind, context: context, initialState: TodoDetailScreenState())
+        super.init(kind: TodoDetailAndroidViewFactory.kind, context: context, initialState: TodoDetailViewState(title: "", isDone: false))
     }
 
-    public func showTodo(title: String, isDone: Bool) {
-        setViewState(TodoDetailScreenState(title: title, isDone: isDone))
-    }
+    public func render(_ state: TodoDetailViewState) { setViewState(state) }
 
-    public func tapToggleDone() { listener?.didTapToggleDone() }
-    public func tapBack() { listener?.didTapBack() }
+    public func send(_ action: TodoDetailViewAction) { listener?.handle(action) }
 }

@@ -34,25 +34,24 @@ final class TodoDetailTests {
         let router = try open(2)
 
         #expect(router.todoID == 2)
-        #expect(views.views.last?.title == "RIB 문서 읽기")
-        #expect(views.views.last?.isDone == false)
+        #expect(views.views.last?.states == [TodoDetailViewState(title: "RIB 문서 읽기", isDone: false)])
         parent.detach(router)
     }
 
     @Test func toggleUpdatesStoreAndView() throws {
         let router = try open(1)
 
-        views.views.last?.listener?.didTapToggleDone()
+        views.views.last?.listener?.handle(.toggleDoneTapped)
 
         #expect(store.doneIDs == [1])
-        #expect(views.views.last?.isDone == true)
+        #expect(views.views.last?.state?.isDone == true)
         parent.detach(router)
     }
 
     @Test func backTellsListener() throws {
         let router = try open(1)
 
-        views.views.last?.listener?.didTapBack()
+        views.views.last?.listener?.handle(.backTapped)
 
         #expect(listener.closeRequests == 1)
         parent.detach(router)

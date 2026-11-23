@@ -36,7 +36,7 @@ final class LoggedInTests {
     private var view: FakeLoggedInView { views.views.last! }
 
     @Test func showsUserNameAndListByDefault() {
-        #expect(view.userName == "carti")
+        #expect(view.state?.userName == "carti")
         #expect(view.screen === listBuilder.views.last)
     }
 
@@ -75,21 +75,21 @@ final class LoggedInTests {
     }
 
     @Test func logoutTellsListener() {
-        view.listener?.didTapLogout()
+        view.listener?.handle(.logoutTapped)
 
         #expect(listener.logoutRequests == 1)
     }
 
     @Test func sessionTimerTicksUntilDetached() async {
-        #expect(view.sessionSeconds == 0)
+        #expect(view.state == LoggedInViewState(userName: "carti", sessionSeconds: 0))
 
         await clock.advance(by: .milliseconds(2_500))
-        #expect(view.sessionSeconds == 2)
+        #expect(view.state?.sessionSeconds == 2)
 
         parent.detach(router)
         await runCurrent()
         await clock.advance(by: .seconds(5))
-        #expect(view.sessionSeconds == 2)
+        #expect(view.state?.sessionSeconds == 2)
         parent.attach(router)  // deinit의 detach와 짝을 맞춘다.
     }
 }

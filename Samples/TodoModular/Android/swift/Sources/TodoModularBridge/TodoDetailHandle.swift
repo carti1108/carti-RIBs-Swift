@@ -24,11 +24,11 @@ public final class TodoDetailScreenHandle: Sendable {
     }
 
     public func toggleDoneTapped() {
-        MainActor.assumeIsolated { screen?.tapToggleDone() }
+        MainActor.assumeIsolated { screen?.send(.toggleDoneTapped) }
     }
 
     public func backTapped() {
-        MainActor.assumeIsolated { screen?.tapBack() }
+        MainActor.assumeIsolated { screen?.send(.backTapped) }
     }
 
     @MainActor private var screen: TodoDetailAndroidScreen? {

@@ -35,14 +35,18 @@ final class LoggedOutTests {
     private var view: FakeLoggedOutView { views.views.last! }
 
     private func login(_ name: String) async {
-        view.listener?.didTapLogin(rawName: name)
+        view.listener?.handle(.loginTapped(rawName: name))
         await runCurrent()
+    }
+
+    @Test func rendersIdleStateWhenAttached() {
+        #expect(view.states == [LoggedOutViewState()])
     }
 
     @Test func blankNameShowsErrorWithoutCallingService() async {
         await login("   ")
 
-        #expect(view.error == LoggedOutInteractor.emptyNameError)
+        #expect(view.state?.errorMessage == LoggedOutInteractor.emptyNameError)
         #expect(auth.requests.isEmpty)
     }
 
@@ -50,7 +54,7 @@ final class LoggedOutTests {
         await login("  carti ")
 
         #expect(auth.requests == ["carti"])
-        #expect(view.isLoading)
+        #expect(view.state == LoggedOutViewState(errorMessage: nil, isLoading: true))
     }
 
     @Test func successTellsListener() async {
@@ -60,17 +64,19 @@ final class LoggedOutTests {
         await runCurrent()
 
         #expect(listener.loggedInNames == ["carti"])
-        #expect(!view.isLoading)
+        #expect(view.state?.isLoading == false)
     }
 
-    @Test func failureShowsErrorAndStopsLoading() async {
+    /// 오류와 로딩 해제가 따로 그려지면 중간 상태가 화면에 나온다.
+    @Test func failureRendersErrorAndLoadingOffInOneState() async {
         await login("carti")
+        let rendersBeforeResponse = view.states.count
 
         auth.respond(.failure(message: "서버 오류"))
         await runCurrent()
 
-        #expect(view.error == "서버 오류")
-        #expect(!view.isLoading)
+        #expect(view.states.count == rendersBeforeResponse + 1)
+        #expect(view.state == LoggedOutViewState(errorMessage: "서버 오류", isLoading: false))
         #expect(listener.loggedInNames.isEmpty)
     }
 
@@ -91,5 +97,6 @@ final class LoggedOutTests {
         #expect(auth.wasCancelled)
         #expect(view.listener == nil)
         parent.attach(router)  // deinit의 detach와 짝을 맞춘다.
+        #expect(view.state?.isLoading == false)
     }
 }

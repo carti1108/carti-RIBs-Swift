@@ -24,6 +24,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
     private let authService: any AuthService
     private weak var listener: (any LoggedOutListener)?
     private var isLoggingIn = false
+    private var viewState = LoggedOutViewState()
 
     init(presenter: any LoggedOutPresentable, authService: any AuthService, listener: any LoggedOutListener) {
         self.authService = authService
@@ -33,21 +34,36 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
 
     override func didBecomeActive() {
         presenter.listener = self
+        presenter.render(viewState)
     }
 
     override func willResignActive() {
         presenter.listener = nil
         isLoggingIn = false
+        // 요청이 취소됐으니 다시 붙을 때 로딩으로 그리지 않는다.
+        viewState = LoggedOutViewState(errorMessage: viewState.errorMessage)
     }
 
-    func didTapLogin(rawName: String) {
+    func handle(_ action: LoggedOutViewAction) {
+        switch action {
+        case .loginTapped(let rawName): didTapLogin(rawName: rawName)
+        }
+    }
+
+    private func didTapLogin(rawName: String) {
         let name = Self.trimmed(rawName)
         guard !name.isEmpty else {
-            presenter.showError(Self.emptyNameError)
+            update(LoggedOutViewState(errorMessage: Self.emptyNameError))
             return
         }
-        presenter.showError(nil)
         login(name)
+    }
+
+    /// 상태가 바뀌었을 때만 한 번 그린다.
+    private func update(_ next: LoggedOutViewState) {
+        guard next != viewState else { return }
+        viewState = next
+        presenter.render(next)
     }
 
     private func login(_ userName: String) {
@@ -55,7 +71,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
         isLoggingIn = true
         startTask { [weak self] in
             guard let self else { return }
-            presenter.showLoading(true)
+            update(LoggedOutViewState(isLoading: true))
             let result: AuthResult
             do {
                 result = try await authService.signIn(userName: userName)
@@ -63,10 +79,12 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
                 return  // 비활성화로 취소됐다. 뷰는 이미 떨어졌다.
             }
             isLoggingIn = false
-            presenter.showLoading(false)
             switch result {
-            case .success(let name): listener?.didLogin(userName: name)
-            case .failure(let message): presenter.showError(message)
+            case .success(let name):
+                update(LoggedOutViewState())
+                listener?.didLogin(userName: name)
+            case .failure(let message):
+                update(LoggedOutViewState(errorMessage: message))
             }
         }
     }

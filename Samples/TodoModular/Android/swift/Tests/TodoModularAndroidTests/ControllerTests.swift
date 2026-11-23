@@ -39,7 +39,7 @@ struct TodoAppControllerTests {
         controller.start(savedState: nil)
         let loggedOut = try #require(controller.screen(id: try id(child(try tree(controller))), as: LoggedOutAndroidScreen.self))
 
-        loggedOut.tapLogin(rawName: " carti ")
+        loggedOut.send(.loginTapped(rawName: " carti "))
         await runCurrent()
         #expect(loggedOut.currentState.isLoading)
         auth.respond(.success(userName: "carti"))
@@ -56,12 +56,12 @@ struct TodoAppControllerTests {
     @Test func restoresOpenDetailFromSavedState() async throws {
         controller.start(savedState: nil)
         let loggedOut = try #require(controller.screen(id: try id(child(try tree(controller))), as: LoggedOutAndroidScreen.self))
-        loggedOut.tapLogin(rawName: "carti")
+        loggedOut.send(.loginTapped(rawName: "carti"))
         await runCurrent()
         auth.respond(.success(userName: "carti"))
         await runCurrent()
         let listNode = child(child(try tree(controller)))
-        try #require(controller.screen(id: try id(listNode), as: TodoListAndroidScreen.self)).tapTodo(id: 2)
+        try #require(controller.screen(id: try id(listNode), as: TodoListAndroidScreen.self)).send(.todoTapped(id: 2))
         let saved = try #require(controller.saveState())
         controller.stop()
 
@@ -122,11 +122,11 @@ struct FeatureDemoControllerTests {
         let listNode = child(try tree(demo))
         let list = try #require(demo.screen(id: try id(listNode), as: TodoListAndroidScreen.self))
 
-        list.tapTodo(id: 1)
+        list.send(.todoTapped(id: 1))
         await runCurrent()
 
         #expect(try tree(demo)["event"]?.stringValue == "didSelectTodo(id: 1)")
-        #expect(list.currentState.first?.isDone == true)
+        #expect(list.currentState.todos.first?.isDone == true)
         demo.stop()
     }
 }

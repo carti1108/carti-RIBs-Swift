@@ -25,7 +25,7 @@ public final class LoggedInBuilder: Builder<any LoggedInDependency>, LoggedInBui
             userName: userName,
             todoStore: component.todoStore,
             listener: listener,
-            sessionTimer: SessionTimerWorker(presenter: view, clock: dependency.clock)
+            sessionTimer: SessionTimerWorker(clock: dependency.clock)
         )
         return LoggedInRouter(
             interactor: interactor,
@@ -47,13 +47,13 @@ protocol LoggedInInternalRouting: AnyObject {
 /// 목록을 기본 화면으로 두고 상세를 위에 쌓는다. 뒤로 가기는 열린 상세를 닫고, 닫을 것이 없으면 false.
 /// 저장 상태: 완료한 할 일과 열려 있던 상세 id.
 final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, LoggedInPresentableListener,
-    TodoListListener, TodoDetailListener
+    TodoListListener, TodoDetailListener, SessionTimerListener
 {
     static let doneIDsKey = "doneIds"
     static let openDetailIDKey = "openDetailId"
 
     weak var router: (any LoggedInInternalRouting)?
-    private let userName: String
+    private var viewState: LoggedInViewState
     private let todoStore: TodoStore
     private weak var listener: (any LoggedInListener)?
     private let sessionTimer: SessionTimerWorker
@@ -65,16 +65,17 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
         listener: any LoggedInListener,
         sessionTimer: SessionTimerWorker
     ) {
-        self.userName = userName
+        self.viewState = LoggedInViewState(userName: userName)
         self.todoStore = todoStore
         self.listener = listener
         self.sessionTimer = sessionTimer
         super.init(presenter: presenter)
+        sessionTimer.listener = self
     }
 
     override func didBecomeActive() {
         presenter.listener = self
-        presenter.showUserName(userName)
+        presenter.render(viewState)
         if let doneIDs = savedInstanceState?[Self.doneIDsKey]?.listValue {
             todoStore.restoreDone(doneIDs.compactMap(\.intValue))
         }
@@ -101,7 +102,17 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
         return true
     }
 
-    func didTapLogout() { listener?.didRequestLogout() }
+    func handle(_ action: LoggedInViewAction) {
+        switch action {
+        case .logoutTapped: listener?.didRequestLogout()
+        }
+    }
+
+    func sessionDidTick(seconds: Int64) {
+        guard seconds != viewState.sessionSeconds else { return }
+        viewState = LoggedInViewState(userName: viewState.userName, sessionSeconds: seconds)
+        presenter.render(viewState)
+    }
 
     func didSelectTodo(id: Int64) { router?.routeToDetail(todoID: id) }
 
@@ -154,24 +165,29 @@ final class LoggedInRouter: ViewableRouter<LoggedInInteractor, any LoggedInViewC
     }
 }
 
-/// 로그인한 동안 1초마다 세션 시간을 뷰에 알린다. Interactor가 비활성화되면 함께 멈춘다.
+@MainActor
+protocol SessionTimerListener: AnyObject {
+    func sessionDidTick(seconds: Int64)
+}
+
+/// 로그인한 동안 1초마다 세션 시간을 알린다. Interactor가 비활성화되면 함께 멈춘다.
+/// 뷰를 직접 그리지 않는다. 화면 상태는 Interactor 한 곳에서만 만든다.
 final class SessionTimerWorker: Worker {
     static let tick: Duration = .seconds(1)
 
-    private let presenter: any LoggedInPresentable
+    weak var listener: (any SessionTimerListener)?
     private let clock: any TodoClock
 
-    init(presenter: any LoggedInPresentable, clock: any TodoClock) {
-        self.presenter = presenter
+    init(clock: any TodoClock) {
         self.clock = clock
         super.init()
     }
 
     override func didStart(_ interactorScope: any InteractorScope) {
-        startTask { [presenter, clock] in
+        startTask { [weak self, clock] in
             var seconds: Int64 = 0
             while true {
-                presenter.showSessionSeconds(seconds)
+                self?.listener?.sessionDidTick(seconds: seconds)
                 do {
                     try await clock.sleep(for: Self.tick)
                 } catch {

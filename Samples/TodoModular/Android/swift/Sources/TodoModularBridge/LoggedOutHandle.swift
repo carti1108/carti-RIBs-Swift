@@ -29,7 +29,7 @@ public final class LoggedOutScreenHandle: Sendable {
     }
 
     public func loginTapped(rawName: String) {
-        MainActor.assumeIsolated { screen?.tapLogin(rawName: rawName) }
+        MainActor.assumeIsolated { screen?.send(.loginTapped(rawName: rawName)) }
     }
 
     @MainActor private var screen: LoggedOutAndroidScreen? {

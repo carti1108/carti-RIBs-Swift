@@ -1,10 +1,25 @@
 import RIBs
 import TodoCore
 
+/// 화면에 그릴 값 전체. 플랫폼은 이 값만 보고 그린다(ADR-0025).
+public struct LoggedOutViewState: Equatable, Sendable {
+    public var errorMessage: String?
+    public var isLoading: Bool
+
+    public init(errorMessage: String? = nil, isLoading: Bool = false) {
+        self.errorMessage = errorMessage
+        self.isLoading = isLoading
+    }
+}
+
 /// 뷰 → 공유 코드: 사용자 입력.
+public enum LoggedOutViewAction: Equatable, Sendable {
+    case loginTapped(rawName: String)
+}
+
 @MainActor
 public protocol LoggedOutPresentableListener: AnyObject {
-    func didTapLogin(rawName: String)
+    func handle(_ action: LoggedOutViewAction)
 }
 
 /// 공유 코드 → 뷰. 플랫폼이 구현한다.
@@ -12,8 +27,7 @@ public protocol LoggedOutPresentableListener: AnyObject {
 public protocol LoggedOutPresentable: Presentable {
     /// 활성 구간에만 설정된다. 비활성이면 nil이라 입력이 무시된다. 플랫폼은 `weak`로 둔다.
     var listener: (any LoggedOutPresentableListener)? { get set }
-    func showError(_ message: String?)
-    func showLoading(_ isLoading: Bool)
+    func render(_ state: LoggedOutViewState)
 }
 
 /// Router → 뷰. 붙일 자식 화면이 없어 비어 있다.

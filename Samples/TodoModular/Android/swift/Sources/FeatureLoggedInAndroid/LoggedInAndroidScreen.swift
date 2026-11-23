@@ -16,36 +16,21 @@ public final class LoggedInAndroidViewFactory: LoggedInViewFactory {
     public func makeLoggedInView() -> any LoggedInViewContract { LoggedInAndroidScreen(context: context) }
 }
 
-public struct LoggedInScreenState: Equatable, Sendable {
-    public var userName = ""
-    public var sessionSeconds: Int64 = 0
-}
-
 @MainActor
-public final class LoggedInAndroidScreen: BridgedScreen<LoggedInScreenState>, LoggedInViewContract {
+public final class LoggedInAndroidScreen: BridgedScreen<LoggedInViewState>, LoggedInViewContract {
     public weak var listener: (any LoggedInPresentableListener)?
     private lazy var slot = AndroidScreenSlot(owner: self)
 
     init(context: ScreenContext) {
-        super.init(kind: LoggedInAndroidViewFactory.kind, context: context, initialState: LoggedInScreenState())
+        super.init(kind: LoggedInAndroidViewFactory.kind, context: context, initialState: LoggedInViewState(userName: ""))
     }
 
-    public func showUserName(_ name: String) {
-        var state = currentState
-        state.userName = name
-        setViewState(state)
-    }
-
-    public func showSessionSeconds(_ seconds: Int64) {
-        var state = currentState
-        state.sessionSeconds = seconds
-        setViewState(state)
-    }
+    public func render(_ state: LoggedInViewState) { setViewState(state) }
 
     public func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
     public func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
 
-    public func tapLogout() { listener?.didTapLogout() }
+    public func send(_ action: LoggedInViewAction) { listener?.handle(action) }
 
     override public func state() -> [String: RibValue] { ["child": slot.renderedValue] }
 }

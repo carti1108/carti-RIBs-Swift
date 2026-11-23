@@ -5,13 +5,13 @@ import TodoCoreTesting
 @MainActor
 public final class FakeLoggedOutView: LoggedOutViewContract {
     public weak var listener: (any LoggedOutPresentableListener)?
-    public private(set) var error: String?
-    public private(set) var isLoading = false
+    /// 그려진 상태를 순서대로 모은다.
+    public private(set) var states: [LoggedOutViewState] = []
+    public var state: LoggedOutViewState? { states.last }
 
     public init() {}
 
-    public func showError(_ message: String?) { error = message }
-    public func showLoading(_ isLoading: Bool) { self.isLoading = isLoading }
+    public func render(_ state: LoggedOutViewState) { states.append(state) }
 }
 
 @MainActor

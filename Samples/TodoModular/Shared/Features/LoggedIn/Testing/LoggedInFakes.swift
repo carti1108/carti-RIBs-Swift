@@ -8,14 +8,13 @@ import TodoCoreTesting
 @MainActor
 public final class FakeLoggedInView: LoggedInViewContract {
     public weak var listener: (any LoggedInPresentableListener)?
-    public private(set) var userName: String?
-    public private(set) var sessionSeconds: Int64?
+    public private(set) var states: [LoggedInViewState] = []
+    public var state: LoggedInViewState? { states.last }
     public private(set) var screen: (any ViewControllable)?
 
     public init() {}
 
-    public func showUserName(_ name: String) { userName = name }
-    public func showSessionSeconds(_ seconds: Int64) { sessionSeconds = seconds }
+    public func render(_ state: LoggedInViewState) { states.append(state) }
     public func showScreen(_ screen: any ViewControllable) { self.screen = screen }
     public func hideScreen(_ screen: any ViewControllable) { if self.screen === screen { self.screen = nil } }
 }

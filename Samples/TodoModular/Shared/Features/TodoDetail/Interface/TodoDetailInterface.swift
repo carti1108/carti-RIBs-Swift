@@ -1,16 +1,30 @@
 import RIBs
 import TodoCore
 
+public struct TodoDetailViewState: Equatable, Sendable {
+    public var title: String
+    public var isDone: Bool
+
+    public init(title: String, isDone: Bool) {
+        self.title = title
+        self.isDone = isDone
+    }
+}
+
+public enum TodoDetailViewAction: Equatable, Sendable {
+    case toggleDoneTapped
+    case backTapped
+}
+
 @MainActor
 public protocol TodoDetailPresentableListener: AnyObject {
-    func didTapToggleDone()
-    func didTapBack()
+    func handle(_ action: TodoDetailViewAction)
 }
 
 @MainActor
 public protocol TodoDetailPresentable: Presentable {
     var listener: (any TodoDetailPresentableListener)? { get set }
-    func showTodo(title: String, isDone: Bool)
+    func render(_ state: TodoDetailViewState)
 }
 
 @MainActor

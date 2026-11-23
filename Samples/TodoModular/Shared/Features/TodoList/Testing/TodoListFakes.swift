@@ -6,11 +6,12 @@ import TodoCoreTesting
 @MainActor
 public final class FakeTodoListView: TodoListViewContract {
     public weak var listener: (any TodoListPresentableListener)?
-    public private(set) var todos: [Todo] = []
+    public private(set) var states: [TodoListViewState] = []
+    public var state: TodoListViewState? { states.last }
 
     public init() {}
 
-    public func showTodos(_ todos: [Todo]) { self.todos = todos }
+    public func render(_ state: TodoListViewState) { states.append(state) }
 }
 
 @MainActor

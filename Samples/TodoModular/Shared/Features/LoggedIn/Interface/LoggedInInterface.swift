@@ -3,17 +3,31 @@ import FeatureTodoListInterface
 import RIBs
 import TodoCore
 
+/// 머리말에 그릴 값. 자식 화면은 상태가 아니라 `LoggedInViewControllable`로 붙인다(ADR-0025).
+public struct LoggedInViewState: Equatable, Sendable {
+    public var userName: String
+    public var sessionSeconds: Int64
+
+    public init(userName: String, sessionSeconds: Int64 = 0) {
+        self.userName = userName
+        self.sessionSeconds = sessionSeconds
+    }
+}
+
+public enum LoggedInViewAction: Equatable, Sendable {
+    case logoutTapped
+}
+
 @MainActor
 public protocol LoggedInPresentableListener: AnyObject {
-    func didTapLogout()
+    func handle(_ action: LoggedInViewAction)
 }
 
 /// Interactor → 뷰: 머리말(사용자 이름, 세션 시간)을 그린다.
 @MainActor
 public protocol LoggedInPresentable: Presentable {
     var listener: (any LoggedInPresentableListener)? { get set }
-    func showUserName(_ name: String)
-    func showSessionSeconds(_ seconds: Int64)
+    func render(_ state: LoggedInViewState)
 }
 
 /// Router → 뷰: 자식 화면을 붙이고 뗀다.

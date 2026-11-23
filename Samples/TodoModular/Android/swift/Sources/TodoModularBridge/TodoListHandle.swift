@@ -44,12 +44,12 @@ public final class TodoListScreenHandle: Sendable {
     /// 지금 목록. 화면이 이미 내려갔으면 빈 배열.
     public func rows() -> [TodoListRow] {
         MainActor.assumeIsolated {
-            (screen?.currentState ?? []).map { TodoListRow(id: $0.id, title: $0.title, isDone: $0.isDone) }
+            (screen?.currentState.todos ?? []).map { TodoListRow(id: $0.id, title: $0.title, isDone: $0.isDone) }
         }
     }
 
     public func todoTapped(id: Int64) {
-        MainActor.assumeIsolated { screen?.tapTodo(id: id) }
+        MainActor.assumeIsolated { screen?.send(.todoTapped(id: id)) }
     }
 
     @MainActor private var screen: TodoListAndroidScreen? {

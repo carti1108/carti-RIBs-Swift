@@ -17,36 +17,27 @@ final class TodoDetailScreen: TodoDetailViewContract, SwiftUIRenderable {
     weak var listener: (any TodoDetailPresentableListener)?
     private let model = TodoDetailModel()
 
-    func showTodo(title: String, isDone: Bool) {
-        model.title = title
-        model.isDone = isDone
-    }
+    func render(_ state: TodoDetailViewState) { model.state = state }
 
     func makeView() -> AnyView {
-        AnyView(TodoDetailView(
-            model: model,
-            onBack: { [weak self] in self?.listener?.didTapBack() },
-            onToggle: { [weak self] in self?.listener?.didTapToggleDone() }
-        ))
+        AnyView(TodoDetailView(model: model) { [weak self] action in self?.listener?.handle(action) })
     }
 }
 
 @MainActor @Observable
 final class TodoDetailModel {
-    var title = ""
-    var isDone = false
+    var state = TodoDetailViewState(title: "", isDone: false)
 }
 
 private struct TodoDetailView: View {
     let model: TodoDetailModel
-    let onBack: () -> Void
-    let onToggle: () -> Void
+    let send: (TodoDetailViewAction) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Button("← 목록", action: onBack).accessibilityIdentifier("backButton")
-            Text(model.title).font(.title3.bold()).accessibilityIdentifier("detailTitle")
-            Button(model.isDone ? "완료 취소" : "완료로 표시", action: onToggle)
+            Button("← 목록") { send(.backTapped) }.accessibilityIdentifier("backButton")
+            Text(model.state.title).font(.title3.bold()).accessibilityIdentifier("detailTitle")
+            Button(model.state.isDone ? "완료 취소" : "완료로 표시") { send(.toggleDoneTapped) }
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("toggleDoneButton")
         }

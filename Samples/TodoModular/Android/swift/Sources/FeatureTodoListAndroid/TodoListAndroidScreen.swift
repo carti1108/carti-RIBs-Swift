@@ -1,7 +1,6 @@
 import FeatureTodoListInterface
 import RIBs
 import TodoAndroidSupport
-import TodoCore
 
 /// 할 일 목록 피처의 Android 화면을 만든다.
 @MainActor
@@ -17,14 +16,14 @@ public final class TodoListAndroidViewFactory: TodoListViewFactory {
 }
 
 @MainActor
-public final class TodoListAndroidScreen: BridgedScreen<[Todo]>, TodoListViewContract {
+public final class TodoListAndroidScreen: BridgedScreen<TodoListViewState>, TodoListViewContract {
     public weak var listener: (any TodoListPresentableListener)?
 
     init(context: ScreenContext) {
-        super.init(kind: TodoListAndroidViewFactory.kind, context: context, initialState: [])
+        super.init(kind: TodoListAndroidViewFactory.kind, context: context, initialState: TodoListViewState())
     }
 
-    public func showTodos(_ todos: [Todo]) { setViewState(todos) }
+    public func render(_ state: TodoListViewState) { setViewState(state) }
 
-    public func tapTodo(id: Int64) { listener?.didTapTodo(id: id) }
+    public func send(_ action: TodoListViewAction) { listener?.handle(action) }
 }
