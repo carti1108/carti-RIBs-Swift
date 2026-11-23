@@ -80,6 +80,11 @@ final class LoggedInTests {
         #expect(listener.logoutRequests == 1)
     }
 
+    /// 타이머의 첫 알림(0초)은 이미 그린 값이라 다시 그리지 않는다.
+    @Test func firstTickDoesNotRenderAgain() {
+        #expect(view.states == [LoggedInViewState(userName: "carti", sessionSeconds: 0)])
+    }
+
     @Test func sessionTimerTicksUntilDetached() async {
         #expect(view.state == LoggedInViewState(userName: "carti", sessionSeconds: 0))
 

@@ -53,7 +53,7 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
     private func didTapLogin(rawName: String) {
         let name = Self.trimmed(rawName)
         guard !name.isEmpty else {
-            update(LoggedOutViewState(errorMessage: Self.emptyNameError))
+            update(LoggedOutViewState(errorMessage: Self.emptyNameError, isLoading: viewState.isLoading))
             return
         }
         login(name)

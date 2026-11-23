@@ -88,6 +88,15 @@ final class LoggedOutTests {
         #expect(auth.requests == ["carti"])
     }
 
+    /// 뷰가 버튼을 막지 않아 빈 이름이 들어와도 진행 중인 요청의 로딩 표시는 남아야 한다.
+    @Test func blankNameWhileLoadingKeepsLoading() async {
+        await login("carti")
+
+        await login("   ")
+
+        #expect(view.state == LoggedOutViewState(errorMessage: LoggedOutInteractor.emptyNameError, isLoading: true))
+    }
+
     @Test func detachCancelsRequestAndClearsListener() async {
         await login("carti")
 
