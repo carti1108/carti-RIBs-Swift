@@ -25,3 +25,4 @@
 | [0021](ADR-0021-android-view-bridge-via-swift-java.md) | Android 뷰 브리지는 swift-java(JNI 모드)로 생성하고 Swift 런타임을 동적 라이브러리로 싣는다 | 채택 |
 | [0022](ADR-0022-web-view-bridge-via-bridgejs.md) | Web 뷰 브리지는 BridgeJS로 생성하고 뷰는 JS가 그린다 | 채택 |
 | [0023](ADR-0023-screen-structure-outside-view-bridge.md) | 화면 구조는 브리지 밖에 두고, 목록 항목은 경계용 값 타입으로 넘긴다 | 채택 |
+| [0024](ADR-0024-mufeature-sample-modules.md) | µFeature 샘플은 피처마다 Interface·Impl·Testing·Tests를 나누고, Impl은 조립 모듈만 import한다 | 채택 |
