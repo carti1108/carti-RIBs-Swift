@@ -27,3 +27,4 @@
 | [0023](ADR-0023-screen-structure-outside-view-bridge.md) | 화면 구조는 브리지 밖에 두고, 목록 항목은 경계용 값 타입으로 넘긴다 | 채택 |
 | [0024](ADR-0024-mufeature-sample-modules.md) | µFeature 샘플은 피처마다 Interface·Impl·Testing·Tests를 나누고, Impl은 조립 모듈만 import한다 | 채택 |
 | [0025](ADR-0025-sample-view-contract-state-and-action.md) | 샘플의 뷰 계약은 모두 `render(state)`와 `handle(action)`으로 둔다 | 채택 |
+| [0026](ADR-0026-todomodular-web-views-in-react.md) | TodoModular 웹 뷰는 React와 TypeScript로 쓰고, 프레임워크는 JS 쪽에만 둔다 | 채택 |

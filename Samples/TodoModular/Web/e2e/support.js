@@ -1,5 +1,5 @@
-// E2E 공통: 이 디렉터리를 정적 서버로 띄우고 헤드리스 Chrome을 연다.
-// 먼저 `swift package --swift-sdk <wasm SDK> js`로 .build/plugins/PackageToJS/outputs/Package를 만들어 둔다.
+// E2E 공통: Vite가 빌드한 `dist`를 정적 서버로 띄우고 헤드리스 Chrome을 연다.
+// `npm run test:e2e`가 빌드부터 한다. 그 전에 `swift package --swift-sdk <wasm SDK> js`로 Wasm 패키지를 만들어 둔다.
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
@@ -7,8 +7,8 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import puppeteer from "puppeteer";
 
-const root = fileURLToPath(new URL("..", import.meta.url));
-const mimeTypes = { ".html": "text/html", ".js": "text/javascript", ".wasm": "application/wasm", ".json": "application/json" };
+const root = fileURLToPath(new URL("../dist", import.meta.url));
+const mimeTypes = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".wasm": "application/wasm" };
 
 export const timeout = 10_000;
 

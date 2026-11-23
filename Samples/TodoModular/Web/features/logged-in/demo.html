@@ -14,16 +14,6 @@
 </head>
 <body>
   <div id="app"></div>
-  <!-- PackageToJS 출력이 bare import하는 WASI shim을 npm으로 받은 로컬 파일에 연결한다(CDN 없이 재현). -->
-  <script type="importmap">
-    { "imports": { "@bjorn3/browser_wasi_shim": "../../node_modules/@bjorn3/browser_wasi_shim/dist/index.js" } }
-  </script>
-  <script type="module">
-    import { init } from "../../.build/plugins/PackageToJS/outputs/Package/index.js";
-    import { LoggedInView } from "./view.js";
-    // 이 피처만 띄운다. 다른 피처의 뷰는 불러오지 않는다.
-    const { exports } = await init();
-    exports.startLoggedInDemo(new LoggedInView());
-  </script>
+  <script type="module" src="./demo.ts"></script>
 </body>
 </html>
