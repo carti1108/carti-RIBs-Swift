@@ -1,0 +1,14 @@
+{
+  "name": "todo-modular-web-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:e2e": "node --test e2e/*.test.js"
+  },
+  "devDependencies": {
+    "puppeteer": "24.10.0"
+  },
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "0.3.0"
+  }
+}

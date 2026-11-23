@@ -30,6 +30,13 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 
 `Sources/RIBs/RIBs.docc`의 한국어 랜딩 문서가 생명주기, 라우팅, Worker, 상태 저장·복원, 플랫폼 어댑터를 설명합니다. `swift-docc-plugin`은 문서 생성에만 쓰는 의존이라 라이브러리 산출물(Wasm·Android 포함)에 들어가지 않습니다(ADR-0012).
 
+## 샘플
+
+샘플별 빌드·실행 절차는 각 README에 있습니다.
+
+- 기본 샘플: [iOS](../Samples/iOSLogin/README.md), [Android](../Samples/AndroidLogin/README.md), [Web](../Samples/WebLogin/README.md)
+- µFeature 샘플(`Samples/TodoModular`, ADR-0024): [Web](../Samples/TodoModular/Web/README.md)
+
 ## Windows
 
 swift.org 툴체인 6.4.2(`winget install Swift.Toolchain --version 6.4.2`), Visual Studio Build Tools 2022(C++ 도구, Windows SDK)가 필요합니다. 의존성 체크아웃에 심볼릭 링크가 있어 **개발자 모드**를 켜야 합니다. 명령은 `vcvars64.bat`를 부른 셸에서 실행하고, 설치 직후 새 환경 변수를 못 받은 셸이면 `SDKROOT`를 직접 잡습니다.
