@@ -1,6 +1,6 @@
 # Android 샘플 (Compose)
 
-Swift가 화면 트리를 `RibState` JSON으로 그려 JNI로 Kotlin에 넘기고, Compose가 그 JSON을 그립니다. 입력은 `(화면 id, 동작, 인자)`로 Swift에 돌아갑니다.
+화면은 Kotlin(Compose)이 그립니다. 화면 구조(`kind`·`id`·`child`)만 JSON 트리로 넘어오고, 화면 상태와 입력은 swift-java가 만든 타입 있는 브리지(화면별 `XxxViewBridge`·`XxxScreenHandle`)로 오갑니다(ADR-0020, ADR-0021, ADR-0023).
 
 - Swift `@MainActor` 작업은 libdispatch 메인 큐를 메인 Looper에 붙여 Android 메인 스레드에서 돕니다(ADR-0010).
 - Swift 6.4.2에는 사용자 정의 메인 실행기 공개 API가 없어 libdispatch SPI를 쓰며, 시작 시 자체검사가 연결이 끊기면 원인을 담아 실패시킵니다(ADR-0014).
