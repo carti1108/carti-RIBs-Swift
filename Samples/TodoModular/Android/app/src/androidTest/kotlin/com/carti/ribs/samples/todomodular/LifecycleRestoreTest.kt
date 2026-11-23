@@ -1,0 +1,119 @@
+package com.carti.ribs.samples.todomodular
+
+import com.carti.ribs.samples.todomodular.core.RibActivity
+import com.carti.ribs.samples.todomodular.core.SwiftBridge
+import com.carti.ribs.samples.todomodular.feature.loggedout.ui.LoggedOutTags
+import com.carti.ribs.samples.todomodular.feature.todolist.ui.TodoListTags
+import com.carti.ribs.samples.todomodular.feature.tododetail.ui.TodoDetailTags
+import android.content.Intent
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.test.core.app.ActivityScenario
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.After
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+
+/** 구성 변경과 프로세스 종료 뒤 복원이 같은 화면(할 일 상세)을 되살리는지 기기에서 확인한다. */
+@RunWith(AndroidJUnit4::class)
+class LifecycleRestoreTest {
+    @get:Rule
+    val compose = createEmptyComposeRule()
+
+    private lateinit var scenario: ActivityScenario<MainActivity>
+
+    @Before
+    fun launch() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val intent = Intent(context, MainActivity::class.java)
+            .putExtra(RibActivity.EXTRA_LOGIN_DELAY_MILLIS, LOGIN_DELAY_MILLIS)
+        scenario = ActivityScenario.launch(intent)
+    }
+
+    @After
+    fun close() {
+        scenario.close()
+    }
+
+    @Test
+    fun mainQueueSelfCheckPasses() {
+        compose.waitUntil(TIMEOUT_MILLIS) {
+            var draining = false
+            scenario.onActivity { draining = SwiftBridge.isMainQueueDraining() }
+            draining
+        }
+    }
+
+    @Test
+    fun configurationChangeKeepsTodoDetailAndTree() {
+        openDoneTodoDetail()
+
+        // 회전과 같은 구성 변경: Activity만 새로 만들고 ViewModel(Swift 트리)은 그대로다.
+        scenario.recreate()
+
+        waitForTag(TodoDetailTags.DETAIL_TITLE)
+        compose.onNodeWithTag(TodoDetailTags.DETAIL_TITLE).assertTextEquals("우유 사기")
+        compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).assertTextEquals("완료 취소")
+    }
+
+    @Test
+    fun processDeathRestoresTodoDetailFromSavedState() {
+        openDoneTodoDetail()
+
+        // 프로세스 종료처럼 메모리 상태를 버린다: 옛 Activity가 파괴될 때 ViewModel을 지우면
+        // onCleared → SwiftBridge.stop()으로 Swift 트리가 사라진다.
+        // recreate()보다 먼저 지우면 안 된다. recreate()가 onSaveInstanceState를 다시 부르는데,
+        // 그때 트리가 없으면 저장값이 null로 덮인다.
+        scenario.onActivity { old ->
+            old.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_DESTROY) old.viewModelStore.clear()
+            })
+        }
+        // recreate()가 옛 Activity를 멈추며 Swift 상태를 Bundle에 쓰고, 그 Bundle로 Activity를 다시 만든다.
+        // 새 ViewModel이 SavedStateHandle의 값으로 트리를 되살린다.
+        scenario.recreate()
+
+        waitForTag(TodoDetailTags.DETAIL_TITLE)
+        compose.onNodeWithTag(TodoDetailTags.DETAIL_TITLE).assertTextEquals("우유 사기")
+        compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).assertTextEquals("완료 취소")
+
+        // 되살린 트리도 살아 있다: 뒤로 가면 완료 표시가 남은 목록이 나온다.
+        scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        waitForTag(TodoListTags.todoRow(1))
+        compose.onNodeWithTag(TodoListTags.todoRow(1)).assertTextEquals("✓ 우유 사기")
+        var draining = false
+        scenario.onActivity { draining = SwiftBridge.isMainQueueDraining() }
+        assertTrue(draining)
+    }
+
+    private fun openDoneTodoDetail() {
+        compose.onNodeWithTag(LoggedOutTags.NAME_FIELD).performTextInput("carti")
+        compose.onNodeWithTag(LoggedOutTags.LOGIN_BUTTON).performClick()
+        waitForTag(TodoListTags.todoRow(1))
+        compose.onNodeWithTag(TodoListTags.todoRow(1)).performClick()
+        waitForTag(TodoDetailTags.DETAIL_TITLE)
+        compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).performClick()
+        compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).assertTextEquals("완료 취소")
+    }
+
+    private fun waitForTag(tag: String) {
+        compose.waitUntil(TIMEOUT_MILLIS) {
+            compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    private companion object {
+        const val LOGIN_DELAY_MILLIS = 300L
+        const val TIMEOUT_MILLIS = 8_000L
+    }
+}
