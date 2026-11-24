@@ -1,7 +1,7 @@
 import FeatureLoggedIn
 import FeatureLoggedInInterface
 import FeatureLoggedInTesting
-import FeatureLoggedInUI
+import FeatureLoggedInAdapter
 import FeatureTodoDetailInterface
 import FeatureTodoListInterface
 import Observation

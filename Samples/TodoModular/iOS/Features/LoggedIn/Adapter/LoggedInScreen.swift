@@ -1,10 +1,11 @@
 import FeatureLoggedInInterface
+import FeatureLoggedInUI
 import Observation
 import RIBs
 import RIBsSwiftUI
 import SwiftUI
 
-/// 로그인 피처의 SwiftUI 뷰를 만든다. 자식(목록·상세) 화면은 슬롯으로만 받아 자식 UI 모듈을 모른다.
+/// 로그인 피처의 어댑터(ADR-0027)를 만든다. 자식(목록·상세) 화면은 슬롯으로만 받아 자식 피처를 모른다.
 @MainActor
 public final class LoggedInScreenFactory: LoggedInViewFactory {
     public init() {}
@@ -12,6 +13,7 @@ public final class LoggedInScreenFactory: LoggedInViewFactory {
     public func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen() }
 }
 
+/// 뷰 계약을 구현하고, 받은 상태를 풀어 순수 뷰(`FeatureLoggedInUI`)에 넘긴다.
 @MainActor
 final class LoggedInScreen: LoggedInViewContract, SwiftUIRenderable {
     weak var listener: (any LoggedInPresentableListener)?
@@ -23,7 +25,7 @@ final class LoggedInScreen: LoggedInViewContract, SwiftUIRenderable {
     func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
 
     func makeView() -> AnyView {
-        AnyView(LoggedInView(model: model, slot: slot) { [weak self] action in self?.listener?.handle(action) })
+        AnyView(LoggedInContent(model: model, slot: slot) { [weak self] action in self?.listener?.handle(action) })
     }
 }
 
@@ -32,21 +34,19 @@ final class LoggedInModel {
     var state = LoggedInViewState(userName: "")
 }
 
-private struct LoggedInView: View {
+/// 모델을 관찰해 순수 뷰를 다시 그린다. 상태를 인자로 풀고 콜백을 액션으로 묶는다.
+private struct LoggedInContent: View {
     let model: LoggedInModel
     let slot: RIBScreenSlot
     let send: (LoggedInViewAction) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("\(model.state.userName)님, 환영합니다").font(.title2.bold()).accessibilityIdentifier("welcomeLabel")
-            Text("로그인 \(model.state.sessionSeconds)초").accessibilityIdentifier("sessionLabel")
-            Button("로그아웃") { send(.logoutTapped) }
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("logoutButton")
+        LoggedInView(
+            userName: model.state.userName,
+            sessionSeconds: model.state.sessionSeconds,
+            onLogout: { send(.logoutTapped) }
+        ) {
             RIBSlotView(slot: slot)
-            Spacer()
         }
-        .padding(24)
     }
 }
