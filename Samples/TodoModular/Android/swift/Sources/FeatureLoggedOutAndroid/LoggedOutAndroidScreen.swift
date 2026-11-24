@@ -2,7 +2,7 @@ import FeatureLoggedOutInterface
 import RIBs
 import TodoAndroidSupport
 
-/// 로그아웃 피처의 Android 화면을 만든다. Kotlin `:feature:loggedout:ui`가 짝이다.
+/// 로그아웃 피처의 Android 화면을 만든다. Kotlin `:feature:loggedout:adapter`가 짝이다.
 @MainActor
 public final class LoggedOutAndroidViewFactory: LoggedOutViewFactory {
     nonisolated public static let kind = "loggedOut"

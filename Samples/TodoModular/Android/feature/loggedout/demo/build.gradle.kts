@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:loggedout:ui"))
+    implementation(project(":feature:loggedout:adapter"))
 }

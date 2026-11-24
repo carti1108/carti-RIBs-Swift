@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:loggedin:ui"))
+    implementation(project(":feature:loggedin:adapter"))
 }

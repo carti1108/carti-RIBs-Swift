@@ -12,20 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.carti.ribs.samples.todomodular.core.rememberAttachedHandle
-import com.carti.ribs.samples.todomodular.swiftbridge.LoggedOutScreenHandle
-import com.carti.ribs.samples.todomodular.swiftbridge.LoggedOutViewBridge
-import java.util.Optional
 
-/** Swift `LoggedOutAndroidViewFactory.kind`와 같은 문자열. */
-const val LOGGED_OUT_KIND = "loggedOut"
+// 순수 뷰(ADR-0027). 값과 콜백만 받아 그린다. 이 모듈은 `:bridge`에 의존하지 않아 Swift 런타임 없이 미리보기와 테스트가 된다.
 
 object LoggedOutTags {
     const val NAME_FIELD = "nameField"
@@ -34,29 +29,10 @@ object LoggedOutTags {
     const val LOADING_INDICATOR = "loadingIndicator"
 }
 
-/** Swift `LoggedOutViewBridge`의 Compose 쪽 구현. Swift가 넘긴 값을 Compose 상태로 든다. */
-private class LoggedOutView : LoggedOutViewBridge {
-    var errorMessage: String? by mutableStateOf(null)
-        private set
-    var isLoading: Boolean by mutableStateOf(false)
-        private set
-
-    override fun render(errorMessage: Optional<String>, isLoading: Boolean) {
-        this.errorMessage = errorMessage.orElse(null)
-        this.isLoading = isLoading
-    }
-}
-
+/** 입력 중인 이름은 뷰가 들고 있다가 로그인 때 넘긴다. */
 @Composable
-fun LoggedOutScreen(screenId: Long) {
+fun LoggedOutView(errorMessage: String?, isLoading: Boolean, onLogin: (String) -> Unit) {
     var name by rememberSaveable { mutableStateOf("") }
-    val view = remember { LoggedOutView() }
-    val handle = rememberAttachedHandle(
-        create = { LoggedOutScreenHandle.init(screenId, it) },
-        attach = { it.attach(view) },
-        detach = { it.detach() },
-    )
-    val isLoading = view.isLoading
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
@@ -71,16 +47,22 @@ fun LoggedOutScreen(screenId: Long) {
             singleLine = true,
             modifier = Modifier.testTag(LoggedOutTags.NAME_FIELD),
         )
-        view.errorMessage?.let {
+        errorMessage?.let {
             Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(LoggedOutTags.ERROR_LABEL))
         }
         if (isLoading) CircularProgressIndicator(modifier = Modifier.testTag(LoggedOutTags.LOADING_INDICATOR))
         Button(
-            onClick = { handle.loginTapped(name) },
+            onClick = { onLogin(name) },
             enabled = !isLoading,
             modifier = Modifier.testTag(LoggedOutTags.LOGIN_BUTTON),
         ) {
             Text("로그인")
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoggedOutViewPreview() {
+    MaterialTheme { LoggedOutView(errorMessage = "이름을 입력하세요", isLoading = false, onLogin = {}) }
 }

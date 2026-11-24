@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:tododetail:ui"))
+    implementation(project(":feature:tododetail:adapter"))
 }

@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import com.carti.ribs.samples.todomodular.core.RibActivity
 import com.carti.ribs.samples.todomodular.core.RibTreeStarter
 import com.carti.ribs.samples.todomodular.core.SwiftBridge
-import com.carti.ribs.samples.todomodular.feature.tododetail.ui.TodoDetailScreen
-import com.carti.ribs.samples.todomodular.feature.tododetail.ui.TODO_DETAIL_KIND
+import com.carti.ribs.samples.todomodular.feature.tododetail.adapter.TodoDetailScreen
+import com.carti.ribs.samples.todomodular.feature.tododetail.adapter.TODO_DETAIL_KIND
 import org.json.JSONObject
 
 /** TodoDetail 피처만 띄운다. 부모에게 갈 이벤트는 화면 아래에, 자식 피처는 자리표시 화면으로 보인다. */

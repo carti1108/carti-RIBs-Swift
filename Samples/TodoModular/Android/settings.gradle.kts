@@ -22,5 +22,5 @@ dependencyResolutionManagement {
 //   :app                   모든 :ui를 잇는 앱
 include(":bridge", ":app")
 listOf("loggedout", "loggedin", "todolist", "tododetail").forEach { feature ->
-    include(":feature:$feature:ui", ":feature:$feature:demo")
+    include(":feature:$feature:ui", ":feature:$feature:adapter", ":feature:$feature:demo")
 }
