@@ -11,7 +11,8 @@ React·Vite·TypeScript는 이 디렉터리의 npm 의존성에만 있습니다.
 | `Sources/FeatureXxxWeb` | 피처의 웹 화면(뷰 계약 구현)과 뷰 팩토리. 자기 Interface만 압니다 |
 | `Sources/TodoWebSupport` | DOM 화면 기반 클래스, 루트 화면, 데모용 자리표시 화면 |
 | `Sources/TodoModularWeb` | `@JS` 브리지, 전체 앱과 피처별 데모 조립 |
-| `features/<피처>/view.tsx` | 피처의 화면 컴포넌트와 브리지 프로토콜(`XxxViewBridge`) 구현 |
+| `features/<피처>/view.tsx` | 순수 뷰. props로 받은 값과 콜백만으로 그립니다. Swift 브리지 타입을 모릅니다(ADR-0027) |
+| `features/<피처>/adapter.tsx` | 어댑터. 브리지 프로토콜(`XxxViewBridge`)을 구현하고 값을 순수 뷰에 넘깁니다 |
 | `features/<피처>/demo.html`, `demo.ts` | 그 피처만 띄우는 데모 페이지 |
 | `index.html`, `app.ts` | 전체 앱 |
 | `support/` | React 루트를 브리지에 잇는 `ReactScreen`, Wasm 진입점과 생성된 타입 |
