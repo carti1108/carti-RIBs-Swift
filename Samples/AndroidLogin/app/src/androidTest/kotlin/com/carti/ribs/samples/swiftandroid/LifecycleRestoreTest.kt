@@ -12,6 +12,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.carti.ribs.samples.swiftandroid.views.Tags
 import org.junit.After
 import org.junit.Assert.assertTrue
 import org.junit.Before
