@@ -1,31 +1,24 @@
-import { ReactScreen } from "../../support/react-screen";
-import type { TodoListRow, TodoListScreenHandle, TodoListViewBridge } from "../../support/swift";
+// 순수 뷰(ADR-0027). props로 받은 값과 콜백만으로 그린다. React만 import하고 Swift 브리지 타입을 모른다.
+
+/** 목록 한 줄. 뷰가 정의하고 어댑터가 채운다. */
+export type TodoListItem = {
+  id: number;
+  title: string;
+  isDone: boolean;
+};
 
 type Props = {
-  rows: TodoListRow[];
+  items: TodoListItem[];
   onSelect: (id: number) => void;
 };
 
-/** 화면 자리(`host`)가 `<ul>`이라 항목만 그린다. */
-export function TodoListScreen({ rows, onSelect }: Props) {
-  return rows.map((row) => (
-    <li key={row.id}>
-      <button id={`todoRow-${row.id}`} onClick={() => onSelect(row.id)}>
-        {(row.isDone ? "✓ " : "") + row.title}
+/** 화면 자리가 `<ul>`이라 항목만 그린다. */
+export function TodoListView({ items, onSelect }: Props) {
+  return items.map((item) => (
+    <li key={item.id}>
+      <button id={`todoRow-${item.id}`} onClick={() => onSelect(item.id)}>
+        {(item.isDone ? "✓ " : "") + item.title}
       </button>
     </li>
   ));
-}
-
-/** Swift `TodoListViewBridge`(Sources/TodoModularWeb/TodoListBridge.swift)의 React 구현. */
-export class TodoListView implements TodoListViewBridge {
-  #screen = new ReactScreen<TodoListScreenHandle>();
-
-  mount(host: Element, handle: TodoListScreenHandle): void {
-    this.#screen.mount(host, handle);
-  }
-
-  render(rows: TodoListRow[]): void {
-    this.#screen.render((handle) => <TodoListScreen rows={rows} onSelect={(id) => handle.todoTapped(id)} />);
-  }
 }

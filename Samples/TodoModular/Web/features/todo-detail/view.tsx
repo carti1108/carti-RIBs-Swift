@@ -1,5 +1,4 @@
-import { ReactScreen } from "../../support/react-screen";
-import type { TodoDetailScreenHandle, TodoDetailViewBridge } from "../../support/swift";
+// 순수 뷰(ADR-0027). props로 받은 값과 콜백만으로 그린다. React만 import하고 Swift 브리지 타입을 모른다.
 
 type Props = {
   title: string;
@@ -8,8 +7,8 @@ type Props = {
   onToggleDone: () => void;
 };
 
-/** 뒤로 버튼은 닫기를 요청만 한다. 닫는 일은 부모 RIB이 한다. */
-export function TodoDetailScreen({ title, isDone, onBack, onToggleDone }: Props) {
+/** 뒤로 버튼은 닫기를 요청만 한다. */
+export function TodoDetailView({ title, isDone, onBack, onToggleDone }: Props) {
   return (
     <>
       <button id="backButton" onClick={onBack}>
@@ -21,24 +20,4 @@ export function TodoDetailScreen({ title, isDone, onBack, onToggleDone }: Props)
       </button>
     </>
   );
-}
-
-/** Swift `TodoDetailViewBridge`(Sources/TodoModularWeb/TodoDetailBridge.swift)의 React 구현. */
-export class TodoDetailView implements TodoDetailViewBridge {
-  #screen = new ReactScreen<TodoDetailScreenHandle>();
-
-  mount(host: Element, handle: TodoDetailScreenHandle): void {
-    this.#screen.mount(host, handle);
-  }
-
-  render(title: string, isDone: boolean): void {
-    this.#screen.render((handle) => (
-      <TodoDetailScreen
-        title={title}
-        isDone={isDone}
-        onBack={() => handle.backTapped()}
-        onToggleDone={() => handle.toggleDoneTapped()}
-      />
-    ));
-  }
 }

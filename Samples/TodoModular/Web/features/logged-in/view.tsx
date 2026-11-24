@@ -1,21 +1,16 @@
-import { useEffect, useRef } from "react";
-import { ReactScreen } from "../../support/react-screen";
-import type { LoggedInScreenHandle, LoggedInViewBridge } from "../../support/swift";
+// 순수 뷰(ADR-0027). props로 받은 값과 콜백만으로 그린다. React만 import하고 Swift 브리지 타입을 모른다.
+
+import type { ReactNode } from "react";
 
 type Props = {
   userName: string;
   sessionSeconds: number;
-  content: Element;
   onLogout: () => void;
+  /** 자식 화면(할 일 목록·상세) 자리. 무엇이 들어오는지 모른다. */
+  children: ReactNode;
 };
 
-/** `content`는 자식 화면(할 일 목록·상세) 자리다. Swift가 채우므로 원하는 위치에 넣기만 한다. */
-export function LoggedInScreen({ userName, sessionSeconds, content, onLogout }: Props) {
-  const slot = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    slot.current?.replaceChildren(content);
-  }, [content]);
-
+export function LoggedInView({ userName, sessionSeconds, onLogout, children }: Props) {
   return (
     <>
       <h2 id="welcomeLabel">{userName}님, 환영합니다</h2>
@@ -23,29 +18,7 @@ export function LoggedInScreen({ userName, sessionSeconds, content, onLogout }: 
       <button id="logoutButton" onClick={onLogout}>
         로그아웃
       </button>
-      <div ref={slot} />
+      {children}
     </>
   );
-}
-
-type Mounted = { content: Element; handle: LoggedInScreenHandle };
-
-/** Swift `LoggedInViewBridge`(Sources/TodoModularWeb/LoggedInBridge.swift)의 React 구현. */
-export class LoggedInView implements LoggedInViewBridge {
-  #screen = new ReactScreen<Mounted>();
-
-  mount(host: Element, content: Element, handle: LoggedInScreenHandle): void {
-    this.#screen.mount(host, { content, handle });
-  }
-
-  render(userName: string, sessionSeconds: number): void {
-    this.#screen.render(({ content, handle }) => (
-      <LoggedInScreen
-        userName={userName}
-        sessionSeconds={sessionSeconds}
-        content={content}
-        onLogout={() => handle.logoutTapped()}
-      />
-    ));
-  }
 }
