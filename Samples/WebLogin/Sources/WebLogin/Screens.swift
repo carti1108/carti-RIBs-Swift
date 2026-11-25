@@ -48,34 +48,22 @@ final class LoggedInScreen: LoggedInViewContract, DOMScreen {
     private let view: any LoggedInViewBridge
     private let slot = WebScreenSlot()
     private let renderer: SlotRenderer
-    private var userName = ""
-    private var sessionSeconds: Int64 = 0
 
     init(view: any LoggedInViewBridge) {
         self.view = view
         element = DOMBuilder.element("section", id: "loggedIn")
         let content = DOMBuilder.element("div", id: "loggedInContent")
         renderer = SlotRenderer(slot: slot, container: content)
-        let handle = LoggedInScreenHandle { [weak self] in self?.listener?.didTapLogout() }
+        let handle = LoggedInScreenHandle { [weak self] in self?.listener?.handle(.logoutTapped) }
         view.mount(host: element, content: content, handle: handle)
     }
 
-    func showUserName(_ name: String) {
-        userName = name
-        render()
-    }
-
-    func showSessionSeconds(_ seconds: Int64) {
-        sessionSeconds = seconds
-        render()
+    func render(_ state: LoggedInViewState) {
+        view.render(userName: state.userName, sessionSeconds: Int(state.sessionSeconds))
     }
 
     func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
     func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
-
-    private func render() {
-        view.render(userName: userName, sessionSeconds: Int(sessionSeconds))
-    }
 }
 
 @MainActor
@@ -87,12 +75,12 @@ final class TodoListScreen: TodoListViewContract, DOMScreen {
     init(view: any TodoListViewBridge) {
         self.view = view
         element = DOMBuilder.element("ul", id: "todoList")
-        let handle = TodoListScreenHandle { [weak self] id in self?.listener?.didTapTodo(id: Int64(id)) }
+        let handle = TodoListScreenHandle { [weak self] id in self?.listener?.handle(.todoTapped(id: Int64(id))) }
         view.mount(host: element, handle: handle)
     }
 
-    func showTodos(_ todos: [Todo]) {
-        view.render(rows: todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) })
+    func render(_ state: TodoListViewState) {
+        view.render(rows: state.todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) })
     }
 }
 
@@ -106,14 +94,14 @@ final class TodoDetailScreen: TodoDetailViewContract, DOMScreen {
         self.view = view
         element = DOMBuilder.element("section", id: "todoDetail")
         let handle = TodoDetailScreenHandle(
-            onToggleDoneTapped: { [weak self] in self?.listener?.didTapToggleDone() },
-            onBackTapped: { [weak self] in self?.listener?.didTapBack() }
+            onToggleDoneTapped: { [weak self] in self?.listener?.handle(.toggleDoneTapped) },
+            onBackTapped: { [weak self] in self?.listener?.handle(.backTapped) }
         )
         view.mount(host: element, handle: handle)
     }
 
-    func showTodo(title: String, isDone: Bool) {
-        view.render(title: title, isDone: isDone)
+    func render(_ state: TodoDetailViewState) {
+        view.render(title: state.title, isDone: state.isDone)
     }
 }
 

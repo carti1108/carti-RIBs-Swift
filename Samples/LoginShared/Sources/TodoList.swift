@@ -1,14 +1,26 @@
 import RIBs
 
+public struct TodoListViewState: Equatable, Sendable {
+    public var todos: [Todo]
+
+    public init(todos: [Todo] = []) {
+        self.todos = todos
+    }
+}
+
+public enum TodoListViewAction: Equatable, Sendable {
+    case todoTapped(id: Int64)
+}
+
 @MainActor
 public protocol TodoListPresentableListener: AnyObject {
-    func didTapTodo(id: Int64)
+    func handle(_ action: TodoListViewAction)
 }
 
 @MainActor
 public protocol TodoListPresentable: Presentable {
     var listener: (any TodoListPresentableListener)? { get set }
-    func showTodos(_ todos: [Todo])
+    func render(_ state: TodoListViewState)
 }
 
 @MainActor
@@ -52,7 +64,7 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
         let updates = todoStore.updates
         startTask { [presenter] in
             for await todos in updates {
-                presenter.showTodos(todos)
+                presenter.render(TodoListViewState(todos: todos))
             }
         }
     }
@@ -61,7 +73,11 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
         presenter.listener = nil
     }
 
-    func didTapTodo(id: Int64) { listener?.didSelectTodo(id: id) }
+    func handle(_ action: TodoListViewAction) {
+        switch action {
+        case .todoTapped(let id): listener?.didSelectTodo(id: id)
+        }
+    }
 }
 
 typealias TodoListRouter = ViewableRouter<TodoListInteractor, any TodoListViewControllable>

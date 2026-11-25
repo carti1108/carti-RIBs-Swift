@@ -2,8 +2,7 @@ import RIBs
 
 /// 화면에 그릴 값 전체. 플랫폼은 이 값만 보고 그린다.
 ///
-/// 샘플에서 `ViewState`/`ViewAction` 패턴을 보여 주는 RIB이다. 라이브러리는 이 패턴을 요구하지 않는다.
-/// 다른 RIB(`LoggedIn` 등)은 명령형 메서드를 쓴다. 화면에 맞는 쪽을 고르면 된다.
+/// 샘플의 뷰 계약은 모두 `ViewState`/`ViewAction` 모양이다(ADR-0025). 라이브러리는 이 패턴을 요구하지 않는다(ADR-0019).
 /// 상태를 한 값으로 넘기면 에러와 로딩이 한 번에 바뀌어 중간 상태가 화면에 나오지 않는다.
 public struct LoggedOutViewState: Equatable, Sendable {
     public var errorMessage: String?
@@ -84,6 +83,8 @@ final class LoggedOutInteractor: PresentableInteractor<any LoggedOutPresentable>
     override func willResignActive() {
         presenter.listener = nil
         isLoggingIn = false
+        // 요청이 취소됐으니 다시 붙을 때 로딩으로 그리지 않는다.
+        viewState = LoggedOutViewState(errorMessage: viewState.errorMessage)
     }
 
     func handle(_ action: LoggedOutViewAction) {

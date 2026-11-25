@@ -9,17 +9,15 @@ final class LoggedOutModel {
 
 @MainActor @Observable
 final class LoggedInModel {
-    var userName = ""
-    var sessionSeconds: Int64 = 0
+    var state = LoggedInViewState(userName: "")
 }
 
 @MainActor @Observable
 final class TodoListModel {
-    var todos: [Todo] = []
+    var state = TodoListViewState()
 }
 
 @MainActor @Observable
 final class TodoDetailModel {
-    var title = ""
-    var isDone = false
+    var state = TodoDetailViewState(title: "", isDone: false)
 }

@@ -1,6 +1,6 @@
 # 웹 샘플 (Wasm)
 
-`LoginShared` 트리를 Wasm으로 빌드하고, Swift가 JavaScriptKit으로 DOM을 직접 그립니다(ADR-0009).
+`LoginShared` 트리를 Wasm으로 빌드하고, 화면은 JS 뷰(`views/*.js`)가 그립니다. Swift와 JS는 BridgeJS가 만든 화면별 브리지로 오갑니다(ADR-0020, ADR-0022).
 
 swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다.
 

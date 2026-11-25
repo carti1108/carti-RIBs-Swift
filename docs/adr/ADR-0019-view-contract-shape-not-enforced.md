@@ -1,5 +1,5 @@
 ### ADR-0019 코어는 뷰 계약의 모양을 강제하지 않는다
-- 상태: 채택
+- 상태: 채택 (샘플 통일 여부는 ADR-0025로 대체됨)
 - 날짜: 2026-11-20
 - 배경:
   - 로그인 샘플의 LoggedOut RIB은 뷰 계약을 `render(_ state: LoggedOutViewState)`와 `handle(_ action: LoggedOutViewAction)` 두 메서드로 바꿨다(커밋 `bb6ab17`). 상태 변경이 렌더 한 번으로 묶이고, 실패 응답에서 오류와 로딩이 따로 그려지는 문제가 없어졌다.

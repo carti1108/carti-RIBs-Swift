@@ -139,7 +139,7 @@ struct AndroidLoginControllerTests {
         let loggedIn = try attach(loggedInNode, as: LoggedInScreen.self)
         #expect(loggedIn.rendered.states.last?.userName == "carti")
 
-        loggedIn.screen.tapLogout()
+        loggedIn.screen.send(.logoutTapped)
         #expect(child(try tree())?["kind"] == .string(ScreenKind.loggedOut))
         #expect(try attachLoggedOut().rendered.states == [LoggedOutViewState()])
     }
@@ -157,29 +157,29 @@ struct AndroidLoginControllerTests {
         controller.start(savedState: nil)
         try await logIn()
         let list = try attach(child(child(try tree())), as: TodoListScreen.self)
-        #expect(list.rendered.states.last?.first == Todo(id: 1, title: "우유 사기", isDone: false))
-        list.screen.tapTodo(id: 1)
+        #expect(list.rendered.states.last?.todos.first == Todo(id: 1, title: "우유 사기", isDone: false))
+        list.screen.send(.todoTapped(id: 1))
 
         let detailNode = child(child(try tree()))
         #expect(detailNode?["kind"] == .string(ScreenKind.todoDetail))
         let detail = try attach(detailNode, as: TodoDetailScreen.self)
-        #expect(detail.rendered.states.last == TodoDetailScreenState(title: "우유 사기", isDone: false))
-        detail.screen.tapToggleDone()
+        #expect(detail.rendered.states.last == TodoDetailViewState(title: "우유 사기", isDone: false))
+        detail.screen.send(.toggleDoneTapped)
         #expect(detail.rendered.states.last?.isDone == true)
 
         #expect(controller.handleBackPress())
         await settle()
         let listNode = child(child(try tree()))
         #expect(listNode?["kind"] == .string(ScreenKind.todoList))
-        #expect(try attach(listNode, as: TodoListScreen.self).rendered.states.last?.first?.isDone == true)
+        #expect(try attach(listNode, as: TodoListScreen.self).rendered.states.last?.todos.first?.isDone == true)
         #expect(!controller.handleBackPress())
     }
 
     @Test func detailBackTapReturnsToList() async throws {
         controller.start(savedState: nil)
         try await logIn()
-        try attach(child(child(try tree())), as: TodoListScreen.self).screen.tapTodo(id: 1)
-        try attach(child(child(try tree())), as: TodoDetailScreen.self).screen.tapBack()
+        try attach(child(child(try tree())), as: TodoListScreen.self).screen.send(.todoTapped(id: 1))
+        try attach(child(child(try tree())), as: TodoDetailScreen.self).screen.send(.backTapped)
         await settle()
         #expect(child(child(try tree()))?["kind"] == .string(ScreenKind.todoList))
     }
