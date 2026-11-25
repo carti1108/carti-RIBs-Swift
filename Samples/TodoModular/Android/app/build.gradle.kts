@@ -25,7 +25,7 @@ android {
 }
 
 dependencies {
-    listOf("loggedout", "loggedin", "todolist", "tododetail").forEach { implementation(project(":feature:$it:ui")) }
+    listOf("loggedout", "loggedin", "todolist", "tododetail").forEach { implementation(project(":feature:$it:adapter")) }
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

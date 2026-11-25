@@ -22,5 +22,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:todolist:ui"))
+    implementation(project(":feature:todolist:adapter"))
 }

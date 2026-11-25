@@ -2,9 +2,9 @@ import FeatureLoggedOutAndroid
 
 // swift-java가 Java로 내보내는 층. 격리 없는 public 타입만 두고 `@MainActor` 화면은 감춘다(ADR-0020).
 // 모든 호출은 Android 메인 스레드에서 온다고 가정하고 `MainActor.assumeIsolated`로 확인한다(`JNI.swift`와 같다).
-// Kotlin `:feature:loggedout:ui`가 짝이다.
+// Kotlin `:feature:loggedout:adapter`가 짝이다.
 
-/// Kotlin(Compose) 뷰가 구현한다.
+/// Kotlin 어댑터가 구현한다.
 public protocol LoggedOutViewBridge {
     func render(errorMessage: String?, isLoading: Bool)
 }

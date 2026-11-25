@@ -3,7 +3,7 @@ import RIBs
 import RIBsSwiftUI
 import SwiftUI
 
-/// 로그인 상태 RIB의 뷰. 머리말과 자식 RIB 화면(목록·상세) 하나를 그린다.
+/// 로그인 상태 RIB의 어댑터(ADR-0027). 자식 RIB 화면 슬롯을 들고, 순수 뷰에는 `child`로 넘긴다.
 @MainActor
 final class LoggedInScreen: LoggedInViewContract, SwiftUIRenderable {
     weak var listener: (any LoggedInPresentableListener)?
@@ -15,25 +15,22 @@ final class LoggedInScreen: LoggedInViewContract, SwiftUIRenderable {
     func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
 
     func makeView() -> AnyView {
-        AnyView(LoggedInView(model: model, slot: slot) { [weak self] in self?.listener?.handle(.logoutTapped) })
+        AnyView(LoggedInContent(model: model, slot: slot) { [weak self] action in self?.listener?.handle(action) })
     }
 }
 
-private struct LoggedInView: View {
+private struct LoggedInContent: View {
     let model: LoggedInModel
     let slot: RIBScreenSlot
-    let onLogout: () -> Void
+    let send: (LoggedInViewAction) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("\(model.state.userName)님, 환영합니다").font(.title2.bold()).accessibilityIdentifier("welcomeLabel")
-            Text("로그인 \(model.state.sessionSeconds)초").accessibilityIdentifier("sessionLabel")
-            Button("로그아웃", action: onLogout)
-                .buttonStyle(.bordered)
-                .accessibilityIdentifier("logoutButton")
+        LoggedInView(
+            userName: model.state.userName,
+            sessionSeconds: model.state.sessionSeconds,
+            onLogout: { send(.logoutTapped) }
+        ) {
             RIBSlotView(slot: slot)
-            Spacer()
         }
-        .padding(24)
     }
 }

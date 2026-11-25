@@ -1,7 +1,7 @@
 import FeatureTodoList
 import FeatureTodoListInterface
 import FeatureTodoListTesting
-import FeatureTodoListUI
+import FeatureTodoListAdapter
 import Observation
 import RIBsSwiftUI
 import SwiftUI

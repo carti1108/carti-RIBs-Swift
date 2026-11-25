@@ -1,6 +1,6 @@
 import FeatureLoggedOut
 import FeatureLoggedOutInterface
-import FeatureLoggedOutUI
+import FeatureLoggedOutAdapter
 import Observation
 import RIBsSwiftUI
 import SwiftUI

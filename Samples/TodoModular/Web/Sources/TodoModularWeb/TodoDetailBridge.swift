@@ -1,6 +1,6 @@
 import JavaScriptKit
 
-/// 웹 뷰가 구현한다. 이 샘플은 `features/todo-detail/view.tsx`가 구현한다.
+/// 웹 뷰가 구현한다. 이 샘플은 `features/todo-detail/adapter.tsx`가 구현한다.
 @JS protocol TodoDetailViewBridge {
     func mount(host: JSObject, handle: TodoDetailScreenHandle)
     func render(title: String, isDone: Bool)

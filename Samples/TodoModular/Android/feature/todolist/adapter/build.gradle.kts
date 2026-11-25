@@ -1,0 +1,22 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.compose)
+}
+
+// 어댑터 모듈(ADR-0027). Swift 브리지 프로토콜을 구현하고 값을 순수 뷰(`:feature:todolist:ui`)에 넘긴다.
+// 전체 앱과 이 피처의 demo 앱이 함께 쓴다.
+android {
+    namespace = "com.carti.ribs.samples.todomodular.feature.todolist.adapter"
+    compileSdk = 37
+    defaultConfig { minSdk = 28 }
+    buildFeatures { compose = true }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    api(project(":bridge"))
+    api(project(":feature:todolist:ui"))
+}

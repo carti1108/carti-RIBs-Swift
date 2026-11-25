@@ -8,7 +8,7 @@ import JavaScriptKit
     let isDone: Bool
 }
 
-/// 웹 뷰가 구현한다. 이 샘플은 `views/todo-list-view.js`가 구현한다.
+/// 웹 뷰가 구현한다. 이 샘플은 `adapters/todo-list-adapter.js`가 구현한다.
 @JS protocol TodoListViewBridge {
     func mount(host: JSObject, handle: TodoListScreenHandle)
     func render(rows: [TodoListRow])

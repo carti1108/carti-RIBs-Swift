@@ -3,7 +3,7 @@ import JavaScriptKit
 // BridgeJS가 JS로 내보내는 층. 격리 없는 타입만 `@JS`로 두고 `@MainActor` 뷰 계약은 감춘다.
 // Wasm은 단일 스레드라 모든 호출이 메인에서 온다. `MainActor.assumeIsolated`로 확인한다.
 
-/// 웹 뷰가 구현한다. 뷰를 무엇으로 만들지는 정하지 않는다. 이 샘플은 `features/logged-out/view.tsx`가 구현한다.
+/// 웹 뷰가 구현한다. 뷰를 무엇으로 만들지는 정하지 않는다. 이 샘플은 `features/logged-out/adapter.tsx`가 구현한다.
 /// 화면 종류마다 뷰 객체는 하나이고, 그 객체가 같은 종류의 화면 여러 개를 차례로 맡는다(로그아웃할 때마다 새 화면이 생긴다).
 /// 다른 화면의 브리지(`LoggedInBridge.swift` 등)도 같은 규칙을 따른다.
 @JS protocol LoggedOutViewBridge {

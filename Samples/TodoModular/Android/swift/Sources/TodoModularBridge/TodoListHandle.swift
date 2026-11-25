@@ -13,7 +13,7 @@ public struct TodoListRow: Sendable {
     }
 }
 
-/// Kotlin(Compose) 뷰가 구현한다. Kotlin `:feature:todolist:ui`가 짝이다.
+/// Kotlin 어댑터가 구현한다. Kotlin `:feature:todolist:adapter`가 짝이다.
 ///
 /// 목록은 인자로 넘기지 않고, 바뀌었다고만 알린 뒤 뷰가 `TodoListScreenHandle.rows()`로 읽어 간다.
 /// swift-java 0.7.0은 직접 만든 타입의 배열을 Java로 넘길 때 JNI `FindClass`로 원소 클래스를 찾는데,

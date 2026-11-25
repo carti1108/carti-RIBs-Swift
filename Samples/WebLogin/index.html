@@ -19,13 +19,13 @@
   </script>
   <script type="module">
     import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-    import { LoggedOutView } from "./views/logged-out-view.js";
-    import { LoggedInView } from "./views/logged-in-view.js";
-    import { TodoListView } from "./views/todo-list-view.js";
-    import { TodoDetailView } from "./views/todo-detail-view.js";
-    // 화면은 JS 뷰가 그린다. Swift가 정의한 화면별 브리지 프로토콜을 구현한 객체를 넘겨 앱을 시작한다.
+    import { LoggedOutAdapter } from "./adapters/logged-out-adapter.js";
+    import { LoggedInAdapter } from "./adapters/logged-in-adapter.js";
+    import { TodoListAdapter } from "./adapters/todo-list-adapter.js";
+    import { TodoDetailAdapter } from "./adapters/todo-detail-adapter.js";
+    // 화면은 JS가 그린다. 어댑터가 Swift의 화면별 브리지 프로토콜을 구현하고, 값을 순수 뷰(views/)에 넘긴다.
     const { exports } = await init();
-    exports.startLoginApp(new LoggedOutView(), new LoggedInView(), new TodoListView(), new TodoDetailView());
+    exports.startLoginApp(new LoggedOutAdapter(), new LoggedInAdapter(), new TodoListAdapter(), new TodoDetailAdapter());
   </script>
 </body>
 </html>

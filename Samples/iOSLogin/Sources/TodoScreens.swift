@@ -3,7 +3,7 @@ import RIBs
 import RIBsSwiftUI
 import SwiftUI
 
-/// 할 일 목록 RIB의 뷰.
+/// 할 일 목록 RIB의 어댑터(ADR-0027). 공유 코드의 `Todo`를 순수 뷰의 `TodoListItem`으로 옮긴다.
 @MainActor
 final class TodoListScreen: TodoListViewContract, SwiftUIRenderable {
     weak var listener: (any TodoListPresentableListener)?
@@ -12,25 +12,23 @@ final class TodoListScreen: TodoListViewContract, SwiftUIRenderable {
     func render(_ state: TodoListViewState) { model.state = state }
 
     func makeView() -> AnyView {
-        AnyView(TodoListView(model: model) { [weak self] id in self?.listener?.handle(.todoTapped(id: id)) })
+        AnyView(TodoListContent(model: model) { [weak self] action in self?.listener?.handle(action) })
     }
 }
 
-private struct TodoListView: View {
+private struct TodoListContent: View {
     let model: TodoListModel
-    let onSelect: (Int64) -> Void
+    let send: (TodoListViewAction) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(model.state.todos) { todo in
-                Button((todo.isDone ? "✓ " : "") + todo.title) { onSelect(todo.id) }
-                    .accessibilityIdentifier("todoRow-\(todo.id)")
-            }
-        }
+        TodoListView(
+            items: model.state.todos.map { TodoListItem(id: $0.id, title: $0.title, isDone: $0.isDone) },
+            onSelect: { send(.todoTapped(id: $0)) }
+        )
     }
 }
 
-/// 할 일 상세 RIB의 뷰. 뒤로 버튼은 공유 코드에 닫기를 요청하고, 닫는 일은 부모 RIB이 한다.
+/// 할 일 상세 RIB의 어댑터. 뒤로 버튼은 공유 코드에 닫기를 요청하고, 닫는 일은 부모 RIB이 한다.
 @MainActor
 final class TodoDetailScreen: TodoDetailViewContract, SwiftUIRenderable {
     weak var listener: (any TodoDetailPresentableListener)?
@@ -39,26 +37,20 @@ final class TodoDetailScreen: TodoDetailViewContract, SwiftUIRenderable {
     func render(_ state: TodoDetailViewState) { model.state = state }
 
     func makeView() -> AnyView {
-        AnyView(TodoDetailView(
-            model: model,
-            onBack: { [weak self] in self?.listener?.handle(.backTapped) },
-            onToggle: { [weak self] in self?.listener?.handle(.toggleDoneTapped) }
-        ))
+        AnyView(TodoDetailContent(model: model) { [weak self] action in self?.listener?.handle(action) })
     }
 }
 
-private struct TodoDetailView: View {
+private struct TodoDetailContent: View {
     let model: TodoDetailModel
-    let onBack: () -> Void
-    let onToggle: () -> Void
+    let send: (TodoDetailViewAction) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Button("← 목록", action: onBack).accessibilityIdentifier("backButton")
-            Text(model.state.title).font(.title3.bold()).accessibilityIdentifier("detailTitle")
-            Button(model.state.isDone ? "완료 취소" : "완료로 표시", action: onToggle)
-                .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier("toggleDoneButton")
-        }
+        TodoDetailView(
+            title: model.state.title,
+            isDone: model.state.isDone,
+            onBack: { send(.backTapped) },
+            onToggleDone: { send(.toggleDoneTapped) }
+        )
     }
 }

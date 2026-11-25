@@ -1,6 +1,6 @@
+// 순수 뷰(ADR-0027). props로 받은 값과 콜백만으로 그린다. React만 import하고 Swift 브리지 타입을 모른다.
+
 import { useState } from "react";
-import { ReactScreen } from "../../support/react-screen";
-import type { LoggedOutScreenHandle, LoggedOutViewBridge } from "../../support/swift";
 
 type Props = {
   errorMessage: string | null;
@@ -9,7 +9,7 @@ type Props = {
 };
 
 /** 이름 입력값은 이 컴포넌트가 들고 있다가 로그인 때 넘긴다. */
-export function LoggedOutScreen({ errorMessage, isLoading, onLogin }: Props) {
+export function LoggedOutView({ errorMessage, isLoading, onLogin }: Props) {
   const [name, setName] = useState("");
   return (
     <>
@@ -32,23 +32,4 @@ export function LoggedOutScreen({ errorMessage, isLoading, onLogin }: Props) {
       </button>
     </>
   );
-}
-
-/** Swift `LoggedOutViewBridge`(Sources/TodoModularWeb/LoggedOutBridge.swift)의 React 구현. */
-export class LoggedOutView implements LoggedOutViewBridge {
-  #screen = new ReactScreen<LoggedOutScreenHandle>();
-
-  mount(host: Element, handle: LoggedOutScreenHandle): void {
-    this.#screen.mount(host, handle);
-  }
-
-  render(errorMessage: string | null, isLoading: boolean): void {
-    this.#screen.render((handle) => (
-      <LoggedOutScreen
-        errorMessage={errorMessage}
-        isLoading={isLoading}
-        onLogin={(rawName) => handle.loginTapped(rawName)}
-      />
-    ));
-  }
 }

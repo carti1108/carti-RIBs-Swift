@@ -1,7 +1,7 @@
 import FeatureTodoDetail
 import FeatureTodoDetailInterface
 import FeatureTodoDetailTesting
-import FeatureTodoDetailUI
+import FeatureTodoDetailAdapter
 import Observation
 import RIBsSwiftUI
 import SwiftUI

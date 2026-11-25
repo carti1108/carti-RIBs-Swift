@@ -1,7 +1,7 @@
 import FeatureLoggedInAndroid
 
-/// Kotlin(Compose) 뷰가 구현한다. 자식 화면은 이 통로가 아니라 화면 트리의 `child`로 받는다.
-/// Kotlin `:feature:loggedin:ui`가 짝이다.
+/// Kotlin 어댑터가 구현한다. 자식 화면은 이 통로가 아니라 화면 트리의 `child`로 받는다.
+/// Kotlin `:feature:loggedin:adapter`가 짝이다.
 public protocol LoggedInViewBridge {
     func render(userName: String, sessionSeconds: Int64)
 }

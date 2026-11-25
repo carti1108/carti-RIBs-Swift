@@ -1,11 +1,11 @@
 import FeatureLoggedInInterface
-import FeatureLoggedInUI
+import FeatureLoggedInAdapter
 import FeatureLoggedOutInterface
-import FeatureLoggedOutUI
+import FeatureLoggedOutAdapter
 import FeatureTodoDetailInterface
-import FeatureTodoDetailUI
+import FeatureTodoDetailAdapter
 import FeatureTodoListInterface
-import FeatureTodoListUI
+import FeatureTodoListAdapter
 import Foundation
 import RIBs
 import RIBsSwiftUI
@@ -52,7 +52,7 @@ final class RootScreen: RootViewControllable, SwiftUIRenderable {
     }
 }
 
-/// 피처 UI 모듈의 팩토리를 모아 `TodoAppViewFactory`를 채운다. 앱에서 피처 UI를 모두 아는 곳은 여기뿐이다.
+/// 피처 어댑터 모듈의 팩토리를 모아 `TodoAppViewFactory`를 채운다. 앱에서 피처 어댑터를 모두 아는 곳은 여기뿐이다.
 @MainActor
 final class AppViewFactory: TodoAppViewFactory {
     private let loggedOut = LoggedOutScreenFactory()

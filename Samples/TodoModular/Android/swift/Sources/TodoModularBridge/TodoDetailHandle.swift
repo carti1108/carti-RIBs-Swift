@@ -1,6 +1,6 @@
 import FeatureTodoDetailAndroid
 
-/// Kotlin(Compose) 뷰가 구현한다. Kotlin `:feature:tododetail:ui`가 짝이다.
+/// Kotlin 어댑터가 구현한다. Kotlin `:feature:tododetail:adapter`가 짝이다.
 public protocol TodoDetailViewBridge {
     func render(title: String, isDone: Bool)
 }
