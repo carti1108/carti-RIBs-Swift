@@ -30,14 +30,16 @@ enum ViewMounts {
         TodoListWebViewFactory { screen in
             let handle = TodoListScreenHandle(
                 onTodoTapped: { [weak screen] id in screen?.send(.todoTapped(id: Int64(id))) },
-                onRetryTapped: { [weak screen] in screen?.send(.retryTapped) }
+                onRetryTapped: { [weak screen] in screen?.send(.retryTapped) },
+                onFileReceived: { [weak screen] name, text in screen?.send(.fileReceived(name: name, text: text)) }
             )
             view.mount(host: screen.element, handle: handle)
             screen.attach { state in
                 view.render(
                     rows: state.todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) },
                     isLoading: state.isLoading,
-                    errorMessage: state.errorMessage
+                    errorMessage: state.errorMessage,
+                    notice: state.notice
                 )
             }
         }
@@ -47,10 +49,11 @@ enum ViewMounts {
         TodoDetailWebViewFactory { screen in
             let handle = TodoDetailScreenHandle(
                 onToggleDoneTapped: { [weak screen] in screen?.send(.toggleDoneTapped) },
-                onBackTapped: { [weak screen] in screen?.send(.backTapped) }
+                onBackTapped: { [weak screen] in screen?.send(.backTapped) },
+                onTitleCopied: { [weak screen] succeeded in screen?.send(.titleCopied(succeeded: succeeded)) }
             )
             view.mount(host: screen.element, handle: handle)
-            screen.attach { view.render(title: $0.title, isDone: $0.isDone) }
+            screen.attach { view.render(title: $0.title, isDone: $0.isDone, notice: $0.notice) }
         }
     }
 }

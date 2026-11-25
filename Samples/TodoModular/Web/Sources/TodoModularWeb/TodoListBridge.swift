@@ -11,19 +11,22 @@ import JavaScriptKit
 /// 웹 뷰가 구현한다. 이 샘플은 `features/todo-list/adapter.tsx`가 구현한다.
 @JS protocol TodoListViewBridge {
     func mount(host: JSObject, handle: TodoListScreenHandle)
-    func render(rows: [TodoListRow], isLoading: Bool, errorMessage: String?)
+    func render(rows: [TodoListRow], isLoading: Bool, errorMessage: String?, notice: String?)
 }
 
 @JS final class TodoListScreenHandle: Sendable {
     private let onTodoTapped: @MainActor @Sendable (Int) -> Void
     private let onRetryTapped: @MainActor @Sendable () -> Void
+    private let onFileReceived: @MainActor @Sendable (String, String) -> Void
 
     init(
         onTodoTapped: @escaping @MainActor @Sendable (Int) -> Void,
-        onRetryTapped: @escaping @MainActor @Sendable () -> Void
+        onRetryTapped: @escaping @MainActor @Sendable () -> Void,
+        onFileReceived: @escaping @MainActor @Sendable (String, String) -> Void
     ) {
         self.onTodoTapped = onTodoTapped
         self.onRetryTapped = onRetryTapped
+        self.onFileReceived = onFileReceived
     }
 
     @JS func retryTapped() {
@@ -32,5 +35,10 @@ import JavaScriptKit
 
     @JS func todoTapped(id: Int) {
         MainActor.assumeIsolated { onTodoTapped(id) }
+    }
+
+    /// 뷰가 끌어다 놓기나 파일 선택으로 받은 텍스트 파일. 뷰가 `File.text()`로 읽어 넘긴다.
+    @JS func fileReceived(name: String, text: String) {
+        MainActor.assumeIsolated { onFileReceived(name, text) }
     }
 }
