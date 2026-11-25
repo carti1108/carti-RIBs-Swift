@@ -393,4 +393,166 @@ enum Templates {
 
         """
     }
+
+    static func lowerCamel(_ n: String) -> String {
+        n.prefix(1).lowercased() + n.dropFirst()
+    }
+
+    /// Android: 뷰 계약을 구현하는 Swift 화면. 상태는 핸들(`androidHandle`)이 Kotlin에 넘긴다(ADR-0020).
+    static func androidScreen(_ n: String, module: String, support: String) -> String {
+        """
+        import \(module)Interface
+        import RIBs
+        import \(support)
+
+        /// \(n) 피처의 Android 화면을 만든다. 조립 모듈이 `\(n)Builder`에 넘긴다.
+        @MainActor
+        public final class \(n)AndroidViewFactory: \(n)ViewFactory {
+            /// 화면 트리의 `kind`. Kotlin은 이 값으로 Composable을 고른다.
+            nonisolated public static let kind = "\(lowerCamel(n))"
+            private let context: ScreenContext
+
+            public init(context: ScreenContext) {
+                self.context = context
+            }
+
+            public func make\(n)View() -> any \(n)ViewContract { \(n)AndroidScreen(context: context) }
+        }
+
+        @MainActor
+        public final class \(n)AndroidScreen: BridgedScreen<\(n)ViewState>, \(n)ViewContract {
+            public weak var listener: (any \(n)PresentableListener)?
+
+            init(context: ScreenContext) {
+                super.init(kind: \(n)AndroidViewFactory.kind, context: context, initialState: \(n)ViewState())
+            }
+
+            public func render(_ state: \(n)ViewState) { setViewState(state) }
+
+            public func send(_ action: \(n)ViewAction) { listener?.handle(action) }
+        }
+
+        """
+    }
+
+    /// Android: swift-java가 Java로 내보내는 층. 상태를 기본 타입 인자로 풀고, 액션마다 메서드 하나를 둔다.
+    /// `\(n)ViewState`에 필드를 더하면 `render`의 인자와 `attach`를, `\(n)ViewAction`에 case를 더하면 메서드를 함께 고친다.
+    static func androidHandle(_ n: String, module: String) -> String {
+        """
+        import \(module)Android
+
+        /// Kotlin 어댑터가 구현한다.
+        public protocol \(n)ViewBridge {
+            func render(title: String)
+        }
+
+        /// Kotlin이 화면 트리의 `id`로 만들어 화면에 붙는다.
+        public final class \(n)ScreenHandle: Sendable {
+            private let screenID: Int64
+
+            public init(screenID: Int64) {
+                self.screenID = screenID
+            }
+
+            public func attach(view: any \(n)ViewBridge) {
+                nonisolated(unsafe) let view = view
+                MainActor.assumeIsolated {
+                    screen?.attach { view.render(title: $0.title) }
+                }
+            }
+
+            public func detach() {
+                MainActor.assumeIsolated { screen?.detach() }
+            }
+
+            public func closeTapped() {
+                MainActor.assumeIsolated { screen?.send(.closeTapped) }
+            }
+
+            @MainActor private var screen: \(n)AndroidScreen? {
+                controller?.screen(id: screenID, as: \(n)AndroidScreen.self)
+            }
+        }
+
+        """
+    }
+
+    /// Web: 뷰 계약을 구현하는 Swift 화면. `@JS` 타입을 모른다. 그리는 쪽은 조립 쪽이 `mount`에서 붙인다.
+    static func webScreen(_ n: String, module: String, support: String) -> String {
+        """
+        import \(module)Interface
+        import JavaScriptKit
+        import RIBs
+        import \(support)
+
+        /// \(n) 피처의 웹 화면을 만든다. 화면을 그리는 JS 뷰는 조립 쪽이 `mount`에서 붙인다.
+        @MainActor
+        public final class \(n)WebViewFactory: \(n)ViewFactory {
+            private let mount: @MainActor (\(n)WebScreen) -> Void
+
+            public init(mount: @escaping @MainActor (\(n)WebScreen) -> Void) {
+                self.mount = mount
+            }
+
+            public func make\(n)View() -> any \(n)ViewContract {
+                let screen = \(n)WebScreen()
+                mount(screen)
+                return screen
+            }
+        }
+
+        @MainActor
+        public final class \(n)WebScreen: WebScreen<\(n)ViewState>, \(n)ViewContract {
+            public weak var listener: (any \(n)PresentableListener)?
+
+            init() {
+                super.init(tag: "section", id: "\(lowerCamel(n))", initialState: \(n)ViewState())
+            }
+
+            public func render(_ state: \(n)ViewState) { setViewState(state) }
+
+            public func send(_ action: \(n)ViewAction) { listener?.handle(action) }
+        }
+
+        """
+    }
+
+    /// Web: BridgeJS가 JS로 내보내는 층과, 화면과 JS 뷰를 잇는 함수.
+    /// `\(n)ViewState`에 필드를 더하면 `render`의 인자를, `\(n)ViewAction`에 case를 더하면 핸들의 메서드를 함께 고친다.
+    static func webBridge(_ n: String, module: String, support: String) -> String {
+        """
+        import \(module)Web
+        import JavaScriptKit
+        import \(support)
+
+        /// JS 뷰가 구현한다.
+        @JS protocol \(n)ViewBridge {
+            func mount(host: JSObject, handle: \(n)ScreenHandle)
+            func render(title: String)
+        }
+
+        @JS final class \(n)ScreenHandle: Sendable {
+            private let onCloseTapped: @MainActor @Sendable () -> Void
+
+            init(onCloseTapped: @escaping @MainActor @Sendable () -> Void) {
+                self.onCloseTapped = onCloseTapped
+            }
+
+            @JS func closeTapped() {
+                MainActor.assumeIsolated { onCloseTapped() }
+            }
+        }
+
+        /// 화면 상태를 브리지 인자로 풀고, 핸들 호출을 액션으로 묶는다. `\(n)Builder`에 넘길 뷰 팩토리를 만든다.
+        @MainActor
+        func \(lowerCamel(n))ViewFactory(_ view: any \(n)ViewBridge) -> \(n)WebViewFactory {
+            \(n)WebViewFactory { screen in
+                let handle = \(n)ScreenHandle(onCloseTapped: { [weak screen] in screen?.send(.closeTapped) })
+                view.mount(host: screen.element, handle: handle)
+                screen.attach { view.render(title: $0.title) }
+            }
+        }
+
+        """
+    }
 }
