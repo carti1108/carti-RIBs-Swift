@@ -44,7 +44,7 @@ protocol LoggedInInternalRouting: AnyObject {
     func routeAwayFromDetail()
 }
 
-/// 목록을 기본 화면으로 두고 상세를 위에 쌓는다. 뒤로 가기는 열린 상세를 닫고, 닫을 것이 없으면 false.
+/// 목록을 기본 화면으로 두고 상세를 그 위에 보여 준다. 뒤로 가기는 열린 상세를 닫고, 닫을 것이 없으면 false.
 /// 저장 상태: 완료한 할 일과 열려 있던 상세 id.
 final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, LoggedInPresentableListener,
     TodoListListener, TodoDetailListener, SessionTimerListener
@@ -105,6 +105,9 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
     func handle(_ action: LoggedInViewAction) {
         switch action {
         case .logoutTapped: listener?.didRequestLogout()
+        case .detailDismissedByUser:
+            guard isActive else { return }
+            router?.routeAwayFromDetail()
         }
     }
 
@@ -145,23 +148,22 @@ final class LoggedInRouter: ViewableRouter<LoggedInInteractor, any LoggedInViewC
         guard list == nil else { return }
         let child = listBuilder.build(listener: interactor)
         attachChild(child)
-        viewController.showScreen(child.viewControllable)
+        viewController.showList(child.viewControllable)
         list = child
     }
 
     func routeToDetail(todoID: Int64) {
         guard detail == nil, let child = detailBuilder.build(listener: interactor, todoID: todoID) else { return }
         attachChild(child)
-        viewController.showScreen(child.viewControllable)
+        viewController.showDetail(child.viewControllable)
         detail = child
     }
 
     func routeAwayFromDetail() {
         guard let child = detail else { return }
         detachChild(child)
-        viewController.hideScreen(child.viewControllable)
+        viewController.hideDetail(child.viewControllable)
         detail = nil
-        if let list { viewController.showScreen(list.viewControllable) }
     }
 }
 

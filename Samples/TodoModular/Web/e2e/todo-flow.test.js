@@ -71,6 +71,58 @@ describe("TodoModular 웹 앱", () => {
     assert.equal(await page.$("#detailTitle"), null);
   });
 
+  test("브라우저 뒤로 가기로 상세를 닫으면 목록으로 돌아오고 다른 할 일을 열 수 있다", async () => {
+    await login(page, "carti");
+    await page.waitForSelector("#todoRow-1", { timeout });
+    await page.click("#todoRow-1");
+    await waitForText(page, "#detailTitle", "우유 사기");
+
+    await page.goBack();
+
+    await page.waitForSelector("#todoRow-2", { timeout });
+    assert.equal(await page.$("#detailTitle"), null);
+    // RIB 트리에 상세가 남아 있으면 두 번째 상세가 열리지 않는다.
+    await page.click("#todoRow-2");
+    await waitForText(page, "#detailTitle", "RIB 문서 읽기");
+  });
+
+  test("화면의 뒤로 버튼으로 닫은 뒤 연 상세는 기록 항목을 다시 쓰고, 브라우저 뒤로 가기로 닫힌다", async () => {
+    await login(page, "carti");
+    await page.waitForSelector("#todoRow-1", { timeout });
+    const lengthBefore = await page.evaluate(() => history.length);
+    await page.click("#todoRow-1");
+    await page.waitForSelector("#detailTitle", { timeout });
+    await page.click("#backButton");
+    await page.waitForSelector("#todoRow-2", { timeout });
+
+    await page.click("#todoRow-2");
+    await waitForText(page, "#detailTitle", "RIB 문서 읽기");
+    assert.equal(await page.evaluate(() => history.length), lengthBefore + 1);
+
+    await page.goBack();
+    await page.waitForSelector("#todoRow-1", { timeout });
+    assert.equal(await page.$("#detailTitle"), null);
+  });
+
+  test("뒤로 갔다가 앞으로 가도 상세는 다시 열리지 않고, 그 뒤 연 상세는 뒤로 가기로 닫힌다", async () => {
+    await login(page, "carti");
+    await page.waitForSelector("#todoRow-1", { timeout });
+    await page.click("#todoRow-1");
+    await page.waitForSelector("#detailTitle", { timeout });
+    await page.goBack();
+    await page.waitForSelector("#todoRow-1", { timeout });
+
+    await page.goForward();
+    assert.equal(await page.$("#detailTitle"), null);
+
+    await page.click("#todoRow-2");
+    await waitForText(page, "#detailTitle", "RIB 문서 읽기");
+    await page.goBack();
+    await page.waitForSelector("#todoRow-1", { timeout });
+    assert.equal(await page.$("#detailTitle"), null);
+    assert.match(page.url(), /loginDelayMillis/);
+  });
+
   test("상세 화면에서 새로고침하면 sessionStorage에 저장한 상태로 같은 화면을 복원한다", async () => {
     await login(page, "carti");
     await page.waitForSelector("#todoRow-1", { timeout });

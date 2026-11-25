@@ -24,6 +24,8 @@ public struct TodoDetailView: View {
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("toggleDoneButton")
         }
+        .padding(.horizontal, 24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 

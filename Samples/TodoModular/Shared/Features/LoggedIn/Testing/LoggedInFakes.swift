@@ -10,13 +10,37 @@ public final class FakeLoggedInView: LoggedInViewContract {
     public weak var listener: (any LoggedInPresentableListener)?
     public private(set) var states: [LoggedInViewState] = []
     public var state: LoggedInViewState? { states.last }
-    public private(set) var screen: (any ViewControllable)?
+    public enum Call: Equatable, Sendable { case showList, showDetail, hideDetail }
+    public private(set) var calls: [Call] = []
+    public private(set) var list: (any ViewControllable)?
+    public private(set) var detail: (any ViewControllable)?
+    /// 맨 위에 보이는 화면. 상세가 있으면 상세, 없으면 목록.
+    public var screen: (any ViewControllable)? { detail ?? list }
 
     public init() {}
 
     public func render(_ state: LoggedInViewState) { states.append(state) }
-    public func showScreen(_ screen: any ViewControllable) { self.screen = screen }
-    public func hideScreen(_ screen: any ViewControllable) { if self.screen === screen { self.screen = nil } }
+
+    public func showList(_ screen: any ViewControllable) {
+        calls.append(.showList)
+        list = screen
+    }
+
+    public func showDetail(_ screen: any ViewControllable) {
+        calls.append(.showDetail)
+        detail = screen
+    }
+
+    public func hideDetail(_ screen: any ViewControllable) {
+        calls.append(.hideDetail)
+        if detail === screen { detail = nil }
+    }
+
+    /// 사용자가 제스처로 상세를 닫은 상황. 플랫폼 뷰처럼 화면을 먼저 빼고 알린다.
+    public func dismissDetailByUser() {
+        detail = nil
+        listener?.handle(.detailDismissedByUser)
+    }
 }
 
 @MainActor
