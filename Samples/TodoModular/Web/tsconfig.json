@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "include": ["app.ts", "support", "features", "vite.config.ts"]
+  "include": ["app.ts", "support", "features", "spikes", "vite.config.ts"]
 }
