@@ -25,7 +25,7 @@
 - 결과:
   - Web e2e(`e2e/write-request.test.js`)가 앱(`127.0.0.1`)과 다른 출처(`localhost`, 다른 포트)의 테스트 서버로 확인한다. 브라우저가 `Authorization`을 보고 프리플라이트(OPTIONS)를 먼저 보내고, 이어서 `Authorization: Bearer`, `Content-Type: application/json`, JSON 본문으로 POST한다. 201 응답의 할 일, 토큰이 없을 때의 401, 401·409·503의 Problem Details `title`, HTML 오류 본문(문제 없음)이 공유 코드에서 분류된다. 서버가 CORS를 허용하지 않으면 POST는 나가지 않고 `unreachable`이 된다. 스파이크의 `runTransportSpike`로 요청을 그대로 보내 PATCH(본문 포함)와 본문 없는 DELETE(`Content-Type`·본문 없음)도 확인했다. 프리플라이트가 PATCH를 허용하지 않으면 PATCH는 나가지 않고 `unreachable`이 된다.
   - Android 계측 테스트(`HttpUrlConnectionTransportTest`)가 기기 안의 테스트 서버로 `HttpUrlConnectionTransport`를 확인한다. Swift가 넘기는 모양의 헤더 줄과 본문으로 POST(UTF-8 한글 본문 포함), PATCH, 본문 없는 DELETE가 그대로 나가고, `: `가 든 헤더 값도 깨지지 않는다.
-  - iOS는 `URLProtocol` 가짜로 POST 헤더·본문, PATCH 본문, 본문 없는 DELETE를 확인한다. iOS는 실제 서버로 보내지 않는다.
+  - iOS는 `URLProtocol` 가짜로 POST 헤더·본문, PATCH 본문, 본문 없는 DELETE를 확인한다. 실제 소켓 경로는 `URLSessionHTTPTransportLoopbackTests`가 시뮬레이터 테스트 프로세스 안의 `NWListener` 서버로 확인한다. `BearerTokenTransport`와 `TodoAPIClient.createTodo`를 거친 POST(UTF-8 한글 본문, `Authorization: Bearer`), 401 Problem Details, PATCH 본문, 본문 없는 DELETE가 그대로 오간다. 시뮬레이터에서 `http://127.0.0.1`로 보낼 때 ATS 예외는 필요 없었다.
   - API 서버는 `Access-Control-Allow-Origin`과, 프리플라이트에 `Access-Control-Allow-Headers: Authorization, Content-Type`을 줘야 한다. 빠지면 앱은 "연결할 수 없음"만 안다.
   - `RemoteTodoRepository`는 새 오류 셋도 `unavailable`로 줄인다. 피처가 401을 따로 다루려면 `TodoRepositoryError`를 넓혀야 한다. 이 ADR은 하지 않는다.
   - 토큰 갱신과 401 뒤 재시도는 없다. 그렙에서 필요하면 `BearerTokenTransport` 자리에서 다룬다.
