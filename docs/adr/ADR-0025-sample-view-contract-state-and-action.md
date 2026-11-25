@@ -1,5 +1,5 @@
 ### ADR-0025 샘플의 뷰 계약은 모두 `render(state)`와 `handle(action)`으로 둔다
-- 상태: 채택
+- 상태: 채택 (TodoModular LoggedIn의 자식 화면 메서드는 ADR-0030으로 대체됨)
 - 날짜: 2026-11-23
 - 배경:
   - 샘플 RIB 가운데 `LoginShared`의 LoggedOut만 `ViewState`/`ViewAction` 모양이었다(ADR-0019). 나머지(`LoginShared`의 LoggedIn·TodoList·TodoDetail, `TodoModular`의 피처 네 개)는 `showUserName(_:)`, `showTodos(_:)`, `didTapLogout()` 같은 메서드를 화면마다 따로 뒀다(ADR-0008).
