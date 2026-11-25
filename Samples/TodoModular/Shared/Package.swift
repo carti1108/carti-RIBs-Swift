@@ -3,7 +3,8 @@ import PackageDescription
 
 // µFeature 샘플의 공유 패키지(ADR-0024). 피처마다 Interface·Impl·Testing·Tests 4개 타깃을 둔다.
 // Impl은 자기 Interface, 자식 Interface, TodoCore만 의존한다. 실제 Impl을 잇는 곳은 TodoAppRoot 하나다.
-// 주의: SwiftPM 6.4.2(Windows)의 --explicit-target-dependency-import-check는 Impl 간 import를 잡지 못했다(ADR-0024).
+// 경계 검사: scripts/check-sample-boundaries.sh (ADR-0028). SwiftPM의 --explicit-target-dependency-import-check는
+// macOS 호스트 빌드에서만 Impl 간 import를 잡는다(Windows와 Wasm 빌드에서는 잡지 못한다).
 
 let ribs: Target.Dependency = .product(name: "RIBs", package: "RIBs")
 

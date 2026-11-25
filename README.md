@@ -49,11 +49,19 @@ scripts/check-api.sh   # 공개 API 덤프 비교(macOS)
 ## 새 RIB 만들기
 
 ```sh
+# 한 모듈 안에 RIB 하나
 swift package --allow-writing-to-package-directory new-rib \
   --name Profile --sources Sources/App --tests Tests/AppTests --module App [--swiftui Sources/AppUI]
+
+# µFeature 피처 하나(Interface·Impl·Testing·Tests 디렉터리)
+swift package --allow-writing-to-package-directory new-rib \
+  --feature Profile [--root Features] [--prefix Feature] [--swiftui iOS/Features/Profile]
 ```
 
-뷰 계약, Dependency, Listener, Builder, Interactor, Router와 Interactor 테스트, 선택적으로 SwiftUI 화면을 만듭니다. 이미 있는 파일은 덮어쓰지 않습니다.
+- 뷰 계약은 `render(_ state:)`와 `handle(_ action:)` 모양으로 만듭니다(`XxxViewState`, `XxxViewAction`). 라이브러리가 이 모양을 요구하지는 않습니다.
+- `--swiftui`를 주면 순수 뷰(`XxxView`, SwiftUI만 import)와 어댑터(`XxxScreen`)를 따로 만듭니다. 피처 모드에서는 `UI/`와 `Adapter/` 아래에 둡니다.
+- 피처 모드는 `Package.swift`를 고치지 않고 넣을 줄을 출력합니다.
+- 이미 있는 파일은 덮어쓰지 않습니다.
 
 ## 문서
 

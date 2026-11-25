@@ -29,3 +29,5 @@
 | [0025](ADR-0025-sample-view-contract-state-and-action.md) | 샘플의 뷰 계약은 모두 `render(state)`와 `handle(action)`으로 둔다 | 채택 |
 | [0026](ADR-0026-todomodular-web-views-in-react.md) | TodoModular 웹 뷰는 React와 TypeScript로 쓰고, 프레임워크는 JS 쪽에만 둔다 | 채택 (피처 뷰의 파일 배치는 ADR-0027로 대체됨) |
 | [0027](ADR-0027-pure-view-and-adapter.md) | 샘플의 플랫폼 뷰를 순수 뷰와 어댑터로 나눈다 | 채택 |
+| [0028](ADR-0028-sample-boundary-check-script.md) | 샘플의 모듈 경계는 import 문을 읽는 스크립트로 검사한다 | 채택 |
+| [0029](ADR-0029-new-rib-feature-template.md) | `new-rib`에 µFeature 피처 모드를 두고, 템플릿을 ViewState/ViewAction과 순수 뷰·어댑터 모양으로 바꾼다 | 채택 |
