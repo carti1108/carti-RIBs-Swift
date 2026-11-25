@@ -2,7 +2,7 @@
 
 `LoginShared` 트리를 Wasm으로 빌드하고, 화면은 JS가 그립니다. 순수 뷰(`views/*.js`)는 값과 콜백만 받고, 어댑터(`adapters/*.js`)가 BridgeJS가 만든 화면별 브리지를 구현해 값을 넘깁니다(ADR-0020, ADR-0022, ADR-0027).
 
-swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다.
+swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다. macOS나 Linux에서 빌드합니다. Windows 호스트에서는 빌드되지 않습니다([이유](../../docs/building.md#웹-샘플은-windows-호스트에서-빌드되지-않는다)).
 
 ```sh
 TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin   # Linux는 툴체인 경로의 bin
