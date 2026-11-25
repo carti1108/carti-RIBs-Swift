@@ -55,6 +55,7 @@ public protocol LoggedInViewFactory: AnyObject {
 @MainActor
 public protocol LoggedInDependency: Dependency {
     var clock: any TodoClock { get }
+    var todoRepository: any TodoRepository { get }
     func makeTodoListBuilder(dependency: any TodoListDependency) -> any TodoListBuildable
     func makeTodoDetailBuilder(dependency: any TodoDetailDependency) -> any TodoDetailBuildable
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# 샘플의 모듈 경계를 import 문으로 검사한다(ADR-0024, ADR-0027, ADR-0028).
+# 샘플의 모듈 경계를 import 문으로 검사한다(ADR-0024, ADR-0027, ADR-0028, ADR-0032).
 #   µFeature: 피처 Impl은 자기 Interface와 Package.swift에 선언한 자식 Interface만 import한다.
+#   데이터 계층: Foundation은 TodoData만 import하고, 피처는 TodoData를 import하지 않는다.
 #   순수 뷰: UI 프레임워크만 import하고 공유 코드·브리지 타입을 import하지 않는다.
 # 빌드가 필요 없어 어느 호스트에서나 돈다. 위반이 있으면 목록을 출력하고 1로 끝난다.
 set -euo pipefail
@@ -75,6 +76,12 @@ for feature_dir in "$modular"/Shared/Features/*/; do
     # 순수 뷰 (ADR-0027)
     allow_swift_imports "$modular/iOS/Features/$feature/UI" "$any_module" SwiftUI
 done
+
+# 데이터 계층 (ADR-0032): Foundation은 TodoData만 쓰고, 피처는 TodoData를 모른다.
+for shared_dir in Core Features App; do
+    forbid_pattern "$modular/Shared/$shared_dir" '*.swift' '^[[:space:]]*import[[:space:]]+Foundation' 'TodoData 밖에서 Foundation을 import'
+done
+forbid_pattern "$modular/Shared/Features" '*.swift' '^[[:space:]]*(@testable[[:space:]]+)?import[[:space:]]+TodoData([[:space:]]|$)' '피처가 데이터 계층 구현을 import'
 
 allow_swift_imports "$samples/iOSLogin/Sources/Views" "$any_module" SwiftUI
 for gradle in "$modular"/Android/feature/*/ui/build.gradle.kts; do

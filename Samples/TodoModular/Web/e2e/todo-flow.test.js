@@ -123,6 +123,21 @@ describe("TodoModular 웹 앱", () => {
     assert.match(page.url(), /loginDelayMillis/);
   });
 
+  test("할 일을 불러오지 못하면 오류와 다시 시도 버튼을 보이고, 다시 시도하면 목록이 나온다", async () => {
+    await page.close();
+    page = await session.open("/?loginDelayMillis=1&todoFailures=1");
+    await login(page, "carti");
+
+    await waitForText(page, "#todoError", "할 일을 불러오지 못했습니다");
+    assert.equal(await page.$("#todoRow-1"), null);
+
+    await page.click("#todoRetryButton");
+
+    await page.waitForSelector("#todoRow-1", { timeout });
+    assert.equal(await page.$("#todoError"), null);
+    assert.equal(await page.$("#todoLoading"), null);
+  });
+
   test("상세 화면에서 새로고침하면 sessionStorage에 저장한 상태로 같은 화면을 복원한다", async () => {
     await login(page, "carti");
     await page.waitForSelector("#todoRow-1", { timeout });

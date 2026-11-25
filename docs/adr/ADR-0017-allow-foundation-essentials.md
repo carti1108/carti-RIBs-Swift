@@ -1,5 +1,5 @@
 ### ADR-0017 코어와 공유 모듈에서 FoundationEssentials를 허용한다
-- 상태: 제안
+- 상태: 기각 (범위를 샘플 데이터 계층으로 좁혀 ADR-0032로 채택)
 - 날짜: 2026-11-15
 - 배경: ADR-0004는 코어 `RIBs`에서 Foundation을 금지했다. 그 대가로 상태 저장용 값 열거형 `RibValue`와 JSON 인코더·디코더(`RibStateCodec`, 222줄)를 직접 유지한다. 값 종류를 열거형으로 나누는 모양은 Android `Bundle`을 흉내 낸 것인데, Swift에서는 `Codable`이 같은 일을 표준 방식으로 한다. Swift 6부터 swift-foundation의 `FoundationEssentials`(Codable JSON, `Data`, `Date` 등, 국제화·네트워크 제외)가 모든 플랫폼에서 같은 Swift 구현으로 제공되어, ADR-0004가 걱정한 "플랫폼마다 구현과 크기가 다르다"는 문제가 크게 줄었다.
 - 결정:

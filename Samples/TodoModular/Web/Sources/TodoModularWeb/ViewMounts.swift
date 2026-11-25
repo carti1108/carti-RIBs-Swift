@@ -28,10 +28,17 @@ enum ViewMounts {
 
     static func todoList(_ view: any TodoListViewBridge) -> TodoListWebViewFactory {
         TodoListWebViewFactory { screen in
-            let handle = TodoListScreenHandle { [weak screen] id in screen?.send(.todoTapped(id: Int64(id))) }
+            let handle = TodoListScreenHandle(
+                onTodoTapped: { [weak screen] id in screen?.send(.todoTapped(id: Int64(id))) },
+                onRetryTapped: { [weak screen] in screen?.send(.retryTapped) }
+            )
             view.mount(host: screen.element, handle: handle)
             screen.attach { state in
-                view.render(rows: state.todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) })
+                view.render(
+                    rows: state.todos.map { TodoListRow(id: Int($0.id), title: $0.title, isDone: $0.isDone) },
+                    isLoading: state.isLoading,
+                    errorMessage: state.errorMessage
+                )
             }
         }
     }

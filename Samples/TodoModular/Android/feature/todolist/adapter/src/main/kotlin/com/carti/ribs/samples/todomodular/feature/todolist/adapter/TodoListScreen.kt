@@ -23,7 +23,16 @@ const val TODO_LIST_KIND = "todoList"
 private class TodoListAdapter : TodoListViewBridge {
     var todos: List<TodoItem> by mutableStateOf(emptyList())
         private set
+    var isLoading: Boolean by mutableStateOf(false)
+        private set
+    var errorMessage: String? by mutableStateOf(null)
+        private set
     var handle: TodoListScreenHandle? = null
+
+    override fun render(isLoading: Boolean, errorMessage: java.util.Optional<String>) {
+        this.isLoading = isLoading
+        this.errorMessage = errorMessage.orElse(null)
+    }
 
     /** `TodoListRow`는 Swift 메모리를 가리키므로 값을 복사한 뒤 바로 arena를 닫는다. */
     override fun rowsChanged() {
@@ -48,5 +57,11 @@ fun TodoListScreen(screenId: Long) {
             adapter.handle = null
         },
     )
-    TodoListView(todos = adapter.todos, onSelect = handle::todoTapped)
+    TodoListView(
+        todos = adapter.todos,
+        onSelect = handle::todoTapped,
+        isLoading = adapter.isLoading,
+        errorMessage = adapter.errorMessage,
+        onRetry = handle::retryTapped,
+    )
 }

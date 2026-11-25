@@ -27,4 +27,26 @@ class TodoListViewTest {
 
         assertEquals(listOf(2L), selected)
     }
+
+    @Test
+    fun showsErrorWithRetryAndSendsRetry() {
+        var retries = 0
+        compose.setContent {
+            TodoListView(todos = emptyList(), errorMessage = "할 일을 불러오지 못했습니다", onSelect = {}, onRetry = { retries += 1 })
+        }
+
+        compose.onNodeWithTag(TodoListTags.ERROR).assertTextEquals("할 일을 불러오지 못했습니다")
+        compose.onNodeWithTag(TodoListTags.LOADING).assertDoesNotExist()
+        compose.onNodeWithTag(TodoListTags.RETRY).performClick()
+
+        assertEquals(1, retries)
+    }
+
+    @Test
+    fun showsLoadingIndicatorWhileLoading() {
+        compose.setContent { TodoListView(todos = emptyList(), isLoading = true, onSelect = {}) }
+
+        compose.onNodeWithTag(TodoListTags.LOADING).assertExists()
+        compose.onNodeWithTag(TodoListTags.ERROR).assertDoesNotExist()
+    }
 }

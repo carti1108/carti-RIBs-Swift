@@ -45,7 +45,7 @@ let featureTargets =
     + feature("TodoDetail")
 
 /// 플랫폼(Tuist 등)이 모듈별로 받을 수 있도록 테스트가 아닌 타깃마다 제품을 둔다.
-let libraryNames = ["TodoCore", "TodoCoreTesting", "TodoAppRoot"]
+let libraryNames = ["TodoCore", "TodoCoreTesting", "TodoData", "TodoAppRoot"]
     + features.flatMap { ["Feature\($0)Interface", "Feature\($0)", "Feature\($0)Testing"] }
 
 let package = Package(
@@ -59,9 +59,12 @@ let package = Package(
         .target(name: "TodoCore", dependencies: [ribs], path: "Core/Sources"),
         .target(name: "TodoCoreTesting", dependencies: [ribs, "TodoCore"], path: "Core/Testing"),
         .testTarget(name: "TodoCoreTests", dependencies: ["TodoCore", "TodoCoreTesting"], path: "Core/Tests"),
+        // 데이터 계층(ADR-0032). 이 타깃만 FoundationEssentials를 쓴다. 피처는 TodoCore의 `TodoRepository`만 안다.
+        .target(name: "TodoData", dependencies: ["TodoCore"], path: "Data/Sources"),
+        .testTarget(name: "TodoDataTests", dependencies: ["TodoCore", "TodoCoreTesting", "TodoData"], path: "Data/Tests"),
         .target(
             name: "TodoAppRoot",
-            dependencies: [ribs, "TodoCore"] + features.flatMap {
+            dependencies: [ribs, "TodoCore", "TodoData"] + features.flatMap {
                 [Target.Dependency.target(name: "Feature\($0)Interface"), .target(name: "Feature\($0)")]
             },
             path: "App/Sources"

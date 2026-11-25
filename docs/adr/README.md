@@ -18,7 +18,7 @@
 | [0014](ADR-0014-android-main-queue-spi-self-check.md) | Android 메인 큐 연결은 libdispatch SPI를 유지하고 시작 시 자체검사한다 | 채택 |
 | [0015](ADR-0015-sample-root-package-name.md) | 샘플 패키지는 루트 패키지를 디렉터리 이름이 아닌 `RIBs` 이름으로 참조한다 | 채택 |
 | [0016](ADR-0016-mount-and-ribstate-as-extensions.md) | `mount`/`RibMount`와 `RibState`를 RIBs-iOS 밖의 확장으로 유지한다 | 채택 |
-| [0017](ADR-0017-allow-foundation-essentials.md) | 코어와 공유 모듈에서 FoundationEssentials를 허용한다 | 제안 |
+| [0017](ADR-0017-allow-foundation-essentials.md) | 코어와 공유 모듈에서 FoundationEssentials를 허용한다 | 기각 (범위를 샘플 데이터 계층으로 좁혀 ADR-0032로 채택) |
 | [0018](ADR-0018-rib-snapshot.md) | 트리 저장·복원을 `Codable` 기반 `RibSnapshot`으로 바꾼다 | 제안 |
 | [0019](ADR-0019-view-contract-shape-not-enforced.md) | 코어는 뷰 계약의 모양을 강제하지 않는다 | 채택 (샘플 통일 여부는 ADR-0025로 대체됨) |
 | [0020](ADR-0020-per-screen-view-bridge.md) | 플랫폼 뷰 경계는 화면마다 격리 없는 브리지 프로토콜 하나와 핸들 클래스 하나로 둔다 | 채택 |
@@ -33,3 +33,4 @@
 | [0029](ADR-0029-new-rib-feature-template.md) | `new-rib`에 µFeature 피처 모드를 두고, 템플릿을 ViewState/ViewAction과 순수 뷰·어댑터 모양으로 바꾼다 | 채택 |
 | [0030](ADR-0030-detail-navigation-by-intent.md) | 상세 화면 전환은 뷰 계약에 의도 이름으로 두고, 사용자가 제스처로 닫은 것은 `ViewAction`으로 알린다 | 채택 |
 | [0031](ADR-0031-new-rib-platform-connection-templates.md) | 플랫폼 연결 코드는 빌드 때 생성하지 않고 `new-rib` 템플릿으로 한 번 만든다 | 채택 |
+| [0032](ADR-0032-sample-data-layer-with-foundation-essentials.md) | 샘플의 데이터 계층은 공유 모듈 `TodoData`에 두고, 이 모듈에만 FoundationEssentials를 허용한다 | 채택 |

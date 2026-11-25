@@ -17,15 +17,36 @@ public struct TodoListItem: Identifiable, Equatable {
 
 public struct TodoListView: View {
     let items: [TodoListItem]
+    let isLoading: Bool
+    let errorMessage: String?
     let onSelect: (Int64) -> Void
+    let onRetry: () -> Void
 
-    public init(items: [TodoListItem], onSelect: @escaping (Int64) -> Void) {
+    public init(
+        items: [TodoListItem],
+        isLoading: Bool = false,
+        errorMessage: String? = nil,
+        onSelect: @escaping (Int64) -> Void,
+        onRetry: @escaping () -> Void = {}
+    ) {
         self.items = items
+        self.isLoading = isLoading
+        self.errorMessage = errorMessage
         self.onSelect = onSelect
+        self.onRetry = onRetry
     }
 
     public var body: some View {
         VStack(alignment: .leading, spacing: 8) {
+            if isLoading {
+                ProgressView().accessibilityIdentifier("todoLoadingIndicator")
+            }
+            if let errorMessage {
+                Text(errorMessage).foregroundStyle(.red).accessibilityIdentifier("todoErrorLabel")
+                Button("다시 시도", action: onRetry)
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("todoRetryButton")
+            }
             ForEach(items) { item in
                 Button((item.isDone ? "✓ " : "") + item.title) { onSelect(item.id) }
                     .accessibilityIdentifier("todoRow-\(item.id)")
@@ -44,4 +65,8 @@ public struct TodoListView: View {
         ],
         onSelect: { _ in }
     )
+}
+
+#Preview("불러오기 실패") {
+    TodoListView(items: [], errorMessage: "할 일을 불러오지 못했습니다", onSelect: { _ in })
 }

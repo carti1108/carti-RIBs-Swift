@@ -37,7 +37,7 @@ let package = Package(
             dependencies: [
                 ribs, ribsWeb, javaScriptKit, "TodoWebSupport",
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
-                shared("TodoCore"), shared("TodoCoreTesting"), shared("TodoAppRoot"),
+                shared("TodoCore"), shared("TodoCoreTesting"), shared("TodoData"), shared("TodoAppRoot"),
             ] + features.flatMap { name -> [Target.Dependency] in
                 [
                     .target(name: "Feature\(name)Web"),

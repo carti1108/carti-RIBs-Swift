@@ -106,4 +106,27 @@ final class TodoFlowUITests: XCTestCase {
         XCTAssertTrue(title.waitForExistence(timeout: timeout))
         XCTAssertNotEqual(title.label, "우유 사기")
     }
+
+    /// 목록을 불러오지 못하면 오류와 다시 시도 버튼을 보여 주고, 다시 시도하면 목록이 나온다(ADR-0032).
+    @MainActor
+    func testTodoLoadFailureShowsRetryAndRetryLoadsList() {
+        app.terminate()
+        app.launchArguments = ["-loginDelayMillis", "1", "-todoFailures", "1"]
+        app.launch()
+        let field = app.textFields["nameField"]
+        XCTAssertTrue(field.waitForExistence(timeout: timeout))
+        field.tap()
+        field.typeText("carti")
+        app.buttons["loginButton"].tap()
+
+        let error = app.staticTexts["todoErrorLabel"]
+        XCTAssertTrue(error.waitForExistence(timeout: timeout))
+        XCTAssertEqual(error.label, "할 일을 불러오지 못했습니다")
+        XCTAssertFalse(app.buttons["todoRow-1"].exists)
+
+        app.buttons["todoRetryButton"].tap()
+
+        XCTAssertTrue(app.buttons["todoRow-1"].waitForExistence(timeout: timeout))
+        XCTAssertFalse(error.exists)
+    }
 }

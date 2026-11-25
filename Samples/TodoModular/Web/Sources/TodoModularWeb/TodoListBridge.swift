@@ -11,14 +11,23 @@ import JavaScriptKit
 /// 웹 뷰가 구현한다. 이 샘플은 `features/todo-list/adapter.tsx`가 구현한다.
 @JS protocol TodoListViewBridge {
     func mount(host: JSObject, handle: TodoListScreenHandle)
-    func render(rows: [TodoListRow])
+    func render(rows: [TodoListRow], isLoading: Bool, errorMessage: String?)
 }
 
 @JS final class TodoListScreenHandle: Sendable {
     private let onTodoTapped: @MainActor @Sendable (Int) -> Void
+    private let onRetryTapped: @MainActor @Sendable () -> Void
 
-    init(onTodoTapped: @escaping @MainActor @Sendable (Int) -> Void) {
+    init(
+        onTodoTapped: @escaping @MainActor @Sendable (Int) -> Void,
+        onRetryTapped: @escaping @MainActor @Sendable () -> Void
+    ) {
         self.onTodoTapped = onTodoTapped
+        self.onRetryTapped = onRetryTapped
+    }
+
+    @JS func retryTapped() {
+        MainActor.assumeIsolated { onRetryTapped() }
     }
 
     @JS func todoTapped(id: Int) {
