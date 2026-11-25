@@ -7,7 +7,7 @@
 | macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
 | Linux | Static Linux SDK(musl, x86_64·aarch64)로 `RIBs`·`LoginShared`·`RIBsWeb` 교차 빌드 확인. Linux 호스트가 없어 테스트는 실행하지 않음 |
 | Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
-| Windows | 6.4.2 툴체인으로 `swift build`·`swift test` 통과. Windows 호스트에서 Android `.so` 교차 빌드, x86_64 APK 빌드, 에뮬레이터 계측 테스트 통과. 웹 샘플은 빌드 불가([아래](#웹-샘플은-windows-호스트에서-빌드되지-않는다)) |
+| Windows | 6.4.2 툴체인으로 루트 `swift build`·`swift test`(132개), `Samples/TodoModular/Shared`의 `swift build`·`swift test`(72개) 통과(2026-11-25). 웹 샘플은 빌드 불가([아래](#웹-샘플은-windows-호스트에서-빌드되지-않는다)). swift-java를 쓰는 Android 샘플도 빌드 불가([아래](#swift-java를-쓰는-android-샘플은-windows-호스트에서-빌드되지-않는다)) |
 
 ## 공개 API 검사
 
@@ -53,6 +53,7 @@ swift build --package-path Samples/TodoModular/Shared --explicit-target-dependen
 
 이 옵션은 Windows 호스트와 Wasm SDK 빌드(`--swift-sdk ..._wasm`)에서는 위반을 잡지 못합니다. `--build-system native`와 `--target`을 붙여도 잡지 못합니다.
 
+## Windows
 
 swift.org 툴체인 6.4.2(`winget install Swift.Toolchain --version 6.4.2`), Visual Studio Build Tools 2022(C++ 도구, Windows SDK)가 필요합니다. 의존성 체크아웃에 심볼릭 링크가 있어 **개발자 모드**를 켜야 합니다. 명령은 `vcvars64.bat`를 부른 셸에서 실행하고, 설치 직후 새 환경 변수를 못 받은 셸이면 `SDKROOT`를 직접 잡습니다.
 
@@ -77,6 +78,28 @@ Windows 호스트에서 Android 샘플을 빌드하는 방법은 [Android 샘플
 - 패키지 플러그인은 빌드 전에 컴파일되므로 `swift package ... js`뿐 아니라 `swift build --swift-sdk ..._wasm`도 같은 자리에서 실패합니다.
 - 2026-11-25 기준 0.63.0이 최신 릴리스이고, 업스트림 `main`에도 같은 코드가 있습니다. 업스트림 이슈는 [swiftwasm/JavaScriptKit#818](https://github.com/swiftwasm/JavaScriptKit/issues/818)입니다(열림).
 - WSL(Ubuntu)에 Linux 툴체인을 설치해 빌드하는 경로는 확인하지 않았습니다.
+
+### swift-java를 쓰는 Android 샘플은 Windows 호스트에서 빌드되지 않는다
+
+`Samples/TodoModular/Android`와 `Samples/AndroidLogin`은 swift-java 0.7.0을 씁니다(ADR-0021). Windows 호스트에서는 호스트 빌드와 Android 교차 빌드가 모두 swift-java 플러그인 단계에서 실패합니다. macOS나 Linux에서 빌드합니다.
+
+- 원인은 swift-java 플러그인이 경로를 `URL.path(percentEncoded: false)`로 넘기는 데 있습니다. Windows에서는 이 값이 `/C:/Users/...` 모양이라 실행 파일과 출력 파일을 찾지 못합니다. 업스트림 이슈는 [swiftlang/swift-java#920](https://github.com/swiftlang/swift-java/issues/920)입니다(2026-11-25 기준 열림, 0.7.0이 최신 릴리스).
+- 호스트 빌드(`Samples/TodoModular/Android/swift`에서 `swift build`): Kotlin이 구현하는 Swift 프로토콜(`enableJavaCallbacks`)을 처리하는 `JExtractSwiftPlugin`이 Gradle 래퍼를 실행하지 못합니다(`Plugins/JExtractSwiftPlugin/JExtractSwiftPlugin.swift:216-221`).
+
+  ```
+  Error: Executable "\C:\...\Samples\TodoModular\Android\swift\.build\checkouts\swift-java\gradlew" is not found or cannot be executed.
+  error: CustomTask Build\ SwiftKitCore,\ compile\ Java\ callbacks,\ and\ generate\ Swift\ wrappers ... failed with a nonzero exit code.
+  ```
+
+- 앱 빌드(`Samples/TodoModular/Android`에서 `gradlew.bat :app:assembleDebug -PswiftAbis=x86_64`, vcvars64 셸): `:bridge:swiftBuildX86_64`가 18분쯤 의존성을 빌드한 뒤 `_StaticBuildConfigPlugin`에서 실패합니다. 출력 파일 인자가 `/C:/.../static-build-config.json`입니다.
+
+  ```
+  error: CustomTask Run\ -print-static-build-config ... failed with a nonzero exit code.
+  > Task :bridge:swiftBuildX86_64 FAILED
+  ```
+
+- 위의 Windows 행에 있던 "Android `.so` 교차 빌드, APK 빌드, 에뮬레이터 계측 테스트 통과"는 2026-11-14 기록입니다. AndroidLogin이 swift-java로 바뀌기(2026-11-20) 전이라 지금 코드에는 해당하지 않아 지웠습니다. AndroidLogin을 지금 코드로 다시 빌드해 보지는 않았습니다. 같은 플러그인을 거치므로 같은 자리에서 실패할 것으로 봅니다.
+- 의존성을 고쳐 쓰는 방법(패치, fork)은 쓰지 않습니다.
 
 ## Linux(교차 빌드)
 
