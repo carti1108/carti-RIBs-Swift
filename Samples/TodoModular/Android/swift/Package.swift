@@ -38,7 +38,10 @@ let package = Package(
         .target(name: "TodoAndroidSupport", dependencies: [ribs, ribsAndroid]),
         .target(
             name: "TodoModularAndroid",
-            dependencies: [ribs, ribsAndroid, "TodoAndroidSupport", shared("TodoCore"), shared("TodoCoreTesting"), shared("TodoAppRoot")]
+            dependencies: [
+                ribs, ribsAndroid, "TodoAndroidSupport",
+                shared("TodoCore"), shared("TodoCoreTesting"), shared("TodoData"), shared("TodoAppRoot"),
+            ]
                 + features.flatMap { name -> [Target.Dependency] in
                     [
                         .target(name: "Feature\(name)Android"),
@@ -49,7 +52,7 @@ let package = Package(
         .target(
             name: "TodoModularBridge",
             dependencies: [
-                "TodoModularAndroid", "TodoAndroidSupport", ribsAndroid,
+                "TodoModularAndroid", "TodoAndroidSupport", ribsAndroid, shared("TodoCore"), shared("TodoData"),
                 .product(name: "SwiftJava", package: "swift-java"),
             ] + features.map { .target(name: "Feature\($0)Android") },
             exclude: ["swift-java.config"],
@@ -57,7 +60,7 @@ let package = Package(
         ),
         .testTarget(
             name: "TodoModularAndroidTests",
-            dependencies: ["TodoModularAndroid", "TodoAndroidSupport", ribs, shared("TodoCore"), shared("TodoCoreTesting")]
+            dependencies: ["TodoModularAndroid", "TodoAndroidSupport", ribs, shared("TodoCore"), shared("TodoCoreTesting"), shared("TodoData")]
                 + features.map { .target(name: "Feature\($0)Android") }
         ),
     ] + featureTargets,

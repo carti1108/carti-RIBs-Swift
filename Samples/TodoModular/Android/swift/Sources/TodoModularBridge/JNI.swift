@@ -2,6 +2,7 @@
 import Android
 import TodoModularAndroid
 import TodoCore
+import TodoData
 import RIBsAndroid
 
 // Kotlin `com.carti.ribs.samples.todomodular.core.SwiftBridge`(`:bridge` 모듈)와 짝을 이루는 손으로 쓴 JNI 표면(ADR-0010).
@@ -46,6 +47,7 @@ public func nativeStart(env: Env, thiz: jobject, savedState: jbyteArray?, loginD
     return start(env, savedState: saved) { clock in
         TodoAppController(
             authService: DelayedAuthService(delay: .milliseconds(loginDelayMillis), clock: clock),
+            todoRepository: httpTransport.map { RemoteTodoRepository(client: TodoAPIClient(transport: $0)) },
             clock: clock,
             sink: sendToKotlin
         )
