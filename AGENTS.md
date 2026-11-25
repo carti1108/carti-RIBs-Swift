@@ -15,10 +15,10 @@
 
 ## 코드
 
-- `Sources/RIBs`는 표준 라이브러리와 `_Concurrency`만 쓴다. `import Foundation`·`Dispatch`·`Combine` 금지(ADR-0004). CI가 검사한다.
+- `Sources/RIBs`는 표준 라이브러리와 `_Concurrency`만 쓴다. `import Foundation`·`Dispatch`·`Combine` 금지(ADR-0004). CI 워크플로는 아직 없다. CI를 붙일 때(#6) 이 금지 목록을 검사에 넣는다.
 - Swift 6 언어 모드, 엄격한 동시성. 생명주기 타입은 모두 `@MainActor`다(ADR-0003). 내부에 락을 두지 않는다.
 - 비동기 작업은 `Interactor.task(_:)`/`Worker.task(_:)`로 활성 구간에 묶는다. Rx·Combine은 쓰지 않는다(ADR-0002).
-- DI는 손으로 짠 `Component`로 한다(ADR-0005). 숨은 전역·싱글턴을 두지 않는다.
+- DI는 손으로 짠 `Component`로 한다(ADR-0005). 숨은 전역·싱글턴을 두지 않는다. 예외는 Android 샘플의 브리지 진입점뿐이다. Kotlin이 부르는 함수(`@_cdecl`, swift-java 내보내기)는 상태를 둘 인스턴스가 없어 앱 컨트롤러와 `JavaVM` 포인터를 전역에 둔다. 공유 모듈의 RIB 코드는 이 전역을 읽지 않는다.
 - 계약 위반은 `precondition`으로 메시지와 함께 실패시킨다. 복구 가능한 실패는 typed throws로 던진다.
 
 ## 테스트
