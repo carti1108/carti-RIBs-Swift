@@ -16,6 +16,7 @@
 ## 코드
 
 - `Sources/RIBs`는 표준 라이브러리와 `_Concurrency`만 쓴다. `import Foundation`·`Dispatch`·`Combine` 금지(ADR-0004). CI가 검사한다.
+- 샘플 공유 코드에서는 데이터 계층 모듈(`TodoData`)만 `FoundationEssentials`를 쓴다(ADR-0032). 피처와 `TodoCore`는 Foundation 없이 둔다.
 - Swift 6 언어 모드, 엄격한 동시성. 생명주기 타입은 모두 `@MainActor`다(ADR-0003). 내부에 락을 두지 않는다.
 - 비동기 작업은 `Interactor.task(_:)`/`Worker.task(_:)`로 활성 구간에 묶는다. Rx·Combine은 쓰지 않는다(ADR-0002).
 - DI는 손으로 짠 `Component`로 한다(ADR-0005). 숨은 전역·싱글턴을 두지 않는다.
