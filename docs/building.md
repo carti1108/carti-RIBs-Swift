@@ -37,7 +37,22 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 - 기본 샘플: [iOS](../Samples/iOSLogin/README.md), [Android](../Samples/AndroidLogin/README.md), [Web](../Samples/WebLogin/README.md)
 - µFeature 샘플(`Samples/TodoModular`, ADR-0024): [Web](../Samples/TodoModular/Web/README.md)
 
-## Windows
+## 샘플 경계 검사
+
+`Samples/TodoModular`의 피처 경계(ADR-0024)와 샘플의 순수 뷰 규칙(ADR-0027)을 import 문으로 검사합니다(ADR-0028). 빌드가 필요 없어 어느 호스트에서나 돕니다.
+
+```sh
+scripts/check-sample-boundaries.sh   # 위반이 있으면 파일과 import를 출력하고 실패
+```
+
+macOS에서는 SwiftPM의 검사도 함께 쓸 수 있습니다. 선언하지 않은 모듈을 import하면 빌드가 실패합니다.
+
+```sh
+swift build --package-path Samples/TodoModular/Shared --explicit-target-dependency-import-check error
+```
+
+이 옵션은 Windows 호스트와 Wasm SDK 빌드(`--swift-sdk ..._wasm`)에서는 위반을 잡지 못합니다. `--build-system native`와 `--target`을 붙여도 잡지 못합니다.
+
 
 swift.org 툴체인 6.4.2(`winget install Swift.Toolchain --version 6.4.2`), Visual Studio Build Tools 2022(C++ 도구, Windows SDK)가 필요합니다. 의존성 체크아웃에 심볼릭 링크가 있어 **개발자 모드**를 켜야 합니다. 명령은 `vcvars64.bat`를 부른 셸에서 실행하고, 설치 직후 새 환경 변수를 못 받은 셸이면 `SDKROOT`를 직접 잡습니다.
 
