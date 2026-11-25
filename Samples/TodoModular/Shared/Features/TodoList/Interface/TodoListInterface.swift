@@ -7,17 +7,23 @@ public struct TodoListViewState: Equatable, Sendable {
     public var isLoading: Bool
     /// 불러오지 못했을 때 보여 줄 문구. 있으면 뷰는 다시 시도 버튼을 함께 보여 준다.
     public var errorMessage: String?
+    /// 방금 한 일의 결과 문구(예: 파일에서 할 일 추가). 없으면 뷰는 아무것도 보여 주지 않는다.
+    public var notice: String?
 
-    public init(todos: [Todo] = [], isLoading: Bool = false, errorMessage: String? = nil) {
+    public init(todos: [Todo] = [], isLoading: Bool = false, errorMessage: String? = nil, notice: String? = nil) {
         self.todos = todos
         self.isLoading = isLoading
         self.errorMessage = errorMessage
+        self.notice = notice
     }
 }
 
 public enum TodoListViewAction: Equatable, Sendable {
     case todoTapped(id: Int64)
     case retryTapped
+    /// 사용자가 끌어다 놓거나 고른 텍스트 파일. 파일을 받는 방법(끌어다 놓기, 선택 창)은 뷰가 다루고,
+    /// 공유 코드는 이름과 내용만 받는다(#31). 내용의 각 줄이 할 일 하나다.
+    case fileReceived(name: String, text: String)
 }
 
 @MainActor

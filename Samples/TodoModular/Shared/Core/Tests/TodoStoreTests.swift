@@ -30,6 +30,21 @@ struct TodoStoreTests {
         #expect(store.doneIDs == [2, 3])
     }
 
+    @Test func addAppendsTodosWithNewIDs() {
+        let store = TodoStore()
+
+        let added = store.add(titles: ["빨래", "장보기"])
+
+        #expect(added == [Todo(id: 4, title: "빨래", isDone: false), Todo(id: 5, title: "장보기", isDone: false)])
+        #expect(store.todos == TodoStore.sampleTodos + added)
+    }
+
+    @Test func addToEmptyStoreStartsAtOne() {
+        let store = TodoStore(initial: [])
+
+        #expect(store.add(titles: ["첫 할 일"]).map(\.id) == [1])
+    }
+
     @Test func loadTellsSubscribers() async {
         let store = TodoStore.unloaded()
         var iterator = store.updates.makeAsyncIterator()

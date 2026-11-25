@@ -49,14 +49,20 @@ final class TodoDetailInteractor: PresentableInteractor<any TodoDetailPresentabl
             render()
         case .backTapped:
             listener?.didRequestCloseDetail()
+        case .titleCopied(let succeeded):
+            render(notice: succeeded ? Self.copiedNotice : Self.copyFailedNotice)
         }
     }
 
-    private func render() {
+    static let copiedNotice = "제목을 복사했습니다"
+    static let copyFailedNotice = "제목을 복사하지 못했습니다"
+
+    /// 결과 문구는 그 결과를 낸 동작 뒤 한 번만 보인다. 다른 동작으로 다시 그리면 지운다.
+    private func render(notice: String? = nil) {
         guard let todo = todoStore.find(todoID) else {
             preconditionFailure("Todo \(todoID) disappeared while its detail was open")
         }
-        presenter.render(TodoDetailViewState(title: todo.title, isDone: todo.isDone))
+        presenter.render(TodoDetailViewState(title: todo.title, isDone: todo.isDone, notice: notice))
     }
 }
 
