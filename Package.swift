@@ -40,7 +40,7 @@ let package = Package(
         .plugin(
             name: "NewRib",
             capability: .command(
-                intent: .custom(verb: "new-rib", description: "RIB 뼈대(공유 코드, 테스트, 선택적으로 SwiftUI 화면)를 만든다."),
+                intent: .custom(verb: "new-rib", description: "RIB 뼈대를 만든다. 한 모듈 안의 RIB(--name) 또는 µFeature 피처(--feature)."),
                 permissions: [.writeToPackageDirectory(reason: "새 RIB 소스 파일을 만든다.")]
             )
         ),
@@ -49,6 +49,8 @@ let package = Package(
         .testTarget(name: "RIBsUIKitTests", dependencies: ["RIBsUIKit"]),
         .testTarget(name: "RIBsWebTests", dependencies: ["RIBsWeb"]),
         .testTarget(name: "RIBsAndroidTests", dependencies: ["RIBsAndroid"]),
+        // new-rib이 만든 뼈대를 임시 패키지에서 실제로 빌드·테스트한다.
+        .testTarget(name: "NewRibTests"),
         .testTarget(name: "LoginSharedTests", dependencies: ["LoginShared"], path: "Samples/LoginShared/Tests"),
     ],
     swiftLanguageModes: [.v6]
