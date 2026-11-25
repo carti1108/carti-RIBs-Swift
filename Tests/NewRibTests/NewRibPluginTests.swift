@@ -172,6 +172,159 @@ private final class FixturePackage {
         #expect(again.output.contains("Refusing to overwrite"), "\(again.output)")
     }
 
+    /// 플랫폼 연결 코드(`--android`, `--web`)용 매니페스트. Android 쪽은 호스트에서 빌드되므로 타깃으로 넣어 컴파일까지 확인한다.
+    /// Web 쪽은 JavaScriptKit이 필요해 타깃으로 넣지 않고 내용만 확인한다.
+    private static var platformManifest: String {
+        """
+        // swift-tools-version: 6.0
+        import PackageDescription
+
+        let ribs: Target.Dependency = .product(name: "RIBs", package: "RIBs")
+        let ribsAndroid: Target.Dependency = .product(name: "RIBsAndroid", package: "RIBs")
+
+        let package = Package(
+            name: "Fixture",
+            platforms: [.macOS(.v14)],
+            dependencies: [.package(name: "RIBs", path: "\(repositoryRoot)")],
+            targets: [
+                .target(name: "FeatureProfileInterface", dependencies: [ribs], path: "Features/Profile/Interface"),
+                .target(name: "AndroidSupport", dependencies: [ribs, ribsAndroid], path: "Android/Sources/AndroidSupport"),
+                .target(
+                    name: "FeatureProfileAndroid",
+                    dependencies: ["FeatureProfileInterface", "AndroidSupport", ribs, ribsAndroid],
+                    path: "Android/Sources/FeatureProfileAndroid"
+                ),
+                .target(
+                    name: "AppBridge",
+                    dependencies: ["FeatureProfileAndroid", "AndroidSupport", ribs, ribsAndroid],
+                    path: "Android/Sources/AppBridge"
+                ),
+            ],
+            swiftLanguageModes: [.v6]
+        )
+        """
+    }
+
+    /// 생성된 핸들이 기대하는 것: 브리지 타깃의 전역 `controller`와 `screen(id:as:)`.
+    private static let bridgeRuntime = """
+        import AndroidSupport
+        import RIBsAndroid
+
+        @MainActor final class Controller {
+            let registry = ScreenRegistry()
+            func screen<Screen: AndroidScreen>(id: Int64, as type: Screen.Type) -> Screen? { registry.screen(id: id, as: type) }
+        }
+
+        @MainActor var controller: Controller?
+
+        """
+
+    private static let platformArguments = [
+        "--feature", "Profile", "--root", "Features",
+        "--android", "Android/Sources", "--android-bridge", "AppBridge", "--android-support", "AndroidSupport",
+        "--web", "Web/Sources", "--web-bridge", "WebBridge", "--web-support", "WebSupport",
+    ]
+
+    private func makePlatformFixture() throws -> FixturePackage {
+        let fixture = try FixturePackage()
+        try fixture.write(Self.platformManifest, to: "Package.swift")
+        try fixture.write("// 자리표시\n", to: "Features/Profile/Interface/Placeholder.swift")
+        try fixture.write("// 자리표시\n", to: "Android/Sources/FeatureProfileAndroid/Placeholder.swift")
+        // 화면 기반 클래스는 TodoModular 샘플의 것을 그대로 쓴다.
+        let support = try String(
+            contentsOfFile: "\(Self.repositoryRoot)/Samples/TodoModular/Android/swift/Sources/TodoAndroidSupport/BridgedScreen.swift",
+            encoding: .utf8
+        )
+        try fixture.write(support, to: "Android/Sources/AndroidSupport/BridgedScreen.swift")
+        try fixture.write(Self.bridgeRuntime, to: "Android/Sources/AppBridge/Runtime.swift")
+        return fixture
+    }
+
+    @Test func generatedPlatformConnectionCodeBuildsOnHost() throws {
+        let fixture = try makePlatformFixture()
+
+        let result = try fixture.newRibArguments(Self.platformArguments)
+
+        #expect(result.status == 0, "\(result.output)")
+        for path in [
+            "Android/Sources/FeatureProfileAndroid/ProfileAndroidScreen.swift",
+            "Android/Sources/AppBridge/ProfileHandle.swift",
+            "Web/Sources/FeatureProfileWeb/ProfileWebScreen.swift",
+            "Web/Sources/WebBridge/ProfileBridge.swift",
+        ] {
+            #expect(fixture.exists(path), "missing \(path)")
+        }
+
+        // Android 화면과 핸들은 만든 그대로 컴파일된다.
+        let build = try fixture.swift("build")
+        #expect(build.status == 0, "\(build.output.suffix(3000))")
+
+        // 핸들은 상태를 기본 타입 인자로 풀고, 액션마다 메서드 하나를 둔다(ADR-0020).
+        let handle = try fixture.read("Android/Sources/AppBridge/ProfileHandle.swift")
+        #expect(handle.contains("func render(title: String)"))
+        #expect(handle.contains("public func closeTapped()"))
+
+        // 피처의 웹 화면은 `@JS`를 모른다. `@JS` 선언은 브리지 타깃에만 둔다.
+        let webScreen = try fixture.read("Web/Sources/FeatureProfileWeb/ProfileWebScreen.swift")
+        #expect(webScreen.contains("import WebSupport"))
+        #expect(!webScreen.contains("@JS"))
+        let webBridge = try fixture.read("Web/Sources/WebBridge/ProfileBridge.swift")
+        #expect(webBridge.contains("@JS protocol ProfileViewBridge"))
+        #expect(webBridge.contains("@JS final class ProfileScreenHandle"))
+        #expect(webBridge.contains("func profileViewFactory(_ view: any ProfileViewBridge) -> ProfileWebViewFactory"))
+    }
+
+    /// 공유 코드와 플랫폼 코드가 다른 패키지에 있으면(TodoModular) 플랫폼 패키지에서 연결 코드만 만든다.
+    @Test func connectModeCreatesOnlyPlatformFiles() throws {
+        let fixture = try makePlatformFixture()
+
+        let result = try fixture.newRibArguments([
+            "--connect", "Settings",
+            "--web", "Web/Sources", "--web-bridge", "WebBridge", "--web-support", "WebSupport",
+        ])
+
+        #expect(result.status == 0, "\(result.output)")
+        #expect(fixture.exists("Web/Sources/FeatureSettingsWeb/SettingsWebScreen.swift"))
+        #expect(fixture.exists("Web/Sources/WebBridge/SettingsBridge.swift"))
+        #expect(!fixture.exists("Features/Settings"))
+        #expect(!fixture.exists("Android/Sources/FeatureSettingsAndroid"))
+
+        let withoutPlatform = try fixture.newRibArguments(["--connect", "Other"])
+        #expect(withoutPlatform.status != 0)
+        #expect(withoutPlatform.output.contains("--android or --web"), "\(withoutPlatform.output)")
+    }
+
+    @Test func platformOptionsMustComeAsASet() throws {
+        let fixture = try makePlatformFixture()
+
+        let result = try fixture.newRibArguments(["--feature", "Profile", "--root", "Features", "--android", "Android/Sources"])
+
+        #expect(result.status != 0)
+        #expect(result.output.contains("--android-bridge"), "\(result.output)")
+        #expect(!fixture.exists("Features/Profile/Interface/ProfileInterface.swift"))
+    }
+
+    /// 두 플랫폼의 브리지가 같은 타깃이면 `XxxViewBridge`·`XxxScreenHandle`이 두 번 선언된다.
+    @Test func rejectsOneBridgeTargetForBothPlatforms() throws {
+        let fixture = try makePlatformFixture()
+
+        let result = try fixture.newRibArguments([
+            "--connect", "Profile",
+            "--android", "Sources", "--android-bridge", "Bridge", "--android-support", "AndroidSupport",
+            "--web", "Sources", "--web-bridge", "Bridge", "--web-support", "WebSupport",
+        ])
+
+        #expect(result.status != 0)
+        #expect(result.output.contains("different bridge targets"), "\(result.output)")
+        #expect(!fixture.exists("Sources/Bridge"))
+
+        let emptySources = try fixture.newRibArguments([
+            "--connect", "Profile", "--web", "", "--web-bridge", "Bridge", "--web-support", "WebSupport",
+        ])
+        #expect(emptySources.status != 0)
+        #expect(!fixture.exists("Sources/Bridge"))
+    }
+
     @Test func rejectsNameThatIsNotPascalCase() throws {
         let fixture = try FixturePackage()
         try fixture.write(Self.manifest, to: "Package.swift")

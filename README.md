@@ -56,10 +56,17 @@ swift package --allow-writing-to-package-directory new-rib \
 # µFeature 피처 하나(Interface·Impl·Testing·Tests 디렉터리)
 swift package --allow-writing-to-package-directory new-rib \
   --feature Profile [--root Features] [--prefix Feature] [--swiftui iOS/Features/Profile]
+
+# 플랫폼 연결 코드만(Android·Web 패키지에서 실행)
+swift package --allow-writing-to-package-directory new-rib \
+  --connect Profile --web Sources --web-bridge TodoModularWeb --web-support TodoWebSupport
 ```
 
 - 뷰 계약은 `render(_ state:)`와 `handle(_ action:)` 모양으로 만듭니다(`XxxViewState`, `XxxViewAction`). 라이브러리가 이 모양을 요구하지는 않습니다.
 - `--swiftui`를 주면 순수 뷰(`XxxView`, SwiftUI만 import)와 어댑터(`XxxScreen`)를 따로 만듭니다. 피처 모드에서는 `UI/`와 `Adapter/` 아래에 둡니다.
+- `--android <소스 디렉터리> --android-bridge <타깃> --android-support <모듈>`은 Swift 화면(`XxxAndroidScreen`)과 swift-java 핸들(`XxxScreenHandle`, `XxxViewBridge`)을 만듭니다. `--web` 세 옵션은 Swift 화면(`XxxWebScreen`)과 BridgeJS 브리지(`XxxBridge.swift`)를 만듭니다. `--feature`에 함께 주거나, 공유 코드와 플랫폼 코드가 다른 패키지면 `--connect`로 따로 만듭니다.
+  - TodoModular 샘플의 구조를 전제로 합니다. support 모듈에 `BridgedScreen`·`WebScreen`이, Android 브리지 타깃에 전역 `controller`가 있어야 합니다.
+  - 처음 한 번 만드는 뼈대입니다. `XxxViewState`·`XxxViewAction`을 바꾸면 브리지의 인자와 핸들 메서드는 손으로 맞춥니다. Kotlin·JS 쪽 뷰는 만들지 않습니다.
 - 피처 모드는 `Package.swift`를 고치지 않고 넣을 줄을 출력합니다.
 - 이미 있는 파일은 덮어쓰지 않습니다.
 

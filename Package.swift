@@ -40,7 +40,7 @@ let package = Package(
         .plugin(
             name: "NewRib",
             capability: .command(
-                intent: .custom(verb: "new-rib", description: "RIB 뼈대를 만든다. 한 모듈 안의 RIB(--name) 또는 µFeature 피처(--feature)."),
+                intent: .custom(verb: "new-rib", description: "RIB 뼈대를 만든다. 한 모듈 안의 RIB(--name), µFeature 피처(--feature), 플랫폼 연결 코드(--connect)."),
                 permissions: [.writeToPackageDirectory(reason: "새 RIB 소스 파일을 만든다.")]
             )
         ),
