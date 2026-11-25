@@ -9,13 +9,15 @@ private final class FakeSender: AndroidHTTPSender {
         let requestID: Int64
         let method: String
         let path: String
+        let headers: String
+        let body: String
     }
 
     private(set) var started: [Started] = []
     private(set) var cancelled: [Int64] = []
 
-    func start(requestID: Int64, method: String, path: String) {
-        started.append(Started(requestID: requestID, method: method, path: path))
+    func start(requestID: Int64, method: String, path: String, headers: String, body: String) {
+        started.append(Started(requestID: requestID, method: method, path: path, headers: headers, body: body))
     }
 
     func cancel(requestID: Int64) { cancelled.append(requestID) }
@@ -51,6 +53,32 @@ struct AndroidHTTPTransportTests {
         transport.complete(requestID: started.requestID, status: 200, body: "[]")
 
         #expect(await task.value == .success(HTTPResponse(status: 200, body: Array("[]".utf8))))
+    }
+
+    /// swift-java 경계는 문자열만 넘긴다(ADR-0020). 헤더는 이름순 `이름: 값` 줄로, 본문이 없으면 빈 문자열로 보낸다.
+    @Test func passesHeadersAsLinesAndBodyAsString() async throws {
+        let request = HTTPRequest(
+            method: .post,
+            path: "/todos",
+            headers: ["Content-Type": "application/json", "Authorization": "Bearer abc"],
+            body: #"{"title":"운동"}"#
+        )
+        _ = Task { [transport] in try await transport.send(request) }
+        await runCurrent()
+
+        let started = try #require(sender.started.first)
+        #expect(started.method == "POST")
+        #expect(started.headers == "Authorization: Bearer abc\nContent-Type: application/json\n")
+        #expect(started.body == #"{"title":"운동"}"#)
+    }
+
+    @Test func requestWithoutHeadersOrBodyPassesEmptyStrings() async throws {
+        _ = send()
+        await runCurrent()
+
+        let started = try #require(sender.started.first)
+        #expect(started.headers == "")
+        #expect(started.body == "")
     }
 
     @Test func failureIsUnreachable() async throws {

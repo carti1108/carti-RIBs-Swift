@@ -3,7 +3,8 @@ import TodoModularAndroid
 /// Kotlin이 구현한다(`:bridge`의 `HttpUrlConnectionTransport`). 요청을 플랫폼 HTTP 스택으로 보낸다.
 /// 결과는 메인 스레드에서 `HTTPTransportHandle.complete`나 `fail`로 돌려준다.
 public protocol HTTPTransportBridge {
-    func start(requestID: Int64, method: String, path: String)
+    /// `headers`는 `이름: 값` 줄을 `\n`으로 끝낸 문자열이고, `body`는 본문이 없으면 빈 문자열이다.
+    func start(requestID: Int64, method: String, path: String, headers: String, body: String)
     func cancel(requestID: Int64)
 }
 
@@ -43,8 +44,8 @@ private final class BridgeSender: AndroidHTTPSender {
         self.bridge = bridge
     }
 
-    func start(requestID: Int64, method: String, path: String) {
-        bridge.start(requestID: requestID, method: method, path: path)
+    func start(requestID: Int64, method: String, path: String, headers: String, body: String) {
+        bridge.start(requestID: requestID, method: method, path: path, headers: headers, body: body)
     }
 
     func cancel(requestID: Int64) {

@@ -25,9 +25,9 @@ class HttpUrlConnectionTransport(
     /** 진행 중인 요청. 메인 스레드에서만 읽고 쓴다. */
     private val running = mutableMapOf<Long, Future<*>>()
 
-    override fun start(requestID: Long, method: String, path: String) {
+    override fun start(requestID: Long, method: String, path: String, headers: String, body: String) {
         running[requestID] = executor.submit {
-            val result = runCatching { send(method, path) }
+            val result = runCatching { send(method, path, headers, body) }
             main.post {
                 // 취소된 요청은 이미 빠져 있다. Swift도 끝난 요청의 결과는 무시한다.
                 if (running.remove(requestID) == null) return@post
@@ -48,17 +48,28 @@ class HttpUrlConnectionTransport(
         executor.shutdownNow()
     }
 
-    /** 상태 코드가 오류여도 응답으로 돌려준다. 연결하지 못하면 던진다. */
-    private fun send(method: String, path: String): Pair<Int, String> {
+    /**
+     * 상태 코드가 오류여도 응답으로 돌려준다. 연결하지 못하면 던진다.
+     * `headers`는 Swift가 만든 `이름: 값` 줄이고, `body`가 빈 문자열이면 본문 없이 보낸다.
+     */
+    private fun send(method: String, path: String, headers: String, body: String): Pair<Int, String> {
         val connection = URL(baseUrl + path).openConnection() as HttpURLConnection
         try {
             connection.requestMethod = method
             connection.connectTimeout = TIMEOUT_MILLIS
             connection.readTimeout = TIMEOUT_MILLIS
+            headers.lineSequence().filter { it.isNotEmpty() }.forEach { line ->
+                val (name, value) = line.split(": ", limit = 2)
+                connection.setRequestProperty(name, value)
+            }
+            if (body.isNotEmpty()) {
+                connection.doOutput = true
+                connection.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
+            }
             val status = connection.responseCode
             val stream = if (status in 200..299) connection.inputStream else connection.errorStream
-            val body = stream?.use { it.readBytes().toString(Charsets.UTF_8) } ?: ""
-            return status to body
+            val responseBody = stream?.use { it.readBytes().toString(Charsets.UTF_8) } ?: ""
+            return status to responseBody
         } finally {
             connection.disconnect()
         }
