@@ -15,7 +15,7 @@ public final class RemoteTodoRepository: TodoRepository {
         } catch {
             switch error {
             case .cancelled: throw .cancelled
-            case .unreachable, .badStatus, .malformedBody: throw .unavailable
+            case .unreachable, .unauthorized, .conflict, .badStatus, .malformedBody: throw .unavailable
             }
         }
     }
