@@ -61,7 +61,7 @@ final class TimerInteractor: Interactor {
 
 | 라이브러리 | 플랫폼 | 하는 일 |
 |---|---|---|
-| `RIBsSwiftUI` | Apple | `SwiftUIRenderable`, `RIBScreenSlot`, `SwiftUIViewHost` |
+| `RIBsSwiftUI` | Apple | `SwiftUIRenderable`, `RIBScreenSlot`, `RIBScreenStack`, `SwiftUIViewHost` |
 | `RIBsUIKit` | iOS·tvOS·visionOS | `UIKitViewControllable`, `RIBContainerViewController`, `WindowViewHost` |
 | `RIBsWeb` | Wasm(브라우저) | `WebScreenSlot`. DOM은 앱이 JavaScriptKit으로 그린다 |
 | `RIBsAndroid` | Android | `AndroidScreen`, `AndroidRenderer`, `AndroidMainLooper`(메인 큐를 메인 Looper에 붙임) |
