@@ -32,3 +32,4 @@
 | [0028](ADR-0028-sample-boundary-check-script.md) | 샘플의 모듈 경계는 import 문을 읽는 스크립트로 검사한다 | 채택 |
 | [0029](ADR-0029-new-rib-feature-template.md) | `new-rib`에 µFeature 피처 모드를 두고, 템플릿을 ViewState/ViewAction과 순수 뷰·어댑터 모양으로 바꾼다 | 채택 |
 | [0030](ADR-0030-detail-navigation-by-intent.md) | 상세 화면 전환은 뷰 계약에 의도 이름으로 두고, 사용자가 제스처로 닫은 것은 `ViewAction`으로 알린다 | 채택 |
+| [0031](ADR-0031-new-rib-platform-connection-templates.md) | 플랫폼 연결 코드는 빌드 때 생성하지 않고 `new-rib` 템플릿으로 한 번 만든다 | 채택 |
