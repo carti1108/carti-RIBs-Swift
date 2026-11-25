@@ -1,5 +1,5 @@
 ### ADR-0010 Android는 손으로 쓴 JNI로 화면 트리 JSON을 Compose에 넘기고, 메인 큐를 메인 Looper에 붙인다
-- 상태: 채택
+- 상태: 대체됨(ADR-0021)
 - 날짜: 2026-11-13
 - 배경: swift.org의 Swift SDK for Android(6.4.2, NDK r30)로 Swift 코드를 Android `.so`로 빌드할 수 있다. 같은 `LoginShared` RIB 트리를 Kotlin/Jetpack Compose 화면으로 그리려면 (1) Swift와 Kotlin 사이 경계, (2) Swift `@MainActor`가 Android 메인 스레드에서 도는 방법이 필요하다. Android용 Swift 런타임의 메인 실행기는 libdispatch 메인 큐인데, Android 앱에서는 `dispatch_main()`도 CFRunLoop도 돌지 않으므로 그대로 두면 `Task { @MainActor in }`(로그인 지연, 세션 타이머)이 영원히 실행되지 않는다.
 - 결정:

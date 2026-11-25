@@ -1,5 +1,5 @@
 ### ADR-0009 웹(Wasm)은 Swift가 JavaScriptKit으로 DOM을 직접 그리고, 화면 슬롯은 순수 Swift 타깃으로 둔다
-- 상태: 채택
+- 상태: 대체됨(ADR-0022)
 - 날짜: 2026-11-13
 - 배경: 같은 RIB 트리를 브라우저에서 돌려야 한다(M5). carti-RIBs-KMP는 Kotlin이 뷰 계약을 구현해 화면 상태 스냅숏을 `ViewStore`에 담고 React가 `useSyncExternalStore`로 구독한다(KMP ADR-0009). Swift는 swift.org Wasm SDK와 JavaScriptKit으로 브라우저에 올릴 수 있는데, 화면을 누가 그릴지와 어댑터를 어디에 둘지 정해야 한다.
 - 결정:

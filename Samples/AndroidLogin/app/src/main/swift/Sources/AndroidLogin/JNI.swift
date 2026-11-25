@@ -13,7 +13,6 @@ public typealias Env = UnsafeMutablePointer<JNIEnv?>
 private let bridgeClassName = "com/carti/ribs/samples/swiftandroid/SwiftBridge"
 
 /// 메인 스레드 전용 상태. `MainActor`로 격리한다.
-@MainActor private var controller: AndroidLoginController?
 @MainActor private var renderTarget: RenderTarget?
 nonisolated(unsafe) private var javaVM: UnsafeMutablePointer<JavaVM?>?
 
@@ -57,16 +56,6 @@ public func nativeStart(env: Env, thiz: jobject, savedState: jbyteArray?, loginD
         return app.start(savedState: saved)
     }
     return restored ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
-}
-
-@_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeDispatch")
-public func nativeDispatch(env: Env, thiz: jobject, screenID: jlong, action: jbyteArray, argument: jbyteArray) -> jboolean {
-    let action = string(env, from: action)
-    let argument = string(env, from: argument)
-    let handled = MainActor.assumeIsolated {
-        controller?.dispatch(screenID: screenID, action: action, argument: argument) ?? false
-    }
-    return handled ? jboolean(JNI_TRUE) : jboolean(JNI_FALSE)
 }
 
 @_cdecl("Java_com_carti_ribs_samples_swiftandroid_SwiftBridge_nativeHandleBackPress")

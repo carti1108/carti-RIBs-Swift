@@ -4,8 +4,7 @@ import Observation
 
 @MainActor @Observable
 final class LoggedOutModel {
-    var errorMessage: String?
-    var isLoading = false
+    var state = LoggedOutViewState()
 }
 
 @MainActor @Observable

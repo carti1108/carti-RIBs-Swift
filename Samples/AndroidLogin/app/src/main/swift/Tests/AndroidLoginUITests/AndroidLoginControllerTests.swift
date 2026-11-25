@@ -23,6 +23,12 @@ private final class ManualClock: LoginClock {
     var hasWaiters: Bool { !waiters.isEmpty }
 }
 
+/// 화면이 그리라고 넘긴 상태 기록.
+@MainActor
+private final class RenderLog<State> {
+    var states: [State] = []
+}
+
 @MainActor
 private func settle() async {
     for _ in 0..<20 { await Task.yield() }
@@ -42,13 +48,33 @@ struct AndroidLoginControllerTests {
         )
     }
 
-    private func tree() throws -> RibState { try RibState(decoding: controller.encodedTree) }
+    private func tree(_ controller: AndroidLoginController? = nil) throws -> RibState {
+        try RibState(decoding: (controller ?? self.controller).encodedTree)
+    }
 
     private func child(_ state: RibState?) -> RibState? { state?["child"]?.stateValue }
 
-    private func send(_ screen: RibState?, _ action: String, _ argument: String = "") throws {
-        let id = try #require(screen?["id"]?.intValue)
-        #expect(controller.dispatch(screenID: id, action: action, argument: argument))
+    /// 화면 트리 노드의 `id`로 화면을 찾아 붙고, 받은 상태를 순서대로 모은다.
+    private func attach<State, Screen: BridgedScreen<State>>(
+        _ node: RibState?,
+        as type: Screen.Type,
+        in controller: AndroidLoginController? = nil
+    ) throws -> (screen: Screen, rendered: RenderLog<State>) {
+        let id = try #require(node?["id"]?.intValue)
+        let screen = try #require((controller ?? self.controller).screen(id: id, as: type))
+        let rendered = RenderLog<State>()
+        screen.attach { rendered.states.append($0) }
+        return (screen, rendered)
+    }
+
+    private func attachLoggedOut() throws -> (screen: LoggedOutScreen, rendered: RenderLog<LoggedOutViewState>) {
+        try attach(child(try tree()), as: LoggedOutScreen.self)
+    }
+
+    private func logIn(_ name: String = "carti") async throws {
+        try attachLoggedOut().screen.send(.loginTapped(rawName: name))
+        await settle()
+        await clock.advance()
     }
 
     @Test func startsOnLoggedOutScreen() throws {
@@ -56,71 +82,118 @@ struct AndroidLoginControllerTests {
         #expect(child(try tree())?["kind"] == .string(ScreenKind.loggedOut))
     }
 
+    @Test func attachReplaysCurrentLoggedOutState() throws {
+        controller.start(savedState: nil)
+        let (_, rendered) = try attachLoggedOut()
+        #expect(rendered.states == [LoggedOutViewState()])
+    }
+
+    @Test func screenStateStaysOutOfTree() async throws {
+        controller.start(savedState: nil)
+        let loggedOut = child(try tree())
+        #expect(loggedOut?["error"] == nil)
+        #expect(loggedOut?["loading"] == nil)
+
+        try await logIn()
+        let loggedIn = child(try tree())
+        #expect(loggedIn?["userName"] == nil)
+        #expect(loggedIn?["sessionSeconds"] == nil)
+        #expect(child(loggedIn)?["todos"] == nil)
+    }
+
+    @Test func screenLookupRejectsOtherScreens() throws {
+        controller.start(savedState: nil)
+        let rootID = try #require(try tree()["id"]?.intValue)
+        let loggedOutID = try #require(child(try tree())?["id"]?.intValue)
+        #expect(controller.screen(id: rootID, as: LoggedOutScreen.self) == nil)
+        #expect(controller.screen(id: -1, as: LoggedOutScreen.self) == nil)
+        #expect(controller.screen(id: loggedOutID, as: LoggedInScreen.self) == nil)
+    }
+
     @Test func blankNameShowsError() throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "   ")
-        #expect(child(try tree())?["error"] == .string("이름을 입력하세요"))
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: "   "))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: "이름을 입력하세요", isLoading: false))
+    }
+
+    @Test func detachStopsRendering() throws {
+        controller.start(savedState: nil)
+        let (screen, rendered) = try attachLoggedOut()
+        screen.detach()
+        screen.send(.loginTapped(rawName: "   "))
+        #expect(rendered.states.count == 1)
     }
 
     @Test func loginShowsLoadingThenLoggedInAndLogoutReturns() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, " carti ")
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: " carti "))
         await settle()
-        #expect(child(try tree())?["loading"] == .bool(true))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: nil, isLoading: true))
 
         await clock.advance()
-        let loggedIn = child(try tree())
-        #expect(loggedIn?["kind"] == .string(ScreenKind.loggedIn))
-        #expect(loggedIn?["userName"] == .string("carti"))
-        #expect(child(loggedIn)?["kind"] == .string(ScreenKind.todoList))
+        let loggedInNode = child(try tree())
+        #expect(loggedInNode?["kind"] == .string(ScreenKind.loggedIn))
+        #expect(child(loggedInNode)?["kind"] == .string(ScreenKind.todoList))
+        let loggedIn = try attach(loggedInNode, as: LoggedInScreen.self)
+        #expect(loggedIn.rendered.states.last?.userName == "carti")
 
-        try send(loggedIn, ScreenAction.logout)
+        loggedIn.screen.tapLogout()
         #expect(child(try tree())?["kind"] == .string(ScreenKind.loggedOut))
-        #expect(child(try tree())?["error"] == .null)
+        #expect(try attachLoggedOut().rendered.states == [LoggedOutViewState()])
     }
 
     @Test func failingNameShowsServerError() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "fail")
+        let (screen, rendered) = try attachLoggedOut()
+        screen.send(.loginTapped(rawName: "fail"))
         await settle()
         await clock.advance()
-        let loggedOut = child(try tree())
-        #expect(loggedOut?["error"] == .string("로그인에 실패했습니다"))
-        #expect(loggedOut?["loading"] == .bool(false))
+        #expect(rendered.states.last == LoggedOutViewState(errorMessage: "로그인에 실패했습니다", isLoading: false))
     }
 
     @Test func detailToggleAndBackPress() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "carti")
-        await settle()
-        await clock.advance()
-        try send(child(child(try tree())), ScreenAction.selectTodo, "1")
+        try await logIn()
+        let list = try attach(child(child(try tree())), as: TodoListScreen.self)
+        #expect(list.rendered.states.last?.first == Todo(id: 1, title: "우유 사기", isDone: false))
+        list.screen.tapTodo(id: 1)
 
-        let detail = child(child(try tree()))
-        #expect(detail?["kind"] == .string(ScreenKind.todoDetail))
-        #expect(detail?["title"] == .string("우유 사기"))
-        try send(detail, ScreenAction.toggleDone)
-        #expect(child(child(try tree()))?["isDone"] == .bool(true))
+        let detailNode = child(child(try tree()))
+        #expect(detailNode?["kind"] == .string(ScreenKind.todoDetail))
+        let detail = try attach(detailNode, as: TodoDetailScreen.self)
+        #expect(detail.rendered.states.last == TodoDetailScreenState(title: "우유 사기", isDone: false))
+        detail.screen.tapToggleDone()
+        #expect(detail.rendered.states.last?.isDone == true)
 
         #expect(controller.handleBackPress())
         await settle()
-        let list = child(child(try tree()))
-        #expect(list?["kind"] == .string(ScreenKind.todoList))
-        #expect(list?["todos"]?.listValue?.first?.stateValue?["isDone"] == .bool(true))
+        let listNode = child(child(try tree()))
+        #expect(listNode?["kind"] == .string(ScreenKind.todoList))
+        #expect(try attach(listNode, as: TodoListScreen.self).rendered.states.last?.first?.isDone == true)
         #expect(!controller.handleBackPress())
+    }
+
+    @Test func detailBackTapReturnsToList() async throws {
+        controller.start(savedState: nil)
+        try await logIn()
+        try attach(child(child(try tree())), as: TodoListScreen.self).screen.tapTodo(id: 1)
+        try attach(child(child(try tree())), as: TodoDetailScreen.self).screen.tapBack()
+        await settle()
+        #expect(child(child(try tree()))?["kind"] == .string(ScreenKind.todoList))
     }
 
     @Test func savedStateRestoresLoggedInUser() async throws {
         controller.start(savedState: nil)
-        try send(child(try tree()), ScreenAction.login, "carti")
-        await settle()
-        await clock.advance()
+        try await logIn()
         let saved = controller.saveState()
         controller.stop()
 
         let restored = AndroidLoginController(authService: DelayedAuthService(delay: .zero, clock: clock), clock: clock, sink: { _ in })
         #expect(restored.start(savedState: saved))
-        #expect(child(try RibState(decoding: restored.encodedTree))?["userName"] == .string("carti"))
+        let loggedIn = try attach(child(try tree(restored)), as: LoggedInScreen.self, in: restored)
+        #expect(loggedIn.rendered.states.last?.userName == "carti")
         restored.stop()
     }
 

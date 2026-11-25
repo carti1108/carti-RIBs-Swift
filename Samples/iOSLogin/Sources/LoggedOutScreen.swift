@@ -3,17 +3,16 @@ import RIBs
 import RIBsSwiftUI
 import SwiftUI
 
-/// 로그아웃 상태 RIB의 뷰. 상태는 공유 코드가 `showError`·`showLoading`으로 넘기고, 입력은 `listener`로 돌려준다.
+/// 로그아웃 상태 RIB의 뷰. 공유 코드가 `LoggedOutViewState`를 통째로 넘기고, 입력은 `LoggedOutViewAction`으로 돌려준다.
 @MainActor
 final class LoggedOutScreen: LoggedOutViewContract, SwiftUIRenderable {
     weak var listener: (any LoggedOutPresentableListener)?
     let model = LoggedOutModel()
 
-    func showError(_ message: String?) { model.errorMessage = message }
-    func showLoading(_ isLoading: Bool) { model.isLoading = isLoading }
+    func render(_ state: LoggedOutViewState) { model.state = state }
 
     func makeView() -> AnyView {
-        AnyView(LoggedOutView(model: model) { [weak self] name in self?.listener?.didTapLogin(rawName: name) })
+        AnyView(LoggedOutView(model: model) { [weak self] name in self?.listener?.handle(.loginTapped(rawName: name)) })
     }
 }
 
@@ -27,17 +26,17 @@ private struct LoggedOutView: View {
             Text("로그인").font(.largeTitle.bold())
             TextField("이름", text: $name)
                 .textFieldStyle(.roundedBorder)
-                .disabled(model.isLoading)
+                .disabled(model.state.isLoading)
                 .accessibilityIdentifier("nameField")
-            if let message = model.errorMessage {
+            if let message = model.state.errorMessage {
                 Text(message).foregroundStyle(.red).accessibilityIdentifier("errorLabel")
             }
-            if model.isLoading {
+            if model.state.isLoading {
                 ProgressView().accessibilityIdentifier("loadingIndicator")
             }
             Button("로그인") { onLogin(name) }
                 .buttonStyle(.borderedProminent)
-                .disabled(model.isLoading)
+                .disabled(model.state.isLoading)
                 .accessibilityIdentifier("loginButton")
         }
         .padding(24)

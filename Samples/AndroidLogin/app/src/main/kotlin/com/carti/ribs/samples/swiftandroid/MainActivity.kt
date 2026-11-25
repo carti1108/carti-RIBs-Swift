@@ -19,7 +19,7 @@ import org.json.JSONObject
 
 /**
  * Swift RIB 트리를 소유하는 ViewModel. 화면 회전에도 트리를 유지하고, 화면을 완전히 떠날 때 내린다.
- * Swift가 보낸 화면 트리(JSON)를 Compose 상태로 들고 있다.
+ * Swift가 보낸 화면 트리(JSON, 구조만 담는다)를 Compose 상태로 들고 있다.
  */
 class LoginViewModel(loginDelayMillis: Long, savedStateHandle: SavedStateHandle) : ViewModel() {
     var tree: JSONObject by mutableStateOf(JSONObject())
@@ -29,10 +29,6 @@ class LoginViewModel(loginDelayMillis: Long, savedStateHandle: SavedStateHandle)
         val saved = savedStateHandle.get<Bundle>(KEY_RIB_STATE)?.getString(KEY_RIB_STATE)
         SwiftBridge.start(saved, loginDelayMillis) { tree = JSONObject(it) }
         savedStateHandle.setSavedStateProvider(KEY_RIB_STATE) { bundleOf(KEY_RIB_STATE to SwiftBridge.saveState()) }
-    }
-
-    fun send(screenId: Long, action: String, argument: String = "") {
-        SwiftBridge.dispatch(screenId, action, argument)
     }
 
     override fun onCleared() {
@@ -72,7 +68,7 @@ class MainActivity : ComponentActivity() {
         onBackPressedDispatcher.addCallback(this, RibBackPressedCallback(this))
         setContent {
             MaterialTheme {
-                Surface { RibNode(viewModel.tree, viewModel::send) }
+                Surface { RibNode(viewModel.tree) }
             }
         }
     }

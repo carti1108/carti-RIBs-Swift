@@ -19,7 +19,13 @@
   </script>
   <script type="module">
     import { init } from "./.build/plugins/PackageToJS/outputs/Package/index.js";
-    init();
+    import { LoggedOutView } from "./views/logged-out-view.js";
+    import { LoggedInView } from "./views/logged-in-view.js";
+    import { TodoListView } from "./views/todo-list-view.js";
+    import { TodoDetailView } from "./views/todo-detail-view.js";
+    // 화면은 JS 뷰가 그린다. Swift가 정의한 화면별 브리지 프로토콜을 구현한 객체를 넘겨 앱을 시작한다.
+    const { exports } = await init();
+    exports.startLoginApp(new LoggedOutView(), new LoggedInView(), new TodoListView(), new TodoDetailView());
   </script>
 </body>
 </html>

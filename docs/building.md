@@ -11,7 +11,7 @@
 
 ## 공개 API 검사
 
-공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). KMP의 `checkKotlinAbi`/`updateKotlinAbi`와 같은 흐름입니다. macOS·Xcode에서만 돕니다.
+공개 라이브러리 타깃(`RIBs`, `RIBsSwiftUI`, `RIBsUIKit`, `RIBsWeb`, `RIBsAndroid`)의 API를 `swift-api-digester` 덤프로 `api/`에 체크인해 둡니다(ADR-0011). macOS·Xcode에서만 돕니다.
 
 ```sh
 scripts/check-api.sh            # 덤프와 비교. 다르면 깨지는 변경과 diff를 출력하고 실패

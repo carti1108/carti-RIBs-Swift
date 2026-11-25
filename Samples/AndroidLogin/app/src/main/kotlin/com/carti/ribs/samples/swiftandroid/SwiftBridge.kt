@@ -4,7 +4,8 @@ import android.os.Handler
 import android.os.Looper
 
 /**
- * Swift 라이브러리(libAndroidLogin.so)와의 JNI 경계(ADR-0010). Swift 쪽 짝은 `Sources/AndroidLogin/JNI.swift`다.
+ * Swift 라이브러리(libAndroidLogin.so)와의 손으로 쓴 JNI 경계(ADR-0021). Swift 쪽 짝은 `Sources/AndroidLogin/JNI.swift`다.
+ * 시작·종료·뒤로 가기·상태 저장·화면 트리(구조)만 맡는다. 화면의 상태와 입력은 swift-java가 만든 화면별 핸들로 오간다.
  *
  * - 라이브러리 로드와 메인 Looper 연결을 포함해 모든 호출은 UI(메인) 스레드에서 한다. `init`이 이를 확인한다.
  * - Swift는 `MainActor.assumeIsolated`로 이를 확인한다.
@@ -45,9 +46,6 @@ object SwiftBridge {
         return nativeStart(savedState?.toByteArray(Charsets.UTF_8), loginDelayMillis)
     }
 
-    fun dispatch(screenId: Long, action: String, argument: String = ""): Boolean =
-        nativeDispatch(screenId, action.toByteArray(Charsets.UTF_8), argument.toByteArray(Charsets.UTF_8))
-
     fun handleBackPress(): Boolean = nativeHandleBackPress()
 
     fun saveState(): String? = nativeSaveState()?.toString(Charsets.UTF_8)
@@ -66,7 +64,6 @@ object SwiftBridge {
     private external fun nativeAttachMainLooper(): Boolean
     private external fun nativeIsMainQueueDraining(): Boolean
     private external fun nativeStart(savedState: ByteArray?, loginDelayMillis: Long): Boolean
-    private external fun nativeDispatch(screenId: Long, action: ByteArray, argument: ByteArray): Boolean
     private external fun nativeHandleBackPress(): Boolean
     private external fun nativeSaveState(): ByteArray?
     private external fun nativeStop()

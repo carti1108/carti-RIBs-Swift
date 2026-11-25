@@ -2,17 +2,19 @@ import LoginShared
 import RIBs
 import RIBsAndroid
 
-/// JNI 진입점이 부르는 한 덩어리. 렌더러·뷰 팩토리·`LoginApp`을 묶어 시작·입력·뒤로 가기·저장·종료를 제공한다.
+/// JNI 진입점이 부르는 한 덩어리. 렌더러·뷰 팩토리·`LoginApp`을 묶어 시작·화면 조회·뒤로 가기·저장·종료를 제공한다.
 @MainActor
 public final class AndroidLoginController {
     private let renderer: AndroidRenderer
     private let host: AndroidViewHost<RootScreen>
+    private let viewFactory: AndroidLoginViewFactory
     private let app: LoginApp<AndroidLoginViewFactory>
 
     public init(authService: any AuthService, clock: any LoginClock = TaskSleepClock(), sink: @escaping (String) -> Void) {
         renderer = AndroidRenderer(sink: sink)
         host = AndroidViewHost(renderer: renderer)
-        app = LoginApp(viewFactory: AndroidLoginViewFactory(renderer: renderer), authService: authService, clock: clock)
+        viewFactory = AndroidLoginViewFactory(renderer: renderer)
+        app = LoginApp(viewFactory: viewFactory, authService: authService, clock: clock)
     }
 
     /// 저장 문자열이 깨졌으면 버리고 처음부터 시작한다. 되살렸으면 true.
@@ -28,8 +30,9 @@ public final class AndroidLoginController {
         }
     }
 
-    public func dispatch(screenID: Int64, action: String, argument: String) -> Bool {
-        renderer.dispatch(screenID: screenID, action: action, argument: argument)
+    /// 타입 있는 통로로 그릴 화면을 화면 트리의 `id`와 타입으로 찾는다.
+    public func screen<Screen: AndroidScreen>(id: Int64, as type: Screen.Type) -> Screen? {
+        viewFactory.screen(id: id, as: type)
     }
 
     public func handleBackPress() -> Bool { app.handleBackPress() }

@@ -5,7 +5,7 @@
 ## 기준
 
 - **원본은 [uber/RIBs-iOS](https://github.com/uber/RIBs-iOS)**다(ADR-0001). 새 API를 만들기 전에 원본에 같은 역할의 파일이 있는지 확인하고, 있으면 이름·시그니처·호출 순서를 맞춘다.
-- 자매 구현 carti-RIBs-KMP와 동작을 맞춘다. 원본과 다르게 해야 하면 이유를 doc 주석과 ADR에 남긴다.
+- 원본과 다르게 해야 하면 이유를 doc 주석과 ADR에 남긴다.
 - 원본에서 deprecated인 API는 옮기지 않는다.
 
 ## 문서

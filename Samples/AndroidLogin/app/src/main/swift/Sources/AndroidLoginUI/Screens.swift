@@ -2,7 +2,7 @@ import LoginShared
 import RIBs
 import RIBsAndroid
 
-/// Kotlin `Screens.kt`가 고르는 화면 이름과 입력 이름. 두 쪽이 같은 문자열을 써야 한다.
+/// Kotlin `Screens.kt`가 고르는 화면 이름. 두 쪽이 같은 문자열을 써야 한다.
 public enum ScreenKind {
     public static let root = "root"
     public static let loggedOut = "loggedOut"
@@ -11,30 +11,68 @@ public enum ScreenKind {
     public static let todoDetail = "todoDetail"
 }
 
-public enum ScreenAction {
-    public static let login = "login"
-    public static let logout = "logout"
-    public static let selectTodo = "selectTodo"
-    public static let toggleDone = "toggleDone"
-    public static let back = "back"
-}
-
 /// 공유 코드가 RIB마다 요청하는 뷰를 Android 화면 객체로 만든다.
 @MainActor
 public final class AndroidLoginViewFactory: LoginViewFactory {
     private let renderer: AndroidRenderer
+    private var screens: [WeakScreen] = []
 
     public init(renderer: AndroidRenderer) {
         self.renderer = renderer
     }
 
+    /// 살아 있는 화면을 화면 id와 타입으로 찾는다. 다른 종류의 화면이거나 이미 내려갔으면 nil.
+    func screen<Screen: AndroidScreen>(id: Int64, as type: Screen.Type) -> Screen? {
+        screens.lazy.compactMap(\.screen).first { $0.id == id } as? Screen
+    }
+
     public func makeRootView() -> RootScreen { RootScreen(renderer: renderer) }
-    public func makeLoggedOutView() -> any LoggedOutViewContract { LoggedOutScreen(renderer: renderer) }
-    public func makeLoggedInView() -> any LoggedInViewContract { LoggedInScreen(renderer: renderer) }
-    public func makeTodoListView() -> any TodoListViewContract { TodoListScreen(renderer: renderer) }
-    public func makeTodoDetailView() -> any TodoDetailViewContract { TodoDetailScreen(renderer: renderer) }
+    public func makeLoggedOutView() -> any LoggedOutViewContract { track(LoggedOutScreen(renderer: renderer)) }
+    public func makeLoggedInView() -> any LoggedInViewContract { track(LoggedInScreen(renderer: renderer)) }
+    public func makeTodoListView() -> any TodoListViewContract { track(TodoListScreen(renderer: renderer)) }
+    public func makeTodoDetailView() -> any TodoDetailViewContract { track(TodoDetailScreen(renderer: renderer)) }
+
+    private func track<Screen: AndroidScreen>(_ screen: Screen) -> Screen {
+        screens = screens.filter { $0.screen != nil } + [WeakScreen(screen: screen)]
+        return screen
+    }
 }
 
+private struct WeakScreen {
+    weak var screen: AndroidScreen?
+}
+
+/// 상태를 타입 있는 통로로 내보내는 화면의 기반.
+/// 화면 트리에는 `kind`와 `id`(자식이 있으면 `child`)만 싣고, 상태는 `attach`로 붙은 플랫폼 뷰에 직접 넘긴다.
+public class BridgedScreen<State>: AndroidScreen {
+    private var viewState: State
+    private var onRender: ((State) -> Void)?
+
+    init(kind: String, renderer: AndroidRenderer, initialState: State) {
+        viewState = initialState
+        super.init(kind: kind, renderer: renderer)
+    }
+
+    /// 플랫폼 뷰를 붙인다. 붙는 즉시 현재 상태를 한 번 그리게 한다.
+    public final func attach(onRender: @escaping (State) -> Void) {
+        self.onRender = onRender
+        onRender(viewState)
+    }
+
+    public final func detach() {
+        onRender = nil
+    }
+
+    /// 지금 상태. 플랫폼 뷰가 상태를 받는 대신 직접 읽어 갈 때 쓴다.
+    public final var currentState: State { viewState }
+
+    final func setViewState(_ state: State) {
+        viewState = state
+        onRender?(state)
+    }
+}
+
+/// 상태도 입력도 없다. 자식 화면 하나를 화면 트리의 `child`로 내보낸다.
 public final class RootScreen: AndroidScreen, RootViewControllable {
     private lazy var slot = AndroidScreenSlot(owner: self)
 
@@ -47,108 +85,86 @@ public final class RootScreen: AndroidScreen, RootViewControllable {
 }
 
 /// 이름 입력값은 Kotlin(Compose) 화면이 들고 있다가 로그인 입력 때 인자로 넘긴다.
-final class LoggedOutScreen: AndroidScreen, LoggedOutViewContract {
-    weak var listener: (any LoggedOutPresentableListener)?
-    private var errorMessage: String?
-    private var isLoading = false
+public final class LoggedOutScreen: BridgedScreen<LoggedOutViewState>, LoggedOutViewContract {
+    public weak var listener: (any LoggedOutPresentableListener)?
 
-    init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.loggedOut, renderer: renderer) }
-
-    func showError(_ message: String?) {
-        errorMessage = message
-        setNeedsRender()
+    init(renderer: AndroidRenderer) {
+        super.init(kind: ScreenKind.loggedOut, renderer: renderer, initialState: LoggedOutViewState())
     }
 
-    func showLoading(_ isLoading: Bool) {
-        self.isLoading = isLoading
-        setNeedsRender()
-    }
+    public func render(_ state: LoggedOutViewState) { setViewState(state) }
 
-    override func state() -> [String: RibValue] {
-        ["error": errorMessage.map(RibValue.string) ?? .null, "loading": .bool(isLoading)]
-    }
+    public func send(_ action: LoggedOutViewAction) { listener?.handle(action) }
+}
 
-    override func handle(action: String, argument: String) {
-        guard action == ScreenAction.login else { return }
-        listener?.didTapLogin(rawName: argument)
+public struct LoggedInScreenState: Equatable, Sendable {
+    public var userName: String
+    public var sessionSeconds: Int64
+
+    public init(userName: String = "", sessionSeconds: Int64 = 0) {
+        self.userName = userName
+        self.sessionSeconds = sessionSeconds
     }
 }
 
-final class LoggedInScreen: AndroidScreen, LoggedInViewContract {
-    weak var listener: (any LoggedInPresentableListener)?
-    private var userName = ""
-    private var sessionSeconds: Int64 = 0
+/// 자식 화면(할 일 목록·상세)은 화면 트리의 `child`로 내보낸다.
+public final class LoggedInScreen: BridgedScreen<LoggedInScreenState>, LoggedInViewContract {
+    public weak var listener: (any LoggedInPresentableListener)?
     private lazy var slot = AndroidScreenSlot(owner: self)
 
-    init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.loggedIn, renderer: renderer) }
-
-    func showUserName(_ name: String) {
-        userName = name
-        setNeedsRender()
+    init(renderer: AndroidRenderer) {
+        super.init(kind: ScreenKind.loggedIn, renderer: renderer, initialState: LoggedInScreenState())
     }
 
-    func showSessionSeconds(_ seconds: Int64) {
-        sessionSeconds = seconds
-        setNeedsRender()
+    public func showUserName(_ name: String) {
+        setViewState(LoggedInScreenState(userName: name, sessionSeconds: currentState.sessionSeconds))
     }
 
-    func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
-    func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
-
-    override func state() -> [String: RibValue] {
-        ["userName": .string(userName), "sessionSeconds": .int(sessionSeconds), "child": slot.renderedValue]
+    public func showSessionSeconds(_ seconds: Int64) {
+        setViewState(LoggedInScreenState(userName: currentState.userName, sessionSeconds: seconds))
     }
 
-    override func handle(action: String, argument: String) {
-        guard action == ScreenAction.logout else { return }
-        listener?.didTapLogout()
-    }
+    public func showScreen(_ screen: any ViewControllable) { slot.show(screen) }
+    public func hideScreen(_ screen: any ViewControllable) { slot.hide(screen) }
+
+    public func tapLogout() { listener?.didTapLogout() }
+
+    override public func state() -> [String: RibValue] { ["child": slot.renderedValue] }
 }
 
-final class TodoListScreen: AndroidScreen, TodoListViewContract {
-    weak var listener: (any TodoListPresentableListener)?
-    private var todos: [Todo] = []
+public final class TodoListScreen: BridgedScreen<[Todo]>, TodoListViewContract {
+    public weak var listener: (any TodoListPresentableListener)?
 
-    init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.todoList, renderer: renderer) }
-
-    func showTodos(_ todos: [Todo]) {
-        self.todos = todos
-        setNeedsRender()
+    init(renderer: AndroidRenderer) {
+        super.init(kind: ScreenKind.todoList, renderer: renderer, initialState: [])
     }
 
-    override func state() -> [String: RibValue] {
-        let rows = todos.map { todo in
-            RibValue.state(RibState(["id": .int(todo.id), "title": .string(todo.title), "isDone": .bool(todo.isDone)]))
-        }
-        return ["todos": .list(rows)]
-    }
+    public func showTodos(_ todos: [Todo]) { setViewState(todos) }
 
-    override func handle(action: String, argument: String) {
-        guard action == ScreenAction.selectTodo, let id = Int64(argument) else { return }
-        listener?.didTapTodo(id: id)
-    }
+    public func tapTodo(id: Int64) { listener?.didTapTodo(id: id) }
 }
 
-final class TodoDetailScreen: AndroidScreen, TodoDetailViewContract {
-    weak var listener: (any TodoDetailPresentableListener)?
-    private var title = ""
-    private var isDone = false
+public struct TodoDetailScreenState: Equatable, Sendable {
+    public var title: String
+    public var isDone: Bool
 
-    init(renderer: AndroidRenderer) { super.init(kind: ScreenKind.todoDetail, renderer: renderer) }
-
-    func showTodo(title: String, isDone: Bool) {
+    public init(title: String = "", isDone: Bool = false) {
         self.title = title
         self.isDone = isDone
-        setNeedsRender()
+    }
+}
+
+public final class TodoDetailScreen: BridgedScreen<TodoDetailScreenState>, TodoDetailViewContract {
+    public weak var listener: (any TodoDetailPresentableListener)?
+
+    init(renderer: AndroidRenderer) {
+        super.init(kind: ScreenKind.todoDetail, renderer: renderer, initialState: TodoDetailScreenState())
     }
 
-    override func state() -> [String: RibValue] { ["title": .string(title), "isDone": .bool(isDone)] }
-
-    override func handle(action: String, argument: String) {
-        switch action {
-        case ScreenAction.toggleDone: listener?.didTapToggleDone()
-        case ScreenAction.back: listener?.didTapBack()
-        default: break
-        }
+    public func showTodo(title: String, isDone: Bool) {
+        setViewState(TodoDetailScreenState(title: title, isDone: isDone))
     }
+
+    public func tapToggleDone() { listener?.didTapToggleDone() }
+    public func tapBack() { listener?.didTapBack() }
 }

@@ -23,7 +23,7 @@ final class LoginAppTests {
     private var loggedOut: FakeLoggedOutView { factory.loggedOut.last! }
 
     private func login(_ name: String) async {
-        loggedOut.listener?.didTapLogin(rawName: name)
+        loggedOut.listener?.handle(.loginTapped(rawName: name))
         await runCurrent()
     }
 
@@ -81,6 +81,29 @@ final class LoginAppTests {
         #expect(loggedOut.error == "서버 오류")
         #expect(!loggedOut.isLoading)
         #expect(factory.root.screen === loggedOut)
+    }
+
+    @Test func failedLoginRendersErrorAndLoadingInOneUpdate() async throws {
+        try app.start(host: host)
+        await login("carti")
+        let rendersBeforeResponse = loggedOut.renders.count
+
+        auth.respond(.failure(message: "서버 오류"))
+        await runCurrent()
+
+        #expect(loggedOut.renders.count == rendersBeforeResponse + 1)
+        #expect(loggedOut.state == LoggedOutViewState(errorMessage: "서버 오류", isLoading: false))
+    }
+
+    @Test func retryClearsPreviousErrorWhileLoading() async throws {
+        try app.start(host: host)
+        await login("carti")
+        auth.respond(.failure(message: "서버 오류"))
+        await runCurrent()
+
+        await login("carti")
+
+        #expect(loggedOut.state == LoggedOutViewState(errorMessage: nil, isLoading: true))
     }
 
     @Test func tapWhileLoadingIsIgnored() async throws {
