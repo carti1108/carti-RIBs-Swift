@@ -78,4 +78,32 @@ final class TodoFlowUITests: XCTestCase {
         XCTAssertEqual(row.label, "✓ 우유 사기")
         XCTAssertFalse(app.staticTexts["detailTitle"].exists)
     }
+
+    /// 화면 왼쪽 끝에서 미는 뒤로 가기로 상세를 닫아도 RIB 트리가 따라온다(ADR-0030).
+    /// 닫힌 뒤 다른 할 일을 열 수 있어야 한다. 트리에 상세가 남아 있으면 두 번째 상세가 열리지 않는다.
+    @MainActor
+    func testSwipeBackClosesDetailAndKeepsTreeInSync() {
+        let field = app.textFields["nameField"]
+        XCTAssertTrue(field.waitForExistence(timeout: timeout))
+        field.tap()
+        field.typeText("carti")
+        app.buttons["loginButton"].tap()
+
+        let row = app.buttons["todoRow-1"]
+        XCTAssertTrue(row.waitForExistence(timeout: timeout + Double(loginDelayMillis) / 1000))
+        row.tap()
+        let title = app.staticTexts["detailTitle"]
+        XCTAssertTrue(title.waitForExistence(timeout: timeout))
+
+        let leftEdge = app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5))
+        leftEdge.press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)))
+
+        XCTAssertTrue(row.waitForExistence(timeout: timeout))
+        XCTAssertFalse(title.exists)
+
+        let secondRow = app.buttons["todoRow-2"]
+        secondRow.tap()
+        XCTAssertTrue(title.waitForExistence(timeout: timeout))
+        XCTAssertNotEqual(title.label, "우유 사기")
+    }
 }

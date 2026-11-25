@@ -53,6 +53,32 @@ struct TodoAppControllerTests {
         controller.stop()
     }
 
+    /// 화면 트리의 `child`는 맨 위 화면이다. 상세가 닫히면 다시 붙이지 않아도 목록이 나온다(ADR-0030).
+    @Test func backPressClosesDetailAndAnotherCanOpen() async throws {
+        controller.start(savedState: nil)
+        let loggedOut = try #require(controller.screen(id: try id(child(try tree(controller))), as: LoggedOutAndroidScreen.self))
+        loggedOut.send(.loginTapped(rawName: "carti"))
+        await runCurrent()
+        auth.respond(.success(userName: "carti"))
+        await runCurrent()
+        let listNode = child(child(try tree(controller)))
+        try #require(controller.screen(id: try id(listNode), as: TodoListAndroidScreen.self)).send(.todoTapped(id: 2))
+        #expect(kind(child(child(try tree(controller)))) == TodoDetailAndroidViewFactory.kind)
+
+        #expect(controller.handleBackPress())
+
+        let top = child(child(try tree(controller)))
+        #expect(kind(top) == TodoListAndroidViewFactory.kind)
+        #expect(try id(top) == id(listNode))
+
+        // 트리에 상세가 남아 있으면 다음 상세가 열리지 않는다.
+        try #require(controller.screen(id: try id(top), as: TodoListAndroidScreen.self)).send(.todoTapped(id: 1))
+        let detailNode = child(child(try tree(controller)))
+        let detail = try #require(controller.screen(id: try id(detailNode), as: TodoDetailAndroidScreen.self))
+        #expect(detail.currentState.title == "우유 사기")
+        controller.stop()
+    }
+
     @Test func restoresOpenDetailFromSavedState() async throws {
         controller.start(savedState: nil)
         let loggedOut = try #require(controller.screen(id: try id(child(try tree(controller))), as: LoggedOutAndroidScreen.self))

@@ -66,6 +66,44 @@ final class LoggedInTests {
         #expect(view.screen === listBuilder.views.last)
     }
 
+    /// 상세는 목록 위에 얹는다. 닫을 때 목록을 다시 붙이지 않는다(ADR-0030).
+    @Test func detailIsShownAndHiddenWithoutReattachingList() throws {
+        try #require(listBuilder.listeners.first).didSelectTodo(id: 2)
+        #expect(view.calls == [.showList, .showDetail])
+
+        try #require(detailBuilder.listeners.first).didRequestCloseDetail()
+        #expect(view.calls == [.showList, .showDetail, .hideDetail])
+    }
+
+    @Test func userDismissalDetachesDetail() throws {
+        try #require(listBuilder.listeners.first).didSelectTodo(id: 2)
+        let detail = try #require(detailBuilder.routers.last)
+
+        view.dismissDetailByUser()
+
+        #expect(!detail.interactable.isActive)
+        #expect((router as? LoggedInRouter)?.openDetailID == nil)
+        #expect(view.screen === listBuilder.views.last)
+        #expect(!router.handleBackPress())
+    }
+
+    @Test func userDismissalWithoutDetailDoesNothing() {
+        view.dismissDetailByUser()
+
+        #expect(view.calls == [.showList])
+    }
+
+    @Test func userDismissalIsIgnoredWhileInactive() throws {
+        try #require(listBuilder.listeners.first).didSelectTodo(id: 2)
+        let loggedIn = try #require(router as? LoggedInRouter)
+        parent.detach(router)
+
+        loggedIn.interactor.handle(.detailDismissedByUser)
+
+        #expect(loggedIn.openDetailID == 2)
+        parent.attach(router)  // deinit의 detach와 짝을 맞춘다.
+    }
+
     @Test func missingTodoKeepsList() throws {
         detailBuilder.missingIDs = [7]
 

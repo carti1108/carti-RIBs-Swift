@@ -16,6 +16,9 @@ public struct LoggedInViewState: Equatable, Sendable {
 
 public enum LoggedInViewAction: Equatable, Sendable {
     case logoutTapped
+    /// 사용자가 스와이프·브라우저 뒤로 가기 같은 플랫폼 제스처로 상세를 닫았다.
+    /// 뷰는 화면을 이미 뺀 뒤에 이 액션을 보낸다(ADR-0030).
+    case detailDismissedByUser
 }
 
 @MainActor
@@ -31,10 +34,13 @@ public protocol LoggedInPresentable: Presentable {
 }
 
 /// Router → 뷰: 자식 화면을 붙이고 뗀다.
+/// 이름은 무엇을 보여 줄지만 말한다. 상세를 스택에 쌓을지, 시트로 띄울지, 목록 옆에 둘지는 플랫폼 뷰가 정한다(ADR-0030).
 @MainActor
 public protocol LoggedInViewControllable: ViewControllable {
-    func showScreen(_ screen: any ViewControllable)
-    func hideScreen(_ screen: any ViewControllable)
+    func showList(_ screen: any ViewControllable)
+    func showDetail(_ screen: any ViewControllable)
+    /// 이미 없는 화면이면 아무 일도 하지 않는다. 사용자가 제스처로 닫은 뒤에도 Router가 부른다.
+    func hideDetail(_ screen: any ViewControllable)
 }
 
 @MainActor
