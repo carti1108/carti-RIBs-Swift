@@ -4,9 +4,10 @@ import FeatureTodoListInterface
 import RIBs
 import TodoCore
 
-/// 목록과 상세가 같은 `TodoStore`를 쓰도록 여기서 한 번만 만든다.
+/// 목록과 상세가 같은 `TodoStore`를 쓰도록 여기서 한 번만 만든다. 비어 있는 채로 시작하고 목록 피처가 채운다(ADR-0032).
 final class LoggedInComponent: Component<any LoggedInDependency>, TodoListDependency, TodoDetailDependency {
-    var todoStore: TodoStore { shared { TodoStore() } }
+    var todoStore: TodoStore { shared { TodoStore.unloaded() } }
+    var todoRepository: any TodoRepository { dependency.todoRepository }
 }
 
 public final class LoggedInBuilder: Builder<any LoggedInDependency>, LoggedInBuildable {
@@ -57,6 +58,8 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
     private let todoStore: TodoStore
     private weak var listener: (any LoggedInListener)?
     private let sessionTimer: SessionTimerWorker
+    /// 복원할 상세. 목록을 불러온 뒤에야 열 수 있어 그때까지 들고 있는다.
+    private var pendingDetailID: Int64?
 
     init(
         presenter: any LoggedInPresentable,
@@ -81,7 +84,7 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
         }
         router?.routeToList()
         if let openID = savedInstanceState?[Self.openDetailIDKey]?.intValue {
-            router?.routeToDetail(todoID: openID)
+            restoreDetail(todoID: openID)
         }
         sessionTimer.start(self)
     }
@@ -93,7 +96,25 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
 
     override func onSaveInstanceState(_ outState: inout [String: RibValue]) {
         outState[Self.doneIDsKey] = .list(todoStore.doneIDs.map(RibValue.int))
-        outState[Self.openDetailIDKey] = router?.openDetailID.map(RibValue.int) ?? .null
+        outState[Self.openDetailIDKey] = (router?.openDetailID ?? pendingDetailID).map(RibValue.int) ?? .null
+    }
+
+    /// 목록이 이미 있으면 바로 열고, 없으면 불러올 때까지 기다렸다 연다. 기다리는 Task는 비활성화되면 취소된다.
+    private func restoreDetail(todoID: Int64) {
+        guard !todoStore.isLoaded else {
+            router?.routeToDetail(todoID: todoID)
+            return
+        }
+        pendingDetailID = todoID
+        let updates = todoStore.updates
+        startTask { [weak self, todoStore] in
+            for await _ in updates where todoStore.isLoaded {
+                guard let self, let todoID = self.pendingDetailID else { return }
+                self.pendingDetailID = nil
+                self.router?.routeToDetail(todoID: todoID)
+                return
+            }
+        }
     }
 
     override func handleBackPress() -> Bool {
@@ -117,7 +138,10 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
         presenter.render(viewState)
     }
 
-    func didSelectTodo(id: Int64) { router?.routeToDetail(todoID: id) }
+    func didSelectTodo(id: Int64) {
+        pendingDetailID = nil
+        router?.routeToDetail(todoID: id)
+    }
 
     func didRequestCloseDetail() { router?.routeAwayFromDetail() }
 }

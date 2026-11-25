@@ -135,6 +135,35 @@ final class TodoAppTests {
         restored.stop()
     }
 
+    /// 목록을 불러오는 중에 다시 저장해도 복원하려던 상세와 완료 표시를 잃지 않는다(ADR-0032).
+    @Test func savedStateSurvivesSavingAgainBeforeTodosLoad() async throws {
+        try await startLoggedIn()
+        factory.todoList.views.last?.listener?.handle(.todoTapped(id: 3))
+        factory.todoDetail.views.last?.listener?.handle(.toggleDoneTapped)
+        let saved = app.saveState()
+        app.stop()
+
+        let repository = FakeTodoRepository()
+        let restoredFactory = FakeAppViewFactory()
+        let restored = TodoApp(
+            viewFactory: restoredFactory, authService: FakeAuthService(), todoRepository: repository, clock: ManualClock()
+        )
+        try restored.start(host: FakeHost(), savedState: saved)
+        await runCurrent()
+        #expect(restoredFactory.todoList.views.last?.state?.isLoading == true)
+        #expect(restoredFactory.todoDetail.views.isEmpty)
+        // 상세 Router는 아직 없지만 열려던 id와 완료 표시는 그대로 저장된다.
+        #expect(restored.saveState().contains(#""doneIds":[3],"openDetailId":3"#))
+
+        repository.respond(.success(TodoStore.sampleTodos))
+        await runCurrent()
+
+        #expect(restoredFactory.loggedIn.views.last?.screen === restoredFactory.todoDetail.views.last)
+        #expect(restoredFactory.todoDetail.views.last?.state?.title == "운동하기")
+        #expect(restoredFactory.todoDetail.views.last?.state?.isDone == true)
+        restored.stop()
+    }
+
     @Test func corruptSavedStateIsRejectedWithoutStarting() {
         #expect(throws: RibStateDecodingError.self) {
             try app.start(host: host, savedState: "{not json")

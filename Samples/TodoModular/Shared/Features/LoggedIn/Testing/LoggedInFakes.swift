@@ -69,13 +69,20 @@ public final class FakeLoggedInListener: LoggedInListener {
 @MainActor
 public final class FakeLoggedInDependency: LoggedInDependency {
     public let clock: any TodoClock
+    public let todoRepository: any TodoRepository
     private let listBuilder: any TodoListBuildable
     private let detailBuilder: any TodoDetailBuildable
     public private(set) var listDependencies: [any TodoListDependency] = []
     public private(set) var detailDependencies: [any TodoDetailDependency] = []
 
-    public init(clock: any TodoClock, listBuilder: any TodoListBuildable, detailBuilder: any TodoDetailBuildable) {
+    public init(
+        clock: any TodoClock,
+        listBuilder: any TodoListBuildable,
+        detailBuilder: any TodoDetailBuildable,
+        todoRepository: any TodoRepository = FakeTodoRepository()
+    ) {
         self.clock = clock
+        self.todoRepository = todoRepository
         self.listBuilder = listBuilder
         self.detailBuilder = detailBuilder
     }

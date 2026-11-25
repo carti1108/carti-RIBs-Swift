@@ -93,6 +93,8 @@ struct TodoAppControllerTests {
 
         let restored = TodoAppController(authService: FakeAuthService(), clock: ManualClock(), sink: { _ in })
         #expect(restored.start(savedState: saved))
+        // 상세는 목록을 불러온 뒤에 열린다(ADR-0032).
+        await runCurrent()
         let detailNode = child(child(try tree(restored)))
         #expect(kind(detailNode) == TodoDetailAndroidViewFactory.kind)
         let detail = try #require(restored.screen(id: try id(detailNode), as: TodoDetailAndroidScreen.self))

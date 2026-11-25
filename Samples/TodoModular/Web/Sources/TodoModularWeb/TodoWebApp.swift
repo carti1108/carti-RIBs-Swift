@@ -10,6 +10,7 @@ import JavaScriptKit
 import RIBsWeb
 import TodoAppRoot
 import TodoCore
+import TodoData
 import TodoWebSupport
 
 extension HostRootScreen: RootViewControllable {}
@@ -51,7 +52,14 @@ enum TodoWebApp {
         precondition(app == nil, "startTodoApp called twice")
         let host = WebViewHost<HostRootScreen>()
         renderer = SlotRenderer(slot: host.slot, container: Page.appContainer)
-        let app = TodoApp(viewFactory: viewFactory, authService: DelayedAuthService(delay: Page.loginDelay()))
+        let app = TodoApp(
+            viewFactory: viewFactory,
+            authService: DelayedAuthService(delay: Page.loginDelay()),
+            // 실제 앱은 `SampleTodoServer` 자리에 `fetch`로 만든 `HTTPTransport`를 넣는다(ADR-0032).
+            todoRepository: RemoteTodoRepository(
+                client: TodoAPIClient(transport: SampleTodoServer(failuresBeforeSuccess: Page.todoFailures()))
+            )
+        )
         do {
             try app.start(host: host, savedState: SavedStateStore.load())
         } catch {
@@ -64,7 +72,7 @@ enum TodoWebApp {
     }
 }
 
-/// 페이지에서 읽는 값. E2E 테스트는 `?loginDelayMillis=<ms>`로 로그인 지연을 바꾼다.
+/// 페이지에서 읽는 값. E2E 테스트는 `?loginDelayMillis=<ms>`로 로그인 지연을, `?todoFailures=<n>`으로 할 일 요청 실패 횟수를 바꾼다.
 @MainActor
 enum Page {
     static let defaultLoginDelay: Duration = .milliseconds(800)
@@ -72,12 +80,18 @@ enum Page {
     static var appContainer: JSObject { JSObject.global.document.getElementById("app").object! }
 
     static func loginDelay() -> Duration {
+        guard let millis = queryInt("loginDelayMillis"), millis > 0 else { return defaultLoginDelay }
+        return .milliseconds(millis)
+    }
+
+    static func todoFailures() -> Int {
+        max(0, queryInt("todoFailures") ?? 0)
+    }
+
+    private static func queryInt(_ name: String) -> Int? {
         let search = JSObject.global.location.search.string ?? ""
         let params = JSObject.global.URLSearchParams.function!.new(search)
-        guard let raw = params.get!("loginDelayMillis").string, let millis = Int(raw), millis > 0 else {
-            return defaultLoginDelay
-        }
-        return .milliseconds(millis)
+        return params.get!(name).string.flatMap { Int($0) }
     }
 }
 

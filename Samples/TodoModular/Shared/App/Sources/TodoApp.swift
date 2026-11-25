@@ -8,6 +8,7 @@ import FeatureTodoList
 import FeatureTodoListInterface
 import RIBs
 import TodoCore
+import TodoData
 
 /// 조립 모듈(ADR-0024). 피처 Impl을 아는 곳은 여기 하나다.
 
@@ -33,8 +34,20 @@ public protocol TodoAppViewFactory:
 public final class TodoApp<Factory: TodoAppViewFactory> {
     private let router: RootRouter<Factory.RootView>
 
-    public init(viewFactory: Factory, authService: any AuthService, clock: any TodoClock = TaskSleepClock()) {
-        let component = RootComponent(viewFactory: viewFactory, authService: authService, clock: clock)
+    /// `todoRepository`를 주지 않으면 샘플 서버(`SampleTodoServer`)에서 가져오는 저장소를 쓴다.
+    /// 실제 앱은 플랫폼의 전송 구현으로 만든 `RemoteTodoRepository`를 넘긴다(ADR-0032).
+    public init(
+        viewFactory: Factory,
+        authService: any AuthService,
+        todoRepository: (any TodoRepository)? = nil,
+        clock: any TodoClock = TaskSleepClock()
+    ) {
+        let component = RootComponent(
+            viewFactory: viewFactory,
+            authService: authService,
+            todoRepository: todoRepository ?? RemoteTodoRepository(client: TodoAPIClient(transport: SampleTodoServer())),
+            clock: clock
+        )
         router = RootRouter(
             interactor: RootInteractor(),
             viewController: viewFactory.makeRootView(),
@@ -62,16 +75,19 @@ public final class TodoApp<Factory: TodoAppViewFactory> {
 /// 피처 Dependency를 모두 채우고, 자식 Builder를 실제 Impl로 만들어 준다.
 final class RootComponent: EmptyComponent, LoggedOutDependency, LoggedInDependency {
     let authService: any AuthService
+    let todoRepository: any TodoRepository
     let clock: any TodoClock
     private let viewFactory: any TodoListViewFactory & TodoDetailViewFactory
 
     init(
         viewFactory: any TodoListViewFactory & TodoDetailViewFactory,
         authService: any AuthService,
+        todoRepository: any TodoRepository,
         clock: any TodoClock
     ) {
         self.viewFactory = viewFactory
         self.authService = authService
+        self.todoRepository = todoRepository
         self.clock = clock
         super.init()
     }

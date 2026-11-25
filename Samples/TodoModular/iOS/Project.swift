@@ -91,6 +91,7 @@ let project = Project(
                 .package(product: "RIBs"),
                 .package(product: "RIBsSwiftUI"),
                 .package(product: "TodoCore"),
+                .package(product: "TodoData"),
                 .package(product: "TodoAppRoot"),
             ] + features.map { .package(product: "Feature\($0)Interface") },
             settings: swiftSettings

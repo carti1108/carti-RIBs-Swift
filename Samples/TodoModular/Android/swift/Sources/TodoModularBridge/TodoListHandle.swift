@@ -20,6 +20,8 @@ public struct TodoListRow: Sendable {
 /// Swift `Task`에서 시작한 호출에는 Java 호출 스택이 없어 부트 클래스 로더가 쓰이고 `NoClassDefFoundError`가 난다.
 /// Kotlin이 부른 호출의 반환값으로 넘기면 이 문제가 없다(AndroidLogin 샘플과 같다).
 public protocol TodoListViewBridge {
+    /// 로딩과 오류는 기본 타입이라 인자로 넘긴다.
+    func render(isLoading: Bool, errorMessage: String?)
     func rowsChanged()
 }
 
@@ -33,7 +35,10 @@ public final class TodoListScreenHandle: Sendable {
     public func attach(view: any TodoListViewBridge) {
         nonisolated(unsafe) let view = view
         MainActor.assumeIsolated {
-            screen?.attach { _ in view.rowsChanged() }
+            screen?.attach { state in
+                view.render(isLoading: state.isLoading, errorMessage: state.errorMessage)
+                view.rowsChanged()
+            }
         }
     }
 
@@ -46,6 +51,10 @@ public final class TodoListScreenHandle: Sendable {
         MainActor.assumeIsolated {
             (screen?.currentState.todos ?? []).map { TodoListRow(id: $0.id, title: $0.title, isDone: $0.isDone) }
         }
+    }
+
+    public func retryTapped() {
+        MainActor.assumeIsolated { screen?.send(.retryTapped) }
     }
 
     public func todoTapped(id: Int64) {

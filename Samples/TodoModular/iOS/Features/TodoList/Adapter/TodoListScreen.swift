@@ -40,7 +40,10 @@ private struct TodoListContent: View {
     var body: some View {
         TodoListView(
             items: model.state.todos.map { TodoListItem(id: $0.id, title: $0.title, isDone: $0.isDone) },
-            onSelect: { send(.todoTapped(id: $0)) }
+            isLoading: model.state.isLoading,
+            errorMessage: model.state.errorMessage,
+            onSelect: { send(.todoTapped(id: $0)) },
+            onRetry: { send(.retryTapped) }
         )
     }
 }

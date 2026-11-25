@@ -12,6 +12,7 @@ import RIBsSwiftUI
 import SwiftUI
 import TodoAppRoot
 import TodoCore
+import TodoData
 
 @main
 struct TodoModularApp: App {
@@ -75,7 +76,11 @@ final class AppLauncher {
     let host = SwiftUIViewHost<RootScreen>()
     private let app = TodoApp(
         viewFactory: AppViewFactory(),
-        authService: DelayedAuthService(delay: AppLauncher.loginDelay)
+        authService: DelayedAuthService(delay: AppLauncher.loginDelay),
+        // 실제 앱은 `SampleTodoServer` 자리에 `URLSession`으로 만든 `HTTPTransport`를 넣는다(ADR-0032).
+        todoRepository: RemoteTodoRepository(
+            client: TodoAPIClient(transport: SampleTodoServer(failuresBeforeSuccess: AppLauncher.todoFailures))
+        )
     )
     private var isStarted = false
 
@@ -83,6 +88,11 @@ final class AppLauncher {
     private static var loginDelay: Duration {
         let override = UserDefaults.standard.integer(forKey: "loginDelayMillis")
         return override > 0 ? .milliseconds(override) : defaultLoginDelay
+    }
+
+    /// UI 테스트는 `-todoFailures <n>` 실행 인자로 할 일 요청을 처음 n번 실패시킨다.
+    private static var todoFailures: Int {
+        max(0, UserDefaults.standard.integer(forKey: "todoFailures"))
     }
 
     func start(savedState: String) {

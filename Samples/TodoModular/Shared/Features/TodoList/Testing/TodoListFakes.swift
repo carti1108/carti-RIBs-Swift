@@ -39,8 +39,12 @@ public final class FakeTodoListListener: TodoListListener {
 @MainActor
 public final class FakeTodoListDependency: TodoListDependency {
     public let todoStore: TodoStore
+    public let todoRepository: any TodoRepository
 
-    public init(todoStore: TodoStore = TodoStore()) { self.todoStore = todoStore }
+    public init(todoStore: TodoStore = TodoStore(), todoRepository: any TodoRepository = FakeTodoRepository()) {
+        self.todoStore = todoStore
+        self.todoRepository = todoRepository
+    }
 }
 
 /// 부모 피처 테스트용. 빈 화면 Router를 돌려주고, 받은 리스너를 기록한다.
