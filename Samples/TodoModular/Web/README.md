@@ -21,7 +21,7 @@ React·Vite·TypeScript는 이 디렉터리의 npm 의존성에만 있습니다.
 
 ## 빌드와 실행
 
-swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다.
+swift.org 툴체인 6.4.2와 Swift SDK `swift-6.4.2-RELEASE_wasm`, Node.js 22가 필요합니다. macOS나 Linux에서 빌드합니다. Windows 호스트에서는 빌드되지 않습니다([이유](../../../docs/building.md#웹-샘플은-windows-호스트에서-빌드되지-않는다)).
 
 ```sh
 TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin

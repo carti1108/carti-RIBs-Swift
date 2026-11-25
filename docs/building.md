@@ -7,7 +7,7 @@
 | macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
 | Linux | Static Linux SDK(musl, x86_64·aarch64)로 `RIBs`·`LoginShared`·`RIBsWeb` 교차 빌드 확인. Linux 호스트가 없어 테스트는 실행하지 않음 |
 | Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
-| Windows | 6.4.2 툴체인으로 `swift build`·`swift test` 통과. Windows 호스트에서 Android `.so` 교차 빌드, x86_64 APK 빌드, 에뮬레이터 계측 테스트 통과 |
+| Windows | 6.4.2 툴체인으로 `swift build`·`swift test` 통과. Windows 호스트에서 Android `.so` 교차 빌드, x86_64 APK 빌드, 에뮬레이터 계측 테스트 통과. 웹 샘플은 빌드 불가([아래](#웹-샘플은-windows-호스트에서-빌드되지-않는다)) |
 
 ## 공개 API 검사
 
@@ -48,6 +48,20 @@ swift build && swift test
 ```
 
 Windows 호스트에서 Android 샘플을 빌드하는 방법은 [Android 샘플 README](../Samples/AndroidLogin/README.md#windows에서-빌드)에 있습니다.
+
+### 웹 샘플은 Windows 호스트에서 빌드되지 않는다
+
+`Samples/WebLogin`과 `Samples/TodoModular/Web`은 Windows 호스트에서 빌드할 수 없습니다. macOS나 Linux에서 빌드합니다.
+
+- 원인은 JavaScriptKit 0.63.0의 `PackageToJS` 플러그인입니다. `stderr`를 Darwin·Glibc·Musl·Android에서만 import해서 Windows에서 컴파일되지 않습니다.
+
+  ```
+  .build/checkouts/JavaScriptKit/Plugins/PackageToJS/Sources/PackageToJSPlugin.swift:584:27: error: cannot find 'stderr' in scope
+  ```
+
+- 패키지 플러그인은 빌드 전에 컴파일되므로 `swift package ... js`뿐 아니라 `swift build --swift-sdk ..._wasm`도 같은 자리에서 실패합니다.
+- 2026-11-25 기준 0.63.0이 최신 릴리스이고, 업스트림 `main`에도 같은 코드가 있습니다. 업스트림 이슈는 [swiftwasm/JavaScriptKit#818](https://github.com/swiftwasm/JavaScriptKit/issues/818)입니다(열림).
+- WSL(Ubuntu)에 Linux 툴체인을 설치해 빌드하는 경로는 확인하지 않았습니다.
 
 ## Linux(교차 빌드)
 
