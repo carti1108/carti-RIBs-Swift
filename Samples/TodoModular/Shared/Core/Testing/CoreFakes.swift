@@ -91,6 +91,40 @@ public final class FakeAuthService: AuthService {
     }
 }
 
+/// 응답 시점을 테스트가 정하는 할 일 저장소. `autoResponse`를 주면 기다리지 않고 바로 답한다.
+@MainActor
+public final class FakeTodoRepository: TodoRepository {
+    public private(set) var requests = 0
+    public private(set) var cancellations = 0
+    private let autoResponse: Result<[Todo], TodoRepositoryError>?
+    private var pending: CheckedContinuation<Result<[Todo], TodoRepositoryError>, Never>?
+
+    public init(autoResponse: Result<[Todo], TodoRepositoryError>? = nil) {
+        self.autoResponse = autoResponse
+    }
+
+    public func loadTodos() async throws(TodoRepositoryError) -> [Todo] {
+        requests += 1
+        if let autoResponse { return try autoResponse.get() }
+        let result = await withTaskCancellationHandler {
+            await withCheckedContinuation { pending = $0 }
+        } onCancel: {
+            Task { @MainActor in
+                guard self.pending != nil else { return }
+                self.cancellations += 1
+                self.respond(.failure(.cancelled))
+            }
+        }
+        return try result.get()
+    }
+
+    public func respond(_ result: Result<[Todo], TodoRepositoryError>) {
+        let continuation = pending
+        pending = nil
+        continuation?.resume(returning: result)
+    }
+}
+
 /// 피처를 단독으로 테스트할 때 부모 역할을 하는 Router. 자식을 붙이면 활성화되고, 떼면 비활성화된다.
 @MainActor
 public final class TestParentRouter {

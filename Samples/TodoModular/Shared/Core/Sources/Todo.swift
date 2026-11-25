@@ -24,11 +24,32 @@ public final class TodoStore {
     public private(set) var todos: [Todo] {
         didSet { continuations.values.forEach { $0.yield(todos) } }
     }
+    /// 목록을 한 번이라도 받았는지. 받기 전에는 `todos`가 비어 있다.
+    public private(set) var isLoaded: Bool
+    /// 불러오기 전에 복원된 완료 표시. `load`가 목록에 입힌다.
+    private var pendingDoneIDs: [Int64] = []
     private var continuations: [UInt64: AsyncStream<[Todo]>.Continuation] = [:]
     private var nextID: UInt64 = 0
 
+    /// 목록을 이미 가진 저장소. 테스트와 미리보기가 쓴다.
     public init(initial: [Todo] = TodoStore.sampleTodos) {
         todos = initial
+        isLoaded = true
+    }
+
+    private init() {
+        todos = []
+        isLoaded = false
+    }
+
+    /// 아직 불러오지 않은 빈 저장소. `TodoRepository`에서 받은 목록을 `load`로 채운다.
+    public static func unloaded() -> TodoStore { TodoStore() }
+
+    public func load(_ loaded: [Todo]) {
+        let done = pendingDoneIDs
+        pendingDoneIDs = []
+        isLoaded = true
+        todos = done.isEmpty ? loaded : loaded.map { $0.with(isDone: done.contains($0.id)) }
     }
 
     /// 현재 목록을 먼저 보내고 바뀔 때마다 다시 보낸다(Kotlin `StateFlow`).
@@ -50,9 +71,13 @@ public final class TodoStore {
         todos = todos.map { $0.id == id ? $0.with(isDone: !$0.isDone) : $0 }
     }
 
-    public var doneIDs: [Int64] { todos.filter(\.isDone).map(\.id) }
+    public var doneIDs: [Int64] { isLoaded ? todos.filter(\.isDone).map(\.id) : pendingDoneIDs }
 
     public func restoreDone(_ ids: [Int64]) {
+        guard isLoaded else {
+            pendingDoneIDs = ids
+            return
+        }
         todos = todos.map { $0.with(isDone: ids.contains($0.id)) }
     }
 }
