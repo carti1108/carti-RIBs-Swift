@@ -18,14 +18,36 @@ private final class StubURLProtocol: URLProtocol, @unchecked Sendable {
     /// `URLSession`의 스레드가 쓰고 테스트가 읽는다.
     private static let lock = NSLock()
     nonisolated(unsafe) private static var recorded: [URLRequest] = []
+    nonisolated(unsafe) private static var recordedBodies: [Data] = []
     static var requests: [URLRequest] { lock.withLock { recorded } }
-    static func reset() { lock.withLock { recorded = [] } }
+    /// `URLProtocol`에 오는 요청은 본문을 `httpBody` 대신 `httpBodyStream`에 담는다. 읽어서 따로 둔다.
+    static var bodies: [Data] { lock.withLock { recordedBodies } }
+    static func reset() { lock.withLock { recorded = []; recordedBodies = [] } }
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
+    private static func readBody(of request: URLRequest) -> Data {
+        if let body = request.httpBody { return body }
+        guard let stream = request.httpBodyStream else { return Data() }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 1024)
+        while stream.hasBytesAvailable {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            guard count > 0 else { break }
+            data.append(buffer, count: count)
+        }
+        return data
+    }
+
     override func startLoading() {
-        Self.lock.withLock { Self.recorded.append(request) }
+        let body = Self.readBody(of: request)
+        Self.lock.withLock {
+            Self.recorded.append(request)
+            Self.recordedBodies.append(body)
+        }
         switch Self.reply {
         case .response(let status, let body):
             let response = HTTPURLResponse(url: request.url!, statusCode: status, httpVersion: nil, headerFields: nil)!
@@ -73,6 +95,44 @@ struct URLSessionHTTPTransportTests {
 
         #expect(StubURLProtocol.requests.map(\.url?.absoluteString) == ["https://example.test/api/todos"])
         #expect(StubURLProtocol.requests.first?.httpMethod == "GET")
+    }
+
+    @Test func sendsHeadersAndBody() async throws {
+        StubURLProtocol.reply = .response(status: 201, body: Data("{}".utf8))
+        let request = HTTPRequest(
+            method: .post,
+            path: "/todos",
+            headers: ["Authorization": "Bearer abc", "Content-Type": "application/json"],
+            body: #"{"title":"운동"}"#
+        )
+
+        _ = try await transport.send(request)
+
+        let sent = try #require(StubURLProtocol.requests.first)
+        #expect(sent.httpMethod == "POST")
+        #expect(sent.value(forHTTPHeaderField: "Authorization") == "Bearer abc")
+        #expect(sent.value(forHTTPHeaderField: "Content-Type") == "application/json")
+        #expect(StubURLProtocol.bodies.first == Data(#"{"title":"운동"}"#.utf8))
+    }
+
+    @Test func patchSendsMethodAndBody() async throws {
+        StubURLProtocol.reply = .response(status: 200, body: Data("{}".utf8))
+
+        _ = try await transport.send(HTTPRequest(method: .patch, path: "/todos/7", body: #"{"done":true}"#))
+
+        #expect(StubURLProtocol.requests.first?.httpMethod == "PATCH")
+        #expect(StubURLProtocol.requests.first?.url?.absoluteString == "https://example.test/api/todos/7")
+        #expect(StubURLProtocol.bodies.first == Data(#"{"done":true}"#.utf8))
+    }
+
+    @Test func deleteWithoutBodySendsNoBody() async throws {
+        StubURLProtocol.reply = .response(status: 204, body: Data())
+
+        let response = try await transport.send(HTTPRequest(method: .delete, path: "/todos/7"))
+
+        #expect(response.status == 204)
+        #expect(StubURLProtocol.requests.first?.httpMethod == "DELETE")
+        #expect(StubURLProtocol.bodies.first == Data())
     }
 
     @Test func returnsStatusAndBodyBytes() async {
