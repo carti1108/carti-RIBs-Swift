@@ -43,6 +43,7 @@ typealias RibTreeStarter = (savedState: String?, loginDelayMillis: Long, onRende
 class RibTreeViewModel(
     start: RibTreeStarter,
     loginDelayMillis: Long,
+    todoBaseUrl: String?,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     var tree: JSONObject by mutableStateOf(JSONObject())
@@ -50,6 +51,7 @@ class RibTreeViewModel(
 
     init {
         val saved = savedStateHandle.get<Bundle>(KEY_RIB_STATE)?.getString(KEY_RIB_STATE)
+        todoBaseUrl?.let(SwiftBridge::installHttpTransport)
         start(saved, loginDelayMillis) { tree = JSONObject(it) }
         savedStateHandle.setSavedStateProvider(KEY_RIB_STATE) { bundleOf(KEY_RIB_STATE to SwiftBridge.saveState()) }
     }
@@ -86,13 +88,14 @@ abstract class RibActivity : ComponentActivity() {
 
     private val viewModel: RibTreeViewModel by lazy {
         val delay = intent.getLongExtra(EXTRA_LOGIN_DELAY_MILLIS, DEFAULT_LOGIN_DELAY_MILLIS)
+        val todoBaseUrl = intent.getStringExtra(EXTRA_TODO_BASE_URL)
         val start = startTree
         ViewModelProvider(
             this,
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T =
-                    RibTreeViewModel(start, delay, extras.createSavedStateHandle()) as T
+                    RibTreeViewModel(start, delay, todoBaseUrl, extras.createSavedStateHandle()) as T
             },
         )[RibTreeViewModel::class.java]
     }
@@ -139,6 +142,9 @@ abstract class RibActivity : ComponentActivity() {
     companion object {
         /** 테스트가 로딩 상태를 확실히 잡도록 응답 지연을 바꾸는 인텐트 값. */
         const val EXTRA_LOGIN_DELAY_MILLIS: String = "loginDelayMillis"
+
+        /** 할 일 API 서버 주소(`http://host:port/api`). 주면 `HttpURLConnection`으로 요청하고, 없으면 앱 안의 샘플 서버를 쓴다. */
+        const val EXTRA_TODO_BASE_URL: String = "todoBaseUrl"
 
         /** 샘플 서버 응답 지연. 로딩 표시를 눈으로 확인할 수 있을 만큼만 둔다. */
         const val DEFAULT_LOGIN_DELAY_MILLIS: Long = 800

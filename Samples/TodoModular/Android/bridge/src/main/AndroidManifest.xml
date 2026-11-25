@@ -1,2 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 할 일 API를 HttpURLConnection으로 부른다(ADR-0033). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

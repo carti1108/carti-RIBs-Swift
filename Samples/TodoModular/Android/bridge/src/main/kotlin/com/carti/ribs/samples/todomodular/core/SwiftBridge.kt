@@ -2,6 +2,8 @@ package com.carti.ribs.samples.todomodular.core
 
 import android.os.Handler
 import android.os.Looper
+import com.carti.ribs.samples.todomodular.swiftbridge.HTTPTransportHandle
+import org.swift.swiftkit.core.SwiftArena
 
 /**
  * Swift 라이브러리(libTodoModularBridge.so)와의 손으로 쓴 JNI 경계(ADR-0021). Swift 쪽 짝은 `swift/Sources/TodoModularBridge/JNI.swift`다.
@@ -61,7 +63,29 @@ object SwiftBridge {
     fun stop() {
         nativeStop()
         renderListener = null
+        uninstallHttpTransport()
     }
+
+    /**
+     * 할 일 API를 `baseUrl`의 서버에서 가져오게 한다(ADR-0033). [start] 전에 메인 스레드에서 부른다.
+     * 부르지 않으면 Swift 쪽 샘플 서버를 쓴다.
+     */
+    fun installHttpTransport(baseUrl: String) {
+        check(httpTransport == null) { "installHttpTransport called twice without stop" }
+        val handle = HTTPTransportHandle.init(SwiftArena.ofAuto())
+        val transport = HttpUrlConnectionTransport(baseUrl, handle)
+        handle.install(transport)
+        httpTransport = handle to transport
+    }
+
+    private fun uninstallHttpTransport() {
+        val (handle, transport) = httpTransport ?: return
+        httpTransport = null
+        handle.uninstall()
+        transport.shutdown()
+    }
+
+    private var httpTransport: Pair<HTTPTransportHandle, HttpUrlConnectionTransport>? = null
 
     /** Swift가 JNI로 부른다. */
     @JvmStatic

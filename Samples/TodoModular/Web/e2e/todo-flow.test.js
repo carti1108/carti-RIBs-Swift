@@ -124,8 +124,8 @@ describe("TodoModular 웹 앱", () => {
   });
 
   test("할 일을 불러오지 못하면 오류와 다시 시도 버튼을 보이고, 다시 시도하면 목록이 나온다", async () => {
-    await page.close();
-    page = await session.open("/?loginDelayMillis=1&todoFailures=1");
+    session.api.failNext(1);
+    const requestsBefore = session.api.requests;
     await login(page, "carti");
 
     await waitForText(page, "#todoError", "할 일을 불러오지 못했습니다");
@@ -136,6 +136,20 @@ describe("TodoModular 웹 앱", () => {
     await page.waitForSelector("#todoRow-1", { timeout });
     assert.equal(await page.$("#todoError"), null);
     assert.equal(await page.$("#todoLoading"), null);
+    // 실패한 요청과 다시 시도한 요청이 서버에 실제로 갔다.
+    assert.equal(session.api.requests, requestsBefore + 2);
+  });
+
+  test("네트워크가 끊겨 요청이 실패해도 오류를 보이고, 다시 연결한 뒤 다시 시도하면 목록이 나온다", async () => {
+    await page.waitForSelector("#nameField", { timeout });
+    await page.setOfflineMode(true);
+    await login(page, "carti");
+    await waitForText(page, "#todoError", "할 일을 불러오지 못했습니다");
+
+    await page.setOfflineMode(false);
+    await page.click("#todoRetryButton");
+
+    await page.waitForSelector("#todoRow-1", { timeout });
   });
 
   test("상세 화면에서 새로고침하면 sessionStorage에 저장한 상태로 같은 화면을 복원한다", async () => {

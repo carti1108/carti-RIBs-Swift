@@ -1,5 +1,5 @@
 ### ADR-0032 샘플의 데이터 계층은 공유 모듈 `TodoData`에 두고, 이 모듈에만 FoundationEssentials를 허용한다
-- 상태: 채택
+- 상태: 채택 (Web의 `?todoFailures=`와 "실제 전송 구현은 없다"는 ADR-0033으로 대체됨)
 - 날짜: 2026-11-25
 - 배경:
   - 이 포트의 목적은 뷰를 뺀 나머지를 플랫폼 사이에 공유하는 것이다. 그 "나머지"에는 네트워크 응답 해석과 저장소가 들어가는데, `TodoModular`에는 지연만 주는 `DelayedAuthService`와 하드코딩한 `TodoStore.sampleTodos`뿐이었다. 데이터 계층을 공유하는 모양이 검증되지 않았다.

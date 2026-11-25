@@ -44,9 +44,20 @@ public final class TodoAppController: RibController {
     private let stack: RenderStack
     private let app: TodoApp<AndroidAppViewFactory>
 
-    public init(authService: any AuthService, clock: any TodoClock = TaskSleepClock(), sink: @escaping (String) -> Void) {
+    /// `todoRepository`를 주지 않으면 앱 안의 샘플 서버를 쓴다(ADR-0032).
+    public init(
+        authService: any AuthService,
+        todoRepository: (any TodoRepository)? = nil,
+        clock: any TodoClock = TaskSleepClock(),
+        sink: @escaping (String) -> Void
+    ) {
         stack = RenderStack(sink: sink)
-        app = TodoApp(viewFactory: AndroidAppViewFactory(context: stack.context), authService: authService, clock: clock)
+        app = TodoApp(
+            viewFactory: AndroidAppViewFactory(context: stack.context),
+            authService: authService,
+            todoRepository: todoRepository,
+            clock: clock
+        )
     }
 
     @discardableResult

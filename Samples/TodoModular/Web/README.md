@@ -30,8 +30,10 @@ $TC/swift package --swift-sdk swift-6.4.2-RELEASE_wasm js   # .build/plugins/Pac
 npm ci                                                # React, Vite, TypeScript, WASI shim, Puppeteer
 npm run dev                                           # 개발 서버(http://localhost:5173)
 npm run build                                         # 타입 검사 뒤 dist/에 빌드
-npm run test:e2e                                      # 빌드한 뒤 전체 앱 5개, 피처 데모 4개
+npm run test:e2e                                      # 빌드한 뒤 전체 앱과 피처 데모 e2e
 ```
+
+할 일 목록은 `fetch`로 같은 출처의 `/api/todos`에서 읽습니다(ADR-0033). 개발 서버와 빌드 결과에서는 정적 JSON `public/api/todos`가 응답합니다. e2e는 테스트 서버(`e2e/support.js`)가 이 경로를 맡아 실패 응답도 만듭니다.
 
 Wasm을 먼저 빌드해야 합니다. 타입 검사가 `.build` 안의 `bridge-js.d.ts`를 읽습니다. Swift 쪽을 고치면 `swift package ... js`를 다시 돌립니다.
 

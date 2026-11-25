@@ -55,10 +55,8 @@ enum TodoWebApp {
         let app = TodoApp(
             viewFactory: viewFactory,
             authService: DelayedAuthService(delay: Page.loginDelay()),
-            // 실제 앱은 `SampleTodoServer` 자리에 `fetch`로 만든 `HTTPTransport`를 넣는다(ADR-0032).
-            todoRepository: RemoteTodoRepository(
-                client: TodoAPIClient(transport: SampleTodoServer(failuresBeforeSuccess: Page.todoFailures()))
-            )
+            // 같은 출처의 `/api/todos`를 `fetch`로 읽는다(ADR-0033). 개발 서버와 빌드 결과에는 정적 JSON(`public/api/todos`)이 있다.
+            todoRepository: RemoteTodoRepository(client: TodoAPIClient(transport: FetchHTTPTransport(baseURL: "/api")))
         )
         do {
             try app.start(host: host, savedState: SavedStateStore.load())
@@ -72,7 +70,7 @@ enum TodoWebApp {
     }
 }
 
-/// 페이지에서 읽는 값. E2E 테스트는 `?loginDelayMillis=<ms>`로 로그인 지연을, `?todoFailures=<n>`으로 할 일 요청 실패 횟수를 바꾼다.
+/// 페이지에서 읽는 값. E2E 테스트는 `?loginDelayMillis=<ms>`로 로그인 지연을 바꾼다.
 @MainActor
 enum Page {
     static let defaultLoginDelay: Duration = .milliseconds(800)
@@ -82,10 +80,6 @@ enum Page {
     static func loginDelay() -> Duration {
         guard let millis = queryInt("loginDelayMillis"), millis > 0 else { return defaultLoginDelay }
         return .milliseconds(millis)
-    }
-
-    static func todoFailures() -> Int {
-        max(0, queryInt("todoFailures") ?? 0)
     }
 
     private static func queryInt(_ name: String) -> Int? {

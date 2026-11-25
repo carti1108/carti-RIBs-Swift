@@ -91,9 +91,31 @@ let project = Project(
                 .package(product: "RIBs"),
                 .package(product: "RIBsSwiftUI"),
                 .package(product: "TodoCore"),
+                .target(name: "TodoTransport"),
                 .package(product: "TodoData"),
                 .package(product: "TodoAppRoot"),
             ] + features.map { .package(product: "Feature\($0)Interface") },
+            settings: swiftSettings
+        ),
+        // `HTTPTransport`의 `URLSession` 구현(ADR-0033). 이 플랫폼이 데이터 계층에 대해 구현하는 것은 이것 하나다.
+        .target(
+            name: "TodoTransport",
+            destinations: .iOS,
+            product: .staticFramework,
+            bundleId: "\(bundlePrefix).transport",
+            deploymentTargets: deploymentTargets,
+            sources: ["Transport/Sources/**"],
+            dependencies: [.package(product: "TodoData")],
+            settings: swiftSettings
+        ),
+        .target(
+            name: "TodoTransportTests",
+            destinations: .iOS,
+            product: .unitTests,
+            bundleId: "\(bundlePrefix).transport.tests",
+            deploymentTargets: deploymentTargets,
+            sources: ["Transport/Tests/**"],
+            dependencies: [.target(name: "TodoTransport"), .package(product: "TodoData")],
             settings: swiftSettings
         ),
         .target(
