@@ -33,4 +33,5 @@
 | [0029](ADR-0029-new-rib-feature-template.md) | `new-rib`에 µFeature 피처 모드를 두고, 템플릿을 ViewState/ViewAction과 순수 뷰·어댑터 모양으로 바꾼다 | 채택 |
 | [0030](ADR-0030-detail-navigation-by-intent.md) | 상세 화면 전환은 뷰 계약에 의도 이름으로 두고, 사용자가 제스처로 닫은 것은 `ViewAction`으로 알린다 | 채택 |
 | [0031](ADR-0031-new-rib-platform-connection-templates.md) | 플랫폼 연결 코드는 빌드 때 생성하지 않고 `new-rib` 템플릿으로 한 번 만든다 | 채택 |
-| [0032](ADR-0032-sample-data-layer-with-foundation-essentials.md) | 샘플의 데이터 계층은 공유 모듈 `TodoData`에 두고, 이 모듈에만 FoundationEssentials를 허용한다 | 채택 |
+| [0032](ADR-0032-sample-data-layer-with-foundation-essentials.md) | 샘플의 데이터 계층은 공유 모듈 `TodoData`에 두고, 이 모듈에만 FoundationEssentials를 허용한다 | 채택 (Web의 `?todoFailures=`와 "실제 전송 구현은 없다"는 ADR-0033으로 대체됨) |
+| [0033](ADR-0033-platform-http-transports.md) | 전송 계층은 플랫폼의 HTTP 스택으로 구현하고, Android는 Kotlin이 보내고 Swift가 결과를 받는다 | 채택 |
