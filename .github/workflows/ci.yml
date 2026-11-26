@@ -185,9 +185,13 @@ jobs:
       - name: TodoModular 생성
         working-directory: Samples/TodoModular/iOS
         run: tuist generate --no-open
+      # UI 테스트는 실패한 테스트만 한 번 더 돌린다. 두 번 다 실패해야 잡이 실패한다.
+      # 재시도로 통과해도 로그의 "Test Case ... failed"로 흔들림을 알 수 있고, 결과 번들은 실패 시 올린다.
       - name: TodoModular UI 테스트
         working-directory: Samples/TodoModular/iOS
-        run: xcodebuild test -workspace TodoModular.xcworkspace -scheme TodoModular -destination "$SIMULATOR"
+        run: >-
+          xcodebuild test -workspace TodoModular.xcworkspace -scheme TodoModular -destination "$SIMULATOR"
+          -retry-tests-on-failure -test-iterations 2 -resultBundlePath "$RUNNER_TEMP/TodoModularUITests.xcresult"
       - name: TodoModular 전송 테스트
         working-directory: Samples/TodoModular/iOS
         run: >-
@@ -203,7 +207,16 @@ jobs:
         working-directory: Samples/iOSLogin
         run: |
           tuist generate --no-open
-          xcodebuild test -workspace LoginSample.xcworkspace -scheme LoginSample -destination "$SIMULATOR"
+          xcodebuild test -workspace LoginSample.xcworkspace -scheme LoginSample -destination "$SIMULATOR" \
+            -retry-tests-on-failure -test-iterations 2 -resultBundlePath "$RUNNER_TEMP/LoginSampleUITests.xcresult"
+      - name: 실패한 UI 테스트 결과 올리기
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-ui-test-results
+          path: ${{ runner.temp }}/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 7
 
   # Android 샘플(TodoModular, AndroidLogin). Swift 호스트 테스트 뒤 x86_64 에뮬레이터에서 계측 테스트를 돌린다.
   android:

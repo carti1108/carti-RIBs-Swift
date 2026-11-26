@@ -60,6 +60,55 @@ W=.build/plugins/PackageToJS/outputs/Package/TodoModularWeb.wasm
 stat -f%z $W; gzip -9c $W | wc -c; brotli -c -q 11 $W | wc -c
 ```
 
+### µFeature 샘플의 증분 빌드
+
+TodoModular에서 한 곳을 고쳤을 때 무엇이 다시 컴파일되는지 플랫폼별로 쟀습니다(#14).
+
+2026-11-26, Apple M1(8코어), Xcode 27.0, swift.org 툴체인 6.4.2, Android Studio JBR 25, Gradle 9.7.1.
+
+| 플랫폼 | 빌드 명령 | 구성 |
+|---|---|---|
+| 공유 패키지 | `Samples/TodoModular/Shared`에서 `swift build` | 디버그, Xcode의 Swift |
+| Web | `swift package --swift-sdk swift-6.4.2-RELEASE_wasm js` 뒤 `npm run build` | 디버그, swift.org 6.4.2 |
+| iOS | `xcodebuild build -scheme TodoModular`(시뮬레이터) | 디버그 |
+| Android | `./gradlew :app:assembleDebug -PswiftAbis=arm64-v8a` | Swift는 릴리스(Gradle이 `-c release`로 부름), swift.org 6.4.2 |
+
+시나리오:
+
+- **구현**: `FeatureTodoDetail` 안의 내부 문자열 하나를 바꿈
+- **Interface**: `FeatureTodoDetailInterface`에 쓰지 않는 공개 타입 하나를 더함
+- **코어**: `TodoCore`의 샘플 데이터 문자열 하나를 바꿈(공개 API는 그대로)
+
+시간(초, 괄호 안은 다시 컴파일된 Swift 모듈 수):
+
+| 플랫폼 | 깨끗한 빌드 | 변경 없음 | 구현 | Interface | 코어 |
+|---|---|---|---|---|---|
+| 공유 패키지 | 12 (17) | 1 (0) | 2 (2) | 3 (7) | 2 (16) |
+| Web | 74 (28) | 3 (0) | 4 (3) | 7 (10) | 6 (21) |
+| iOS | 38 (23) | 14 (0) | 14 (1) | 16 (7) | 16 (6) |
+| Android | 531 (32) | 20 (0) | 11 (1) | 15 (1) | 16 (1) |
+
+다시 컴파일된 모듈:
+
+| 플랫폼 | 구현 | Interface | 코어 |
+|---|---|---|---|
+| 공유 패키지 | `FeatureTodoDetail`, `TodoAppRoot` | TodoDetail 3개(Impl·Interface·Testing), LoggedIn 3개, `TodoAppRoot` | 공유 패키지 모듈 전부(17개 중 16개, `RIBs` 제외) |
+| Web | `FeatureTodoDetail`, `TodoAppRoot`, `TodoModularWeb` | 공유 패키지와 같은 7개 + `FeatureTodoDetailWeb`, `FeatureLoggedInWeb`, `TodoModularWeb` | 공유 모듈 전부와 웹 모듈 전부(21개) |
+| iOS | `FeatureTodoDetail` | `FeatureTodoDetail`, `FeatureTodoDetailInterface`, `FeatureTodoDetailAdapter`, `FeatureLoggedIn`, `FeatureLoggedInInterface`, `TodoAppRoot`, 앱 `TodoModular` | `TodoCore`, `FeatureTodoDetail`, `FeatureTodoDetailInterface`, `FeatureTodoList`, `FeatureTodoListInterface`, `FeatureLoggedIn` |
+| Android | `FeatureTodoDetail` | `FeatureTodoDetailInterface` | `TodoCore` |
+
+- 피처 구현만 고치면 많아야 그 피처와 그것을 조립하는 루트(공유 패키지·Web)만 다시 컴파일한다. 다른 피처는 어느 플랫폼에서도 건드리지 않는다.
+- Interface를 고치면 공유 패키지·Web·iOS는 그 Interface를 import하는 부모 피처(LoggedIn)까지 다시 컴파일한다. 형제 피처(TodoList, LoggedOut)는 그대로다. Android는 Interface 모듈 하나만 다시 컴파일했다.
+- 공유 패키지와 Web(디버그, SwiftPM)은 공개 API가 그대로여도 `TodoCore`를 고치면 그 위의 모듈을 모두 다시 컴파일했다. 같은 수정에 iOS(Xcode)는 6개, Android(Swift 릴리스)는 `TodoCore` 하나만 다시 컴파일했다. 빌드 시스템마다 모듈 경계를 넘는 증분 판단이 다른 것으로 보이며, 원인은 확인하지 않았다.
+- 샘플이 작아 시간 차이는 몇 초다. iOS의 "변경 없음" 14초와 Android의 20초는 컴파일이 아니라 `xcodebuild`·Gradle 자체의 고정 비용이다.
+- Android 깨끗한 빌드 531초의 대부분은 swift-java와 swift-syntax 같은 의존성 컴파일이다. CI는 이 부분을 캐시한다.
+
+측정 방법:
+
+- 시나리오마다 고치고 빌드한 뒤 되돌리고 다시 빌드해, 다음 시나리오가 같은 상태에서 시작하게 했다.
+- 모듈 목록: 공유 패키지는 `swift build -v`의 `-module-name`, iOS는 `xcodebuild` 로그의 `SwiftCompile ... (in target '…')`, Web·Android는 빌드가 새로 쓴 `.o` 파일의 모듈 디렉터리(`<모듈>-t.build`)로 셌다.
+- 변경이 없어도 매번 컴파일되는 명령 플러그인(`NewRib`)과 매니페스트는 세지 않았다.
+
 ## 샘플 경계 검사
 
 `Samples/TodoModular`의 피처 경계(ADR-0024)와 샘플의 순수 뷰 규칙(ADR-0027)을 import 문으로 검사합니다(ADR-0028). 빌드가 필요 없어 어느 호스트에서나 돕니다.
