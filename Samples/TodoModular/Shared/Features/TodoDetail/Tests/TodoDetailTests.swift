@@ -48,6 +48,30 @@ final class TodoDetailTests {
         parent.detach(router)
     }
 
+    /// 클립보드 쓰기는 뷰가 하고 결과만 액션으로 알린다(#31).
+    @Test func copyResultShowsNotice() throws {
+        let router = try open(1)
+        let view = try #require(views.views.last)
+
+        view.listener?.handle(.titleCopied(succeeded: true))
+        #expect(view.state == TodoDetailViewState(title: "우유 사기", isDone: false, notice: "제목을 복사했습니다"))
+
+        view.listener?.handle(.titleCopied(succeeded: false))
+        #expect(view.state?.notice == "제목을 복사하지 못했습니다")
+        parent.detach(router)
+    }
+
+    @Test func toggleClearsCopyNotice() throws {
+        let router = try open(1)
+        let view = try #require(views.views.last)
+
+        view.listener?.handle(.titleCopied(succeeded: true))
+        view.listener?.handle(.toggleDoneTapped)
+
+        #expect(view.state == TodoDetailViewState(title: "우유 사기", isDone: true))
+        parent.detach(router)
+    }
+
     @Test func backTellsListener() throws {
         let router = try open(1)
 

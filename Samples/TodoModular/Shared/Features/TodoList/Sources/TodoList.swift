@@ -66,6 +66,33 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
         case .retryTapped:
             guard isActive, !viewState.isLoading, !todoStore.isLoaded else { return }
             load()
+        case .fileReceived(let name, let text):
+            importTodos(from: text, fileName: name)
+        }
+    }
+
+    /// 파일 한 번에 더하는 할 일의 상한. 파일 내용은 사용자가 고른 외부 입력이라 크기를 공유 코드가 막는다.
+    static let maxImportedTodos = 100
+
+    /// 줄마다 앞뒤 공백을 지우고 빈 줄을 건너뛴다. 불러오기 전에는 더하지 않는다. 뒤이어 불러온 목록이 덮어쓰기 때문이다.
+    private func importTodos(from text: String, fileName: String) {
+        guard todoStore.isLoaded else {
+            update { $0.notice = "목록을 불러온 뒤에 추가할 수 있습니다" }
+            return
+        }
+        let titles = text.split(whereSeparator: \.isNewline)
+            .map { line in String(line.drop(while: \.isWhitespace).reversed().drop(while: \.isWhitespace).reversed()) }
+            .filter { !$0.isEmpty }
+        guard !titles.isEmpty else {
+            update { $0.notice = "\(fileName)에 추가할 줄이 없습니다" }
+            return
+        }
+        let added = todoStore.add(titles: Array(titles.prefix(Self.maxImportedTodos)))
+        let skipped = titles.count - added.count
+        let todos = todoStore.todos
+        update {
+            $0.todos = todos
+            $0.notice = "\(fileName)에서 \(added.count)개를 추가했습니다" + (skipped > 0 ? ". 나머지 \(skipped)줄은 넘겼습니다" : "")
         }
     }
 

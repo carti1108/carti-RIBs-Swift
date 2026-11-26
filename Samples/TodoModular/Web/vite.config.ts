@@ -15,6 +15,7 @@ export default defineConfig({
         loggedIn: page("./features/logged-in/demo.html"),
         todoList: page("./features/todo-list/demo.html"),
         todoDetail: page("./features/todo-detail/demo.html"),
+        writeRequestSpike: page("./spikes/write-request.html"),
       },
     },
   },

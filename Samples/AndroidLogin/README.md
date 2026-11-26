@@ -26,6 +26,8 @@ cd Samples/AndroidLogin
 
 ## Windows에서 빌드
 
+> 이 절차는 swift-java 도입(2026-11-20) 전에 확인한 것입니다. 지금은 swift-java 플러그인이 Windows 경로를 처리하지 못해 빌드되지 않습니다([빌드 문서](../../docs/building.md#swift-java를-쓰는-android-샘플은-windows-호스트에서-빌드되지-않는다)). macOS나 Linux에서 빌드하세요.
+
 [빌드 문서의 Windows 절](../../docs/building.md#windows)대로 툴체인을 준비한 뒤, Swift SDK를 설치하고 번들의 `setup-android-sdk.sh`를 Git Bash에서 복사 모드로 돌려 NDK에 연결합니다. x86_64 PC의 에뮬레이터는 x86_64 ABI로 빌드합니다.
 
 ```sh

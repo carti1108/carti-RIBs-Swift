@@ -4,16 +4,21 @@ import TodoCore
 public struct TodoDetailViewState: Equatable, Sendable {
     public var title: String
     public var isDone: Bool
+    /// 방금 한 일의 결과 문구(예: 제목 복사). 없으면 뷰는 아무것도 보여 주지 않는다.
+    public var notice: String?
 
-    public init(title: String, isDone: Bool) {
+    public init(title: String, isDone: Bool, notice: String? = nil) {
         self.title = title
         self.isDone = isDone
+        self.notice = notice
     }
 }
 
 public enum TodoDetailViewAction: Equatable, Sendable {
     case toggleDoneTapped
     case backTapped
+    /// 뷰가 제목을 플랫폼 클립보드에 쓴 결과. 클립보드는 뷰가 다루고 공유 코드는 결과만 받는다(#31).
+    case titleCopied(succeeded: Bool)
 }
 
 @MainActor

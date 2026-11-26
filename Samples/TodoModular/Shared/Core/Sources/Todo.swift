@@ -71,6 +71,16 @@ public final class TodoStore {
         todos = todos.map { $0.id == id ? $0.with(isDone: !$0.isDone) : $0 }
     }
 
+    /// 제목마다 완료되지 않은 할 일을 끝에 더하고, 더한 항목을 돌려준다. id는 지금 가장 큰 id 다음부터 붙인다.
+    /// 이 샘플은 서버에 보내지 않는다. 상태 저장은 완료 표시만 하므로 앱을 다시 열면 사라진다.
+    @discardableResult
+    public func add(titles: [String]) -> [Todo] {
+        let firstID = (todos.map(\.id).max() ?? 0) + 1
+        let added = titles.enumerated().map { Todo(id: firstID + Int64($0.offset), title: $0.element, isDone: false) }
+        todos += added
+        return added
+    }
+
     public var doneIDs: [Int64] { isLoaded ? todos.filter(\.isDone).map(\.id) : pendingDoneIDs }
 
     public func restoreDone(_ ids: [Int64]) {

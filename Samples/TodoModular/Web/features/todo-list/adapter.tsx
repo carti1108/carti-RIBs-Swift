@@ -10,15 +10,17 @@ export class TodoListAdapter implements TodoListViewBridge {
     this.#screen.mount(host, handle);
   }
 
-  render(rows: TodoListRow[], isLoading: boolean, errorMessage: string | null): void {
+  render(rows: TodoListRow[], isLoading: boolean, errorMessage: string | null, notice: string | null): void {
     const items = rows.map(({ id, title, isDone }) => ({ id, title, isDone }));
     this.#screen.render((handle) => (
       <TodoListView
         items={items}
         isLoading={isLoading}
         errorMessage={errorMessage}
+        notice={notice}
         onSelect={(id) => handle.todoTapped(id)}
         onRetry={() => handle.retryTapped()}
+        onFileReceived={(name, text) => handle.fileReceived(name, text)}
       />
     ));
   }

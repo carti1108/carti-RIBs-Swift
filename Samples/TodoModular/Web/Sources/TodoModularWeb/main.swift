@@ -42,4 +42,16 @@ import JavaScriptKit
     MainActor.assumeIsolated { FeatureDemo.start { $0.todoDetail(ViewMounts.todoDetail(view)) } }
 }
 
+/// 쓰기 요청 스파이크(#31). `spikes/write-request.html`이 부른다.
+@JS func runWriteRequestSpike(baseURL: String, token: String, title: String) {
+    MainActor.assumeIsolated { WriteRequestSpike.run(baseURL: baseURL, token: token, title: title) }
+}
+
+/// 쓰기 요청 스파이크(#31). 요청 하나를 공유 클라이언트 없이 보낸다(PATCH·DELETE 확인용).
+@JS func runTransportSpike(baseURL: String, token: String, method: String, path: String, body: String) {
+    MainActor.assumeIsolated {
+        WriteRequestSpike.send(baseURL: baseURL, token: token, method: method, path: path, body: body)
+    }
+}
+
 JavaScriptEventLoop.installGlobalExecutor()

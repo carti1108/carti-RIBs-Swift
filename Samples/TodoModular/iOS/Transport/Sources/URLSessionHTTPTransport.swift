@@ -16,6 +16,10 @@ public final class URLSessionHTTPTransport: HTTPTransport {
     public func send(_ request: HTTPRequest) async throws(HTTPTransportError) -> HTTPResponse {
         var urlRequest = URLRequest(url: baseURL.appending(path: request.path))
         urlRequest.httpMethod = request.method.rawValue
+        for (name, value) in request.headers {
+            urlRequest.setValue(value, forHTTPHeaderField: name)
+        }
+        urlRequest.httpBody = request.body.map { Data($0.utf8) }
         let data: Data
         let response: URLResponse
         do {

@@ -10,13 +10,15 @@ export class TodoDetailAdapter implements TodoDetailViewBridge {
     this.#screen.mount(host, handle);
   }
 
-  render(title: string, isDone: boolean): void {
+  render(title: string, isDone: boolean, notice: string | null): void {
     this.#screen.render((handle) => (
       <TodoDetailView
         title={title}
         isDone={isDone}
+        notice={notice}
         onBack={() => handle.backTapped()}
         onToggleDone={() => handle.toggleDoneTapped()}
+        onTitleCopied={(succeeded) => handle.titleCopied(succeeded)}
       />
     ));
   }

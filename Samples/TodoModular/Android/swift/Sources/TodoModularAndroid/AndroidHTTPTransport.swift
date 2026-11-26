@@ -4,7 +4,8 @@ import TodoData
 @MainActor
 public protocol AndroidHTTPSender: AnyObject {
     /// 요청을 시작한다. 결과는 나중에 `AndroidHTTPTransport.complete`나 `fail`로 돌려준다.
-    func start(requestID: Int64, method: String, path: String)
+    /// `headers`는 `이름: 값` 줄을 `\n`으로 끝낸 문자열이고, `body`는 본문이 없으면 빈 문자열이다.
+    func start(requestID: Int64, method: String, path: String, headers: String, body: String)
     func cancel(requestID: Int64)
 }
 
@@ -32,7 +33,13 @@ public final class AndroidHTTPTransport: HTTPTransport {
                     return
                 }
                 pending[requestID] = continuation
-                sender.start(requestID: requestID, method: request.method.rawValue, path: request.path)
+                sender.start(
+                    requestID: requestID,
+                    method: request.method.rawValue,
+                    path: request.path,
+                    headers: Self.headerLines(request.headers),
+                    body: request.body ?? ""
+                )
             }
         } onCancel: {
             Task { @MainActor in self.cancel(requestID) }
@@ -48,6 +55,18 @@ public final class AndroidHTTPTransport: HTTPTransport {
     /// 응답을 받지 못했다(연결 실패, 시간 초과). 이미 끝난 요청이면 무시한다.
     public func fail(requestID: Int64) {
         pending.removeValue(forKey: requestID)?.resume(returning: .failure(.unreachable))
+    }
+
+    /// swift-java 경계는 문자열만 넘긴다(ADR-0020). 헤더를 이름순 `이름: 값\n` 줄로 묶는다.
+    /// HTTP 헤더에는 줄바꿈이 들어갈 수 없어 줄 단위로 나눠도 섞이지 않는다.
+    static func headerLines(_ headers: [String: String]) -> String {
+        headers.sorted { $0.key < $1.key }.map { name, value in
+            precondition(
+                !name.isEmpty && !name.contains(where: \.isNewline) && !name.contains(":") && !value.contains(where: \.isNewline),
+                "invalid HTTP header: \(name)"
+            )
+            return "\(name): \(value)\n"
+        }.joined()
     }
 
     private func cancel(_ requestID: Int64) {
