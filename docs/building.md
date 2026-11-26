@@ -24,7 +24,7 @@
 
 - "공유 코드"는 `Samples/LoginShared/**`와 `Samples/TodoModular/Shared/**`입니다.
 - `.github/**`, `Package.swift`, `Sources/**`, `Plugins/**`가 바뀌면 모든 잡이 돕니다.
-- 문서(`docs/**`, `*.md`)만 바뀌면 `changes` 잡 하나로 끝납니다.
+- 마크다운(`**/*.md`)은 샘플 폴더 안에 있어도 모든 필터에서 뺍니다. 문서(`docs/**`, `.md`)만 바뀌면 `changes` 잡 하나로 끝납니다.
 - iOS UI 테스트는 실패한 테스트만 한 번 더 돌립니다(`-retry-tests-on-failure -test-iterations 2`). 두 번 다 실패하면 잡이 실패하고 `.xcresult`를 아티팩트로 올립니다.
 - Android 잡은 Swift 교차 빌드 결과(`.build`)를 캐시합니다. 깨끗한 빌드 시간의 대부분이 swift-java·swift-syntax 같은 의존성 컴파일이기 때문입니다([증분 빌드](#µfeature-샘플의-증분-빌드)).
 - 웹 잡은 Puppeteer의 Chrome이 root로 뜨지 않아 컨테이너 대신 러너에 툴체인을 설치합니다(`.github/actions/setup-swift-linux`).

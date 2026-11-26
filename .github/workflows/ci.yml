@@ -14,7 +14,8 @@ concurrency:
 
 jobs:
   # 바뀐 경로로 돌릴 잡을 정한다. 라이브러리(`Sources` 등)와 워크플로가 바뀌면 모든 잡이 돈다.
-  # 문서(`docs/**`, `*.md`)와 `Spikes/**`는 어느 필터에도 없어 아무 잡도 돌리지 않는다.
+  # 마크다운(`**/*.md`)은 어느 경로에 있든 모든 필터에서 뺀다(some-with-excludes).
+  # `docs/**`와 `Spikes/**`는 어느 필터에도 없어 아무 잡도 돌리지 않는다.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -31,12 +32,14 @@ jobs:
       - id: filter
         uses: dorny/paths-filter@v4
         with:
+          predicate-quantifier: some-with-excludes
           filters: |
             all: &all
               - '.github/**'
               - 'Package.swift'
               - 'Sources/**'
               - 'Plugins/**'
+              - '!**/*.md'
             library:
               - *all
               - 'Tests/**'
