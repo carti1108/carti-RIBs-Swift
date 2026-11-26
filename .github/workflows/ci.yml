@@ -150,7 +150,11 @@ jobs:
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK_VERSION" > /dev/null
           ndk="$ANDROID_HOME/ndk/$NDK_VERSION"
           echo "ANDROID_NDK_HOME=$ndk" >> "$GITHUB_ENV"
-          ANDROID_NDK_HOME="$ndk" bash ~/.swiftpm/swift-sdks/swift-6.4.2-RELEASE_android.artifactbundle/swift-android/scripts/setup-android-sdk.sh
+          # SwiftPM은 ~/.swiftpm이 없으면 ~/.config/swiftpm 아래에 SDK를 설치한다. bridge/build.gradle.kts와 같은 후보를 본다.
+          bundle=$(ls -d ~/.swiftpm/swift-sdks/swift-6.4.2-RELEASE_android.artifactbundle \
+            ~/.config/swiftpm/swift-sdks/swift-6.4.2-RELEASE_android.artifactbundle 2>/dev/null | head -1)
+          [ -n "$bundle" ] || { echo "Android Swift SDK를 찾지 못했습니다"; exit 1; }
+          ANDROID_NDK_HOME="$ndk" bash "$bundle/swift-android/scripts/setup-android-sdk.sh"
       - name: TodoModular Android Swift 호스트 테스트
         working-directory: Samples/TodoModular/Android/swift
         run: swift test --disable-sandbox
