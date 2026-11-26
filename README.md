@@ -22,7 +22,7 @@ RIBs-iOS에 없는 확장이 두 가지 있습니다. 루트를 붙였다 떼는
 ## 사용
 
 ```swift
-.package(url: "https://github.com/carti1108/carti-RIBs-Swift.git", branch: "main")
+.package(url: "https://github.com/carti1108/carti-RIBs-Swift.git", from: "0.1.0")
 // target dependencies: ["RIBs"]
 ```
 
