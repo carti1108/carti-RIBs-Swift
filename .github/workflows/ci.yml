@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 샘플 모듈 경계
-        run: Scripts/check-sample-boundaries.sh
+        run: scripts/check-sample-boundaries.sh
       # ADR-0004: Sources/RIBs는 표준 라이브러리와 _Concurrency만 쓴다(AGENTS.md).
       - name: RIBs 코어 import 제한
         run: |
@@ -52,4 +52,4 @@ jobs:
       - name: 라이브러리 빌드·테스트
         run: swift build && swift test
       - name: 공개 API 검사
-        run: Scripts/check-api.sh
+        run: scripts/check-api.sh
