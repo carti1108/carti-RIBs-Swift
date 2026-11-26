@@ -37,6 +37,29 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 - 기본 샘플: [iOS](../Samples/iOSLogin/README.md), [Android](../Samples/AndroidLogin/README.md), [Web](../Samples/WebLogin/README.md)
 - µFeature 샘플(`Samples/TodoModular`, ADR-0024): [Web](../Samples/TodoModular/Web/README.md)
 
+### 웹 샘플의 Wasm 크기
+
+`swift package ... js`는 기본이 디버그 빌드입니다. 배포 크기는 `-c release`로 잽니다. `wasm-opt`(binaryen)가 PATH에 있으면 PackageToJS가 최적화에 씁니다(`--no-optimize`로 끔).
+
+2026-11-26, macOS, swift.org 툴체인 6.4.2, Swift SDK `swift-6.4.2-RELEASE_wasm`, JavaScriptKit 0.63.0, binaryen 133. gzip은 `-9`, brotli는 `-q 11`.
+
+| 산출물 | 구성 | 압축 전 | gzip | brotli |
+|---|---|---|---|---|
+| `TodoModularWeb.wasm` | 디버그 | 22.8MB | 6.3MB | 측정 안 함 |
+| `TodoModularWeb.wasm` | 릴리스 + `wasm-opt` | 8.5MB | 3.0MB | 2.2MB |
+| `WebLogin.wasm` | 릴리스 + `wasm-opt` | 4.1MB | 1.5MB | 1.1MB |
+
+- 웹 서버는 `.wasm`을 brotli나 gzip으로 압축해 보내야 합니다. 압축하지 않으면 릴리스도 8.5MB를 받습니다.
+- WebLogin은 Foundation을 쓰지 않습니다. TodoModular는 데이터 계층(`TodoData`)이 `FoundationEssentials`를 씁니다(ADR-0032). 두 샘플의 차이(압축 전 4.4MB) 중 얼마가 `FoundationEssentials`인지는 나눠 재지 않았습니다.
+
+```sh
+TC=~/Library/Developer/Toolchains/swift-6.4.2-RELEASE.xctoolchain/usr/bin
+brew install binaryen brotli
+$TC/swift package --swift-sdk swift-6.4.2-RELEASE_wasm js -c release
+W=.build/plugins/PackageToJS/outputs/Package/TodoModularWeb.wasm
+stat -f%z $W; gzip -9c $W | wc -c; brotli -c -q 11 $W | wc -c
+```
+
 ## 샘플 경계 검사
 
 `Samples/TodoModular`의 피처 경계(ADR-0024)와 샘플의 순수 뷰 규칙(ADR-0027)을 import 문으로 검사합니다(ADR-0028). 빌드가 필요 없어 어느 호스트에서나 돕니다.
