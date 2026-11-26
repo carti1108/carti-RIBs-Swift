@@ -1,0 +1,55 @@
+# 라이브러리·공유 샘플 코드의 빌드·테스트와 경계 검사(#6).
+# 플랫폼 앱(iOS Xcode, Android Gradle, Web e2e)은 아직 돌리지 않는다.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # 빌드가 필요 없는 검사. 어느 호스트에서나 돈다.
+  boundaries:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 샘플 모듈 경계
+        run: Scripts/check-sample-boundaries.sh
+      # ADR-0004: Sources/RIBs는 표준 라이브러리와 _Concurrency만 쓴다(AGENTS.md).
+      - name: RIBs 코어 import 제한
+        run: |
+          violations=$(grep -rnE '^\s*(@[A-Za-z_]+(\([^)]*\))?\s+)*import\s+((struct|class|enum|protocol|func|var|let|typealias)\s+)?[A-Za-z_]' Sources/RIBs \
+            | grep -vE 'import\s+((struct|class|enum|protocol|func|var|let|typealias)\s+)?(Swift|_Concurrency)(\.|\s|$)' || true)
+          if [ -n "$violations" ]; then
+            echo "Sources/RIBs는 Swift 표준 라이브러리와 _Concurrency만 import한다(ADR-0004):"
+            echo "$violations"
+            exit 1
+          fi
+
+  linux:
+    runs-on: ubuntu-latest
+    container: swift:6.4.2
+    steps:
+      - uses: actions/checkout@v4
+      - name: 라이브러리 빌드·테스트
+        run: swift build && swift test
+      - name: TodoModular 공유 패키지 빌드·테스트
+        working-directory: Samples/TodoModular/Shared
+        run: swift build && swift test
+
+  # 공개 API 덤프 비교(ADR-0011). 덤프 표현은 Xcode의 Swift 버전에 따라 달라질 수 있어(docs/building.md)
+  # 덤프를 만든 Xcode와 러너의 Xcode가 다르면 API가 같아도 실패한다.
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode·Swift 버전
+        run: xcodebuild -version && swift --version
+      - name: 라이브러리 빌드·테스트
+        run: swift build && swift test
+      - name: 공개 API 검사
+        run: Scripts/check-api.sh
