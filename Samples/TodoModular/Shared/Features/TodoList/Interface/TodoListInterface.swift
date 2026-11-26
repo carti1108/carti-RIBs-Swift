@@ -57,6 +57,8 @@ public protocol TodoListDependency: Dependency {
 @MainActor
 public protocol TodoListListener: AnyObject {
     func didSelectTodo(id: Int64)
+    /// 서버가 인증을 거절해 목록을 불러올 수 없다. 부모가 다시 로그인으로 보낸다.
+    func didRequireSignIn()
 }
 
 @MainActor

@@ -14,11 +14,12 @@ final class TodoListLoadingTests {
     private let repository = FakeTodoRepository()
     private let views = FakeTodoListViewFactory()
     private let parent = TestParentRouter()
+    private let listener = FakeTodoListListener()
     private let router: any ViewableRouting
 
     init() async {
         let dependency = FakeTodoListDependency(todoStore: store, todoRepository: repository)
-        router = TodoListBuilder(dependency: dependency, viewFactory: views).build(listener: FakeTodoListListener())
+        router = TodoListBuilder(dependency: dependency, viewFactory: views).build(listener: listener)
         parent.attach(router)
         await runCurrent()
     }
@@ -62,6 +63,15 @@ final class TodoListLoadingTests {
         #expect(!store.isLoaded)
         #expect(view.state?.todos == [])
         parent.attach(router)  // deinit의 detach와 짝을 맞춘다.
+    }
+
+    /// 인증이 거절되면 다시 시도 문구 대신 부모에게 다시 로그인이 필요하다고 알린다.
+    @Test func unauthorizedAsksParentToSignInAgain() async {
+        repository.respond(.failure(.unauthorized))
+        await runCurrent()
+
+        #expect(listener.signInRequests == 1)
+        #expect(view.state == TodoListViewState(todos: []))
     }
 
     @Test func failureShowsErrorAndRetryLoadsAgain() async {

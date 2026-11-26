@@ -123,6 +123,8 @@ extension FeatureDemoController: LoggedOutListener, LoggedInListener, TodoListLi
         todoListDependency.todoStore.toggle(id)
     }
 
+    public func didRequireSignIn() { root.showEvent("didRequireSignIn()") }
+
     public func didRequestCloseDetail() { root.showEvent("didRequestCloseDetail()") }
 }
 

@@ -143,6 +143,9 @@ final class LoggedInInteractor: PresentableInteractor<any LoggedInPresentable>, 
         router?.routeToDetail(todoID: id)
     }
 
+    /// 인증이 거절되면 사용자가 로그아웃을 누른 것과 같은 경로로 로그인 화면에 돌아간다.
+    func didRequireSignIn() { listener?.didRequestLogout() }
+
     func didRequestCloseDetail() { router?.routeAwayFromDetail() }
 }
 
