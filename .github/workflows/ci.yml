@@ -155,9 +155,11 @@ jobs:
           path: |
             Samples/TodoModular/Android/swift/.build
             Samples/AndroidLogin/app/src/main/swift/.build
-          key: android-swift-${{ hashFiles('Samples/TodoModular/Android/swift/Package.resolved', 'Samples/AndroidLogin/app/src/main/swift/Package.resolved') }}-${{ github.sha }}
+          key: android-swift-${{ hashFiles('Samples/TodoModular/Android/swift/Package.swift', 'Samples/AndroidLogin/app/src/main/swift/Package.swift') }}-${{ github.sha }}
+          # Package.resolved는 체크인하지 않아(.gitignore) 의존성 버전을 고정한 Package.swift로 키를 만든다.
           restore-keys: |
-            android-swift-${{ hashFiles('Samples/TodoModular/Android/swift/Package.resolved', 'Samples/AndroidLogin/app/src/main/swift/Package.resolved') }}-
+            android-swift-${{ hashFiles('Samples/TodoModular/Android/swift/Package.swift', 'Samples/AndroidLogin/app/src/main/swift/Package.swift') }}-
+            android-swift-
       - uses: ./.github/actions/setup-swift-linux
         with:
           sdks: android-sdk/swift-6.4.2-RELEASE/swift-6.4.2-RELEASE_android.artifactbundle.tar.gz 4d6ad63ea74becd58e123ff58b1b48c3be5ec0db0dff0ea5abe37ac007dd3233
