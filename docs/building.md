@@ -4,10 +4,30 @@
 
 | 플랫폼 | 상태 |
 |---|---|
-| macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트 |
+| macOS·iOS | 로컬 빌드·테스트, iOS 샘플 UI 테스트. CI에서 매번 검사([아래](#ci)) |
 | Linux | Static Linux SDK(musl, x86_64·aarch64)로 `RIBs`·`LoginShared`·`RIBsWeb` 교차 빌드 확인. WSL Ubuntu 24.04에서 루트 `swift test`(145개, `NewRibTests` 포함), TodoModular Android Swift 호스트 테스트(13개), 웹 샘플 빌드와 e2e 통과(2026-11-25, [아래](#wsl에서-빌드)) |
-| Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드 |
+| Wasm·Android | 6.4.2 Swift SDK 빌드, 웹 E2E·Android 샘플 APK 빌드와 에뮬레이터 계측 테스트. CI에서 매번 검사([아래](#ci)) |
 | Windows | 6.4.2 툴체인으로 루트 `swift build`·`swift test`(132개), `Samples/TodoModular/Shared`의 `swift build`·`swift test`(72개) 통과(2026-11-25). 웹 샘플은 빌드 불가([아래](#웹-샘플은-windows-호스트에서-빌드되지-않는다)). swift-java를 쓰는 Android 샘플도 빌드 불가([아래](#swift-java를-쓰는-android-샘플은-windows-호스트에서-빌드되지-않는다)) |
+
+## CI
+
+`.github/workflows/ci.yml`이 `main` 푸시와 PR마다 돕니다. `changes` 잡이 바뀐 경로를 보고 필요한 잡만 돌립니다.
+
+| 잡 | 러너 | 검사 | 도는 경로 |
+|---|---|---|---|
+| `boundaries` | Ubuntu | 샘플 모듈 경계(`scripts/check-sample-boundaries.sh`), `Sources/RIBs` import 제한(ADR-0004) | `Samples/**` |
+| `linux` | `swift:6.4.2` 컨테이너 | 루트와 `Samples/TodoModular/Shared`의 `swift build`·`swift test` | `Tests/**`, `Samples/LoginShared/**`, `Samples/TodoModular/Shared/**` |
+| `macos` | macOS | 루트 `swift build`·`swift test`, 공개 API 검사 | `Tests/**`, `Samples/LoginShared/**`, `api/**`, `scripts/check-api.sh` |
+| `web` | Ubuntu 24.04 | TodoModular 웹과 WebLogin의 Wasm 빌드, e2e | 공유 코드, 두 웹 샘플 |
+| `ios` | macOS | TodoModular·iOSLogin UI 테스트, `URLSession` 전송 테스트, 피처 Example 앱 빌드 | 공유 코드, 두 iOS 샘플 |
+| `android` | Ubuntu 24.04 | TodoModular Swift 호스트 테스트, 두 앱의 APK 빌드, API 35 x86_64 에뮬레이터 계측 테스트 | 공유 코드, 두 Android 샘플 |
+
+- "공유 코드"는 `Samples/LoginShared/**`와 `Samples/TodoModular/Shared/**`입니다.
+- `.github/**`, `Package.swift`, `Sources/**`, `Plugins/**`가 바뀌면 모든 잡이 돕니다.
+- 문서(`docs/**`, `*.md`)만 바뀌면 `changes` 잡 하나로 끝납니다.
+- iOS UI 테스트는 실패한 테스트만 한 번 더 돌립니다(`-retry-tests-on-failure -test-iterations 2`). 두 번 다 실패하면 잡이 실패하고 `.xcresult`를 아티팩트로 올립니다.
+- Android 잡은 Swift 교차 빌드 결과(`.build`)를 캐시합니다. 깨끗한 빌드 시간의 대부분이 swift-java·swift-syntax 같은 의존성 컴파일이기 때문입니다([증분 빌드](#µfeature-샘플의-증분-빌드)).
+- 웹 잡은 Puppeteer의 Chrome이 root로 뜨지 않아 컨테이너 대신 러너에 툴체인을 설치합니다(`.github/actions/setup-swift-linux`).
 
 ## 공개 API 검사
 
@@ -35,7 +55,7 @@ swift package --disable-sandbox preview-documentation --target RIBs   # 로컬 �
 샘플별 빌드·실행 절차는 각 README에 있습니다.
 
 - 기본 샘플: [iOS](../Samples/iOSLogin/README.md), [Android](../Samples/AndroidLogin/README.md), [Web](../Samples/WebLogin/README.md)
-- µFeature 샘플(`Samples/TodoModular`, ADR-0024): [Web](../Samples/TodoModular/Web/README.md)
+- µFeature 샘플(`Samples/TodoModular`, ADR-0024): [개요](../Samples/TodoModular/README.md), [iOS](../Samples/TodoModular/iOS/README.md), [Web](../Samples/TodoModular/Web/README.md), [Android](../Samples/TodoModular/Android/README.md)
 
 ### 웹 샘플의 Wasm 크기
 

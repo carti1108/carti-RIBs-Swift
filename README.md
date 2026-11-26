@@ -44,7 +44,13 @@ scripts/check-api.sh   # 공개 API 덤프 비교(macOS)
 | 웹 (Wasm) | [Samples/WebLogin](Samples/WebLogin/README.md) | `RIBsWeb` |
 | Android (Compose) | [Samples/AndroidLogin](Samples/AndroidLogin/README.md) | `RIBsAndroid` |
 
-실행 방법과 구조는 각 샘플의 README에 있습니다.
+피처마다 Interface·Impl·Testing 모듈로 나누고 HTTP로 할 일 API를 부르는 큰 샘플도 있습니다.
+
+| 샘플 | 위치 | 플랫폼 |
+|---|---|---|
+| µFeature (TodoModular) | [Samples/TodoModular](Samples/TodoModular/README.md) | [iOS](Samples/TodoModular/iOS/README.md), [웹](Samples/TodoModular/Web/README.md), [Android](Samples/TodoModular/Android/README.md) |
+
+실행 방법과 구조는 각 샘플의 README에 있습니다. CI가 무엇을 검사하는지는 [빌드 문서](docs/building.md#ci)에 있습니다.
 
 ## 새 RIB 만들기
 
