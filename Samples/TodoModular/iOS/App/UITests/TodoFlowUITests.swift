@@ -95,8 +95,15 @@ final class TodoFlowUITests: XCTestCase {
         let title = app.staticTexts["detailTitle"]
         XCTAssertTrue(title.waitForExistence(timeout: timeout))
 
-        let leftEdge = app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0.5))
-        leftEdge.press(forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)))
+        // 화면 끝 제스처 영역(끝에서 약 20pt) 안쪽에서 시작해 천천히 민다. x가 정확히 0이거나 빠르게 밀면
+        // 부하가 큰 CI 시뮬레이터에서 뒤로 가기 제스처로 인식되지 않을 때가 있었다(PR #37 CI).
+        let leftEdge = app.coordinate(withNormalizedOffset: CGVector(dx: 0.02, dy: 0.5))
+        leftEdge.press(
+            forDuration: 0.1,
+            thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)),
+            withVelocity: .slow,
+            thenHoldForDuration: 0.1
+        )
 
         XCTAssertTrue(row.waitForExistence(timeout: timeout))
         XCTAssertFalse(title.exists)
