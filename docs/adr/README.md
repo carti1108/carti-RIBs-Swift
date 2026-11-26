@@ -35,5 +35,6 @@
 | [0031](ADR-0031-new-rib-platform-connection-templates.md) | 플랫폼 연결 코드는 빌드 때 생성하지 않고 `new-rib` 템플릿으로 한 번 만든다 | 채택 |
 | [0032](ADR-0032-sample-data-layer-with-foundation-essentials.md) | 샘플의 데이터 계층은 공유 모듈 `TodoData`에 두고, 이 모듈에만 FoundationEssentials를 허용한다 | 채택 (Web의 `?todoFailures=`와 "실제 전송 구현은 없다"는 ADR-0033으로 대체됨) |
 | [0033](ADR-0033-platform-http-transports.md) | 전송 계층은 플랫폼의 HTTP 스택으로 구현하고, Android는 Kotlin이 보내고 Swift가 결과를 받는다 | 채택 (요청 모델과 Android `start` 인자는 ADR-0034로 넓힘) |
-| [0034](ADR-0034-write-requests-auth-and-problem-details.md) | 쓰기 요청과 인증 헤더는 공유 코드가 만들고, 전송 계층은 메서드·헤더·본문을 그대로 보낸다 | 채택 |
+| [0034](ADR-0034-write-requests-auth-and-problem-details.md) | 쓰기 요청과 인증 헤더는 공유 코드가 만들고, 전송 계층은 메서드·헤더·본문을 그대로 보낸다 | 채택 (401 경로와 토큰 갱신은 ADR-0036으로 넓힘) |
 | [0035](ADR-0035-platform-input-as-view-action.md) | 클립보드·파일 같은 플랫폼 입력은 뷰가 다루고, 결과 하나만 `ViewAction`으로 넘긴다 | 채택 |
+| [0036](ADR-0036-unauthorized-path-and-token-refresh.md) | 401은 저장소 오류 `unauthorized`로 피처에 올리고, 토큰 갱신은 `BearerTokenTransport`가 한 번만 한다 | 채택 |

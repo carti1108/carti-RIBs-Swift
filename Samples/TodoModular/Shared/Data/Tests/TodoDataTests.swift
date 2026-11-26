@@ -70,6 +70,16 @@ struct RemoteTodoRepositoryTests {
         #expect(await task.value == .failure(.unavailable))
     }
 
+    /// 401은 피처가 다시 로그인으로 보낼 수 있게 따로 알린다.
+    @Test func unauthorizedStatusIsUnauthorized() async {
+        let task = load()
+        await runCurrent()
+
+        transport.respond(status: 401, json: #"{"title":"토큰 만료"}"#)
+
+        #expect(await task.value == .failure(.unauthorized))
+    }
+
     @Test func transportFailureIsUnavailable() async {
         let task = load()
         await runCurrent()

@@ -123,6 +123,11 @@ final class TodoListInteractor: PresentableInteractor<any TodoListPresentable>, 
                         $0.isLoading = false
                         $0.errorMessage = Self.loadError
                     }
+                case .unauthorized:
+                    // 다시 시도해도 같은 결과라 다시 시도 문구를 띄우지 않고 부모에게 넘긴다.
+                    guard !Task.isCancelled else { return }
+                    self?.update { $0.isLoading = false }
+                    self?.listener?.didRequireSignIn()
                 }
             }
         }

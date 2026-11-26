@@ -30,10 +30,12 @@ public final class FakeTodoListViewFactory: TodoListViewFactory {
 @MainActor
 public final class FakeTodoListListener: TodoListListener {
     public private(set) var selectedIDs: [Int64] = []
+    public private(set) var signInRequests = 0
 
     public init() {}
 
     public func didSelectTodo(id: Int64) { selectedIDs.append(id) }
+    public func didRequireSignIn() { signInRequests += 1 }
 }
 
 @MainActor

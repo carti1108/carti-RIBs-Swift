@@ -79,6 +79,8 @@ extension FeatureDemo: LoggedOutListener, LoggedInListener, TodoListListener, To
         todoListDependency.todoStore.toggle(id)
     }
 
+    func didRequireSignIn() { root.showEvent("didRequireSignIn()") }
+
     func didRequestCloseDetail() { root.showEvent("didRequestCloseDetail()") }
 }
 

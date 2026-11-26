@@ -118,6 +118,13 @@ final class LoggedInTests {
         #expect(listener.logoutRequests == 1)
     }
 
+    /// 목록이 다시 로그인이 필요하다고 알리면 로그아웃과 같은 경로로 보낸다.
+    @Test func signInRequiredByListRequestsLogout() throws {
+        try #require(listBuilder.listeners.first).didRequireSignIn()
+
+        #expect(listener.logoutRequests == 1)
+    }
+
     /// 타이머의 첫 알림(0초)은 이미 그린 값이라 다시 그리지 않는다.
     @Test func firstTickDoesNotRenderAgain() {
         #expect(view.states == [LoggedInViewState(userName: "carti", sessionSeconds: 0)])

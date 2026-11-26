@@ -43,4 +43,6 @@ final class TodoListExampleHarness: TodoListListener {
         lastEvent = "didSelectTodo(id: \(id))"
         dependency.todoStore.toggle(id)
     }
+
+    func didRequireSignIn() { lastEvent = "didRequireSignIn()" }
 }

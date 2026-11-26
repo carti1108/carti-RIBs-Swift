@@ -1,6 +1,6 @@
 import TodoCore
 
-/// API에서 할 일을 가져오는 저장소. 실패 이유는 피처가 쓰는 두 가지(취소, 지금 못 가져옴)로 줄인다.
+/// API에서 할 일을 가져오는 저장소. 실패 이유는 피처가 다르게 다루는 세 가지(취소, 지금 못 가져옴, 인증 거절)로 줄인다.
 @MainActor
 public final class RemoteTodoRepository: TodoRepository {
     private let client: TodoAPIClient
@@ -15,7 +15,8 @@ public final class RemoteTodoRepository: TodoRepository {
         } catch {
             switch error {
             case .cancelled: throw .cancelled
-            case .unreachable, .unauthorized, .conflict, .badStatus, .malformedBody: throw .unavailable
+            case .unauthorized: throw .unauthorized
+            case .unreachable, .conflict, .badStatus, .malformedBody: throw .unavailable
             }
         }
     }
