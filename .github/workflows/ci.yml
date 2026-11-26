@@ -1,5 +1,6 @@
 # 라이브러리·공유 샘플 코드의 빌드·테스트와 경계 검사(#6).
 # 웹 e2e, iOS 앱 UI 테스트, Android 에뮬레이터 계측 테스트까지 돌린다.
+# 바뀐 경로에 따라 필요한 잡만 돈다(changes 잡). 문서만 바뀌면 changes 잡 하나로 끝난다.
 name: CI
 
 on:
@@ -12,8 +13,68 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # 바뀐 경로로 돌릴 잡을 정한다. 라이브러리(`Sources` 등)와 워크플로가 바뀌면 모든 잡이 돈다.
+  # 문서(`docs/**`, `*.md`)와 `Spikes/**`는 어느 필터에도 없어 아무 잡도 돌리지 않는다.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      boundaries: ${{ steps.filter.outputs.boundaries }}
+      library: ${{ steps.filter.outputs.library }}
+      api: ${{ steps.filter.outputs.api }}
+      shared: ${{ steps.filter.outputs.shared }}
+      web: ${{ steps.filter.outputs.web }}
+      ios: ${{ steps.filter.outputs.ios }}
+      android: ${{ steps.filter.outputs.android }}
+    steps:
+      - uses: actions/checkout@v7
+      - id: filter
+        uses: dorny/paths-filter@v4
+        with:
+          filters: |
+            all: &all
+              - '.github/**'
+              - 'Package.swift'
+              - 'Sources/**'
+              - 'Plugins/**'
+            library:
+              - *all
+              - 'Tests/**'
+              - 'Samples/LoginShared/**'
+            api:
+              - *all
+              - 'api/**'
+              - 'scripts/check-api.sh'
+            boundaries:
+              - *all
+              - 'Samples/**'
+              - 'scripts/check-sample-boundaries.sh'
+            shared:
+              - *all
+              - 'Samples/TodoModular/Shared/**'
+            web:
+              - *all
+              - 'Samples/LoginShared/**'
+              - 'Samples/TodoModular/Shared/**'
+              - 'Samples/TodoModular/Web/**'
+              - 'Samples/WebLogin/**'
+            ios:
+              - *all
+              - 'Samples/LoginShared/**'
+              - 'Samples/TodoModular/Shared/**'
+              - 'Samples/TodoModular/iOS/**'
+              - 'Samples/iOSLogin/**'
+            android:
+              - *all
+              - 'Samples/LoginShared/**'
+              - 'Samples/TodoModular/Shared/**'
+              - 'Samples/TodoModular/Android/**'
+              - 'Samples/AndroidLogin/**'
+
   # 빌드가 필요 없는 검사. 어느 호스트에서나 돈다.
   boundaries:
+    needs: changes
+    if: needs.changes.outputs.boundaries == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -32,6 +93,8 @@ jobs:
           fi
 
   linux:
+    needs: changes
+    if: needs.changes.outputs.library == 'true' || needs.changes.outputs.shared == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     container: swift:6.4.2
@@ -46,6 +109,8 @@ jobs:
   # 공개 API 덤프 비교(ADR-0011). 덤프 표현은 Xcode의 Swift 버전에 따라 달라질 수 있어(docs/building.md)
   # 덤프를 만든 Xcode와 러너의 Xcode가 다르면 API가 같아도 실패한다.
   macos:
+    needs: changes
+    if: needs.changes.outputs.library == 'true' || needs.changes.outputs.api == 'true'
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -60,6 +125,8 @@ jobs:
   # 웹 샘플(TodoModular, WebLogin)의 Wasm 빌드와 e2e. docs/building.md "WSL에서 빌드"와 같은 구성이다.
   # Puppeteer의 Chrome은 root로 뜨지 않아 swift 컨테이너 대신 러너(일반 사용자)에 툴체인을 설치한다.
   web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
@@ -95,6 +162,8 @@ jobs:
 
   # iOS 샘플(TodoModular, iOSLogin). Tuist로 프로젝트를 만들고 시뮬레이터에서 UI 테스트를 돌린다.
   ios:
+    needs: changes
+    if: needs.changes.outputs.ios == 'true'
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
@@ -151,6 +220,8 @@ jobs:
 
   # Android 샘플(TodoModular, AndroidLogin). Swift 호스트 테스트 뒤 x86_64 에뮬레이터에서 계측 테스트를 돌린다.
   android:
+    needs: changes
+    if: needs.changes.outputs.android == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
