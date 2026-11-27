@@ -18,16 +18,31 @@ object TodoDetailTags {
     const val DETAIL_TITLE = "detailTitle"
     const val TOGGLE_DONE_BUTTON = "toggleDoneButton"
     const val BACK_BUTTON = "backButton"
+    const val NOTICE = "detailNoticeLabel"
 }
 
 /** 뒤로 버튼은 닫기를 요청만 한다. */
 @Composable
-fun TodoDetailView(title: String, isDone: Boolean, onBack: () -> Unit, onToggleDone: () -> Unit) {
+fun TodoDetailView(
+    title: String,
+    isDone: Boolean,
+    onBack: () -> Unit,
+    onToggleDone: () -> Unit,
+    notice: String? = null,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         TextButton(onClick = onBack, modifier = Modifier.testTag(TodoDetailTags.BACK_BUTTON)) { Text("← 목록") }
         Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.testTag(TodoDetailTags.DETAIL_TITLE))
         Button(onClick = onToggleDone, modifier = Modifier.testTag(TodoDetailTags.TOGGLE_DONE_BUTTON)) {
             Text(if (isDone) "완료 취소" else "완료로 표시")
+        }
+        if (notice != null) {
+            Text(
+                notice,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.testTag(TodoDetailTags.NOTICE),
+            )
         }
     }
 }

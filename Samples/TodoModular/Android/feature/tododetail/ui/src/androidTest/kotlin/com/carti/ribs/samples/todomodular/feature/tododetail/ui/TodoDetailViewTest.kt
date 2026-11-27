@@ -25,9 +25,25 @@ class TodoDetailViewTest {
 
         compose.onNodeWithTag(TodoDetailTags.DETAIL_TITLE).assertTextEquals("우유 사기")
         compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).assertTextEquals("완료 취소")
+        compose.onNodeWithTag(TodoDetailTags.NOTICE).assertDoesNotExist()
         compose.onNodeWithTag(TodoDetailTags.TOGGLE_DONE_BUTTON).performClick()
         compose.onNodeWithTag(TodoDetailTags.BACK_BUTTON).performClick()
 
         assertEquals(listOf("toggle", "back"), events)
+    }
+
+    @Test
+    fun showsNoticeWhenPresent() {
+        compose.setContent {
+            TodoDetailView(
+                title = "우유 사기",
+                isDone = false,
+                onBack = {},
+                onToggleDone = {},
+                notice = "제목을 복사했습니다",
+            )
+        }
+
+        compose.onNodeWithTag(TodoDetailTags.NOTICE).assertTextEquals("제목을 복사했습니다")
     }
 }

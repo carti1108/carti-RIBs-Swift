@@ -19,10 +19,13 @@ private class TodoDetailAdapter : TodoDetailViewBridge {
         private set
     var isDone: Boolean by mutableStateOf(false)
         private set
+    var notice: String? by mutableStateOf(null)
+        private set
 
     override fun render(title: String, isDone: Boolean, notice: java.util.Optional<String>) {
         this.title = title
         this.isDone = isDone
+        this.notice = notice.orElse(null)
     }
 }
 
@@ -39,5 +42,6 @@ fun TodoDetailScreen(screenId: Long) {
         isDone = adapter.isDone,
         onBack = handle::backTapped,
         onToggleDone = handle::toggleDoneTapped,
+        notice = adapter.notice,
     )
 }

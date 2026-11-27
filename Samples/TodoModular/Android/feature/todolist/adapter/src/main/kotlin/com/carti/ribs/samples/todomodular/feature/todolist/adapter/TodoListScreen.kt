@@ -27,6 +27,8 @@ private class TodoListAdapter : TodoListViewBridge {
         private set
     var errorMessage: String? by mutableStateOf(null)
         private set
+    var notice: String? by mutableStateOf(null)
+        private set
     var handle: TodoListScreenHandle? = null
 
     override fun render(
@@ -36,6 +38,7 @@ private class TodoListAdapter : TodoListViewBridge {
     ) {
         this.isLoading = isLoading
         this.errorMessage = errorMessage.orElse(null)
+        this.notice = notice.orElse(null)
     }
 
     /** `TodoListTodo`는 Swift 메모리를 가리키므로 값을 복사한 뒤 바로 arena를 닫는다. */
@@ -66,6 +69,7 @@ fun TodoListScreen(screenId: Long) {
         onSelect = handle::todoTapped,
         isLoading = adapter.isLoading,
         errorMessage = adapter.errorMessage,
+        notice = adapter.notice,
         onRetry = handle::retryTapped,
     )
 }

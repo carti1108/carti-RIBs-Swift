@@ -19,6 +19,7 @@ object TodoListTags {
     const val LOADING: String = "todoLoadingIndicator"
     const val ERROR: String = "todoErrorLabel"
     const val RETRY: String = "todoRetryButton"
+    const val NOTICE: String = "todoNoticeLabel"
 
     fun todoRow(id: Long): String = "todoRow-$id"
 }
@@ -32,6 +33,7 @@ fun TodoListView(
     onSelect: (Long) -> Unit,
     isLoading: Boolean = false,
     errorMessage: String? = null,
+    notice: String? = null,
     onRetry: () -> Unit = {},
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -41,6 +43,14 @@ fun TodoListView(
         if (errorMessage != null) {
             Text(errorMessage, color = MaterialTheme.colorScheme.error, modifier = Modifier.testTag(TodoListTags.ERROR))
             OutlinedButton(onClick = onRetry, modifier = Modifier.testTag(TodoListTags.RETRY)) { Text("다시 시도") }
+        }
+        if (notice != null) {
+            Text(
+                notice,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.testTag(TodoListTags.NOTICE),
+            )
         }
         for (todo in todos) {
             TextButton(onClick = { onSelect(todo.id) }, modifier = Modifier.testTag(TodoListTags.todoRow(todo.id))) {

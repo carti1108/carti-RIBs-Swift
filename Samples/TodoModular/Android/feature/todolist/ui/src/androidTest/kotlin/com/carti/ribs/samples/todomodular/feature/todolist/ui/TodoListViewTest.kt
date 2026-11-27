@@ -48,5 +48,15 @@ class TodoListViewTest {
 
         compose.onNodeWithTag(TodoListTags.LOADING).assertExists()
         compose.onNodeWithTag(TodoListTags.ERROR).assertDoesNotExist()
+        compose.onNodeWithTag(TodoListTags.NOTICE).assertDoesNotExist()
+    }
+
+    @Test
+    fun showsNoticeWhenPresent() {
+        compose.setContent {
+            TodoListView(todos = emptyList(), notice = "2건을 가져왔습니다", onSelect = {})
+        }
+
+        compose.onNodeWithTag(TodoListTags.NOTICE).assertTextEquals("2건을 가져왔습니다")
     }
 }
