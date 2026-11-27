@@ -5,7 +5,7 @@ import FeatureTodoDetailInterface
 import FeatureTodoListInterface
 import TodoCore
 
-public enum BridgeJSONError: Error {
+enum BridgeJSONError: Error {
     case invalidJSON
     case expectedObject(String)
     case expectedString(String)
@@ -274,7 +274,7 @@ private func encodeLoggedInViewState(_ value: LoggedInViewState, into writer: in
     writer.endObject()
 }
 
-public func encodeLoggedInViewStateJSON(_ value: LoggedInViewState) -> String {
+func encodeLoggedInViewStateJSON(_ value: LoggedInViewState) -> String {
     var writer = BridgeJSONWriter()
     encodeLoggedInViewState(value, into: &writer)
     return writer.result
@@ -289,7 +289,7 @@ private func decodeLoggedInViewAction(from json: BridgeJSONValue) throws -> Logg
     }
 }
 
-public func decodeLoggedInViewActionJSON(_ json: String) throws -> LoggedInViewAction {
+func decodeLoggedInViewActionJSON(_ json: String) throws -> LoggedInViewAction {
     let value = try BridgeJSONParser.parse(json)
     return try decodeLoggedInViewAction(from: value)
 }
@@ -303,7 +303,7 @@ private func encodeLoggedOutViewState(_ value: LoggedOutViewState, into writer: 
     writer.endObject()
 }
 
-public func encodeLoggedOutViewStateJSON(_ value: LoggedOutViewState) -> String {
+func encodeLoggedOutViewStateJSON(_ value: LoggedOutViewState) -> String {
     var writer = BridgeJSONWriter()
     encodeLoggedOutViewState(value, into: &writer)
     return writer.result
@@ -321,7 +321,7 @@ private func decodeLoggedOutViewAction(from json: BridgeJSONValue) throws -> Log
     }
 }
 
-public func decodeLoggedOutViewActionJSON(_ json: String) throws -> LoggedOutViewAction {
+func decodeLoggedOutViewActionJSON(_ json: String) throws -> LoggedOutViewAction {
     let value = try BridgeJSONParser.parse(json)
     return try decodeLoggedOutViewAction(from: value)
 }
@@ -337,7 +337,7 @@ private func encodeTodoDetailViewState(_ value: TodoDetailViewState, into writer
     writer.endObject()
 }
 
-public func encodeTodoDetailViewStateJSON(_ value: TodoDetailViewState) -> String {
+func encodeTodoDetailViewStateJSON(_ value: TodoDetailViewState) -> String {
     var writer = BridgeJSONWriter()
     encodeTodoDetailViewState(value, into: &writer)
     return writer.result
@@ -357,7 +357,7 @@ private func decodeTodoDetailViewAction(from json: BridgeJSONValue) throws -> To
     }
 }
 
-public func decodeTodoDetailViewActionJSON(_ json: String) throws -> TodoDetailViewAction {
+func decodeTodoDetailViewActionJSON(_ json: String) throws -> TodoDetailViewAction {
     let value = try BridgeJSONParser.parse(json)
     return try decodeTodoDetailViewAction(from: value)
 }
@@ -375,7 +375,7 @@ private func encodeTodoListViewState(_ value: TodoListViewState, into writer: in
     writer.endObject()
 }
 
-public func encodeTodoListViewStateJSON(_ value: TodoListViewState) -> String {
+func encodeTodoListViewStateJSON(_ value: TodoListViewState) -> String {
     var writer = BridgeJSONWriter()
     encodeTodoListViewState(value, into: &writer)
     return writer.result
@@ -398,7 +398,7 @@ private func decodeTodoListViewAction(from json: BridgeJSONValue) throws -> Todo
     }
 }
 
-public func decodeTodoListViewActionJSON(_ json: String) throws -> TodoListViewAction {
+func decodeTodoListViewActionJSON(_ json: String) throws -> TodoListViewAction {
     let value = try BridgeJSONParser.parse(json)
     return try decodeTodoListViewAction(from: value)
 }

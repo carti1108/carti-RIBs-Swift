@@ -13,30 +13,34 @@ function ChildSlot({ content }: { content: Element }) {
   return <div ref={slot} />;
 }
 
-type Mounted = { content: Element; handle: ChannelHandle };
-
 function send(handle: ChannelHandle, action: LoggedInViewAction): void {
   handle.dispatch(JSON.stringify(action));
 }
 
 /** 어댑터(ADR-0027). 단일 채널 `ChannelViewBridge`를 구현하고 생성 타입을 순수 뷰에 넘긴다. */
 export class LoggedInAdapter implements ChannelViewBridge {
-  #screen = new ReactScreen<Mounted>();
+  #screen = new ReactScreen<ChannelHandle>();
+  #content: Element | null = null;
 
-  mount(host: Element, content: Element | null, handle: ChannelHandle): void {
-    if (!content) throw new Error("LoggedInAdapter requires a child content element");
-    this.#screen.mount(host, { content, handle });
+  mount(host: Element, handle: ChannelHandle): void {
+    this.#content = null;
+    this.#screen.mount(host, handle);
+  }
+
+  setContent(content: Element): void {
+    this.#content = content;
   }
 
   render(stateJSON: string): void {
     const state = JSON.parse(stateJSON) as LoggedInViewState;
-    this.#screen.render(({ content, handle }) => (
+    const content = this.#content;
+    this.#screen.render((handle) => (
       <LoggedInView
         userName={state.userName}
         sessionSeconds={state.sessionSeconds}
         onLogout={() => send(handle, { kind: "logoutTapped" })}
       >
-        <ChildSlot content={content} />
+        {content ? <ChildSlot content={content} /> : null}
       </LoggedInView>
     ));
   }

@@ -35,7 +35,7 @@ public enum SwiftChannelGenerator {
                 into: &lines
             )
             lines.append("")
-            lines.append("public func encode\(feature.stateTypeName)JSON(_ value: \(feature.stateTypeName)) -> String {")
+            lines.append("func encode\(feature.stateTypeName)JSON(_ value: \(feature.stateTypeName)) -> String {")
             lines.append("    var writer = BridgeJSONWriter()")
             lines.append("    encode\(feature.stateTypeName)(value, into: &writer)")
             lines.append("    return writer.result")
@@ -50,7 +50,7 @@ public enum SwiftChannelGenerator {
                 into: &lines
             )
             lines.append("")
-            lines.append("public func decode\(feature.actionTypeName)JSON(_ json: String) throws -> \(feature.actionTypeName) {")
+            lines.append("func decode\(feature.actionTypeName)JSON(_ json: String) throws -> \(feature.actionTypeName) {")
             lines.append("    let value = try BridgeJSONParser.parse(json)")
             lines.append("    return try decode\(feature.actionTypeName)(from: value)")
             lines.append("}")
@@ -237,7 +237,7 @@ public enum SwiftChannelGenerator {
 }
 
 private let runtimeJSONHelpers = #"""
-public enum BridgeJSONError: Error {
+enum BridgeJSONError: Error {
     case invalidJSON
     case expectedObject(String)
     case expectedString(String)

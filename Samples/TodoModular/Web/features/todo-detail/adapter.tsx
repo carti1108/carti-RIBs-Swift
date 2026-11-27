@@ -11,9 +11,11 @@ function send(handle: ChannelHandle, action: TodoDetailViewAction): void {
 export class TodoDetailAdapter implements ChannelViewBridge {
   #screen = new ReactScreen<ChannelHandle>();
 
-  mount(host: Element, _content: Element | null, handle: ChannelHandle): void {
+  mount(host: Element, handle: ChannelHandle): void {
     this.#screen.mount(host, handle);
   }
+
+  setContent(_content: Element): void {}
 
   render(stateJSON: string): void {
     const state = JSON.parse(stateJSON) as TodoDetailViewState;

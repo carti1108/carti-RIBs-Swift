@@ -41,8 +41,8 @@ struct BridgeGenTests {
         )
 
         let swiftCode = SwiftChannelGenerator.generate(schema: schema)
-        #expect(swiftCode.contains("public func encodeTodoListViewStateJSON(_ value: TodoListViewState) -> String"))
-        #expect(swiftCode.contains("public func decodeTodoListViewActionJSON(_ json: String) throws -> TodoListViewAction"))
+        #expect(swiftCode.contains("func encodeTodoListViewStateJSON(_ value: TodoListViewState) -> String"))
+        #expect(swiftCode.contains("func decodeTodoListViewActionJSON(_ json: String) throws -> TodoListViewAction"))
 
         let tsCode = TypeScriptGenerator.generate(schema: schema)
         #expect(tsCode.contains("export type Todo = {"))

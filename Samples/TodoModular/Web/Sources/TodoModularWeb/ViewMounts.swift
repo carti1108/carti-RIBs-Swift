@@ -14,7 +14,7 @@ enum ViewMounts {
                 guard let action = try? decodeLoggedOutViewActionJSON(json) else { return }
                 screen?.send(action)
             }
-            view.mount(host: screen.element, content: nil, handle: handle)
+            view.mount(host: screen.element, handle: handle)
             screen.attach { view.render(stateJSON: encodeLoggedOutViewStateJSON($0)) }
         }
     }
@@ -25,7 +25,8 @@ enum ViewMounts {
                 guard let action = try? decodeLoggedInViewActionJSON(json) else { return }
                 screen?.send(action)
             }
-            view.mount(host: screen.element, content: screen.content, handle: handle)
+            view.mount(host: screen.element, handle: handle)
+            view.setContent(content: screen.content)
             screen.attach { view.render(stateJSON: encodeLoggedInViewStateJSON($0)) }
         }
     }
@@ -36,7 +37,7 @@ enum ViewMounts {
                 guard let action = try? decodeTodoListViewActionJSON(json) else { return }
                 screen?.send(action)
             }
-            view.mount(host: screen.element, content: nil, handle: handle)
+            view.mount(host: screen.element, handle: handle)
             screen.attach { view.render(stateJSON: encodeTodoListViewStateJSON($0)) }
         }
     }
@@ -47,7 +48,7 @@ enum ViewMounts {
                 guard let action = try? decodeTodoDetailViewActionJSON(json) else { return }
                 screen?.send(action)
             }
-            view.mount(host: screen.element, content: nil, handle: handle)
+            view.mount(host: screen.element, handle: handle)
             screen.attach { view.render(stateJSON: encodeTodoDetailViewStateJSON($0)) }
         }
     }
