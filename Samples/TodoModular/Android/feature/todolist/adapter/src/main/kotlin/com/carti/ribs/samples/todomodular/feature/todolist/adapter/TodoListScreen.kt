@@ -29,16 +29,20 @@ private class TodoListAdapter : TodoListViewBridge {
         private set
     var handle: TodoListScreenHandle? = null
 
-    override fun render(isLoading: Boolean, errorMessage: java.util.Optional<String>) {
+    override fun render(
+        isLoading: Boolean,
+        errorMessage: java.util.Optional<String>,
+        notice: java.util.Optional<String>,
+    ) {
         this.isLoading = isLoading
         this.errorMessage = errorMessage.orElse(null)
     }
 
-    /** `TodoListRow`는 Swift 메모리를 가리키므로 값을 복사한 뒤 바로 arena를 닫는다. */
-    override fun rowsChanged() {
+    /** `TodoListTodo`는 Swift 메모리를 가리키므로 값을 복사한 뒤 바로 arena를 닫는다. */
+    override fun todosChanged() {
         val handle = handle ?: return
         todos = SwiftArena.ofConfined().use { arena ->
-            handle.rows(arena).map { TodoItem(it.id, it.title, it.isDone) }
+            handle.todos(arena).map { TodoItem(it.id, it.title, it.isDone) }
         }
     }
 }

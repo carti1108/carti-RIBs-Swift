@@ -1,5 +1,5 @@
 import { ReactScreen } from "../../support/react-screen";
-import type { TodoListRow, TodoListScreenHandle, TodoListViewBridge } from "../../support/swift";
+import type { TodoListScreenHandle, TodoListTodo, TodoListViewBridge } from "../../support/swift";
 import { TodoListView } from "./view";
 
 /** 어댑터(ADR-0027). Swift `TodoListViewBridge`(Sources/TodoModularWeb/TodoListBridge.swift)를 구현하고 값을 순수 뷰에 넘긴다. */
@@ -10,8 +10,8 @@ export class TodoListAdapter implements TodoListViewBridge {
     this.#screen.mount(host, handle);
   }
 
-  render(rows: TodoListRow[], isLoading: boolean, errorMessage: string | null, notice: string | null): void {
-    const items = rows.map(({ id, title, isDone }) => ({ id, title, isDone }));
+  render(todos: TodoListTodo[], isLoading: boolean, errorMessage: string | null, notice: string | null): void {
+    const items = todos.map(({ id, title, isDone }) => ({ id, title, isDone }));
     this.#screen.render((handle) => (
       <TodoListView
         items={items}

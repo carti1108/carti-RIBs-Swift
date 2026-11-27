@@ -20,7 +20,7 @@ private class TodoDetailAdapter : TodoDetailViewBridge {
     var isDone: Boolean by mutableStateOf(false)
         private set
 
-    override fun render(title: String, isDone: Boolean) {
+    override fun render(title: String, isDone: Boolean, notice: java.util.Optional<String>) {
         this.title = title
         this.isDone = isDone
     }
