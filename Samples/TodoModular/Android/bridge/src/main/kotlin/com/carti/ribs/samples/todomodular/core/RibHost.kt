@@ -163,6 +163,28 @@ object HostTags {
 }
 
 /**
+ * 단일 채널로 화면 상태를 구독하고 컴포지션을 떠날 때 뗀다.
+ */
+@Composable
+fun <State> rememberChannelState(
+    screenId: Long,
+    kind: String,
+    initial: State,
+    decode: (JSONObject) -> State,
+): State {
+    var state by remember(screenId, kind) { mutableStateOf(initial) }
+    DisposableEffect(screenId, kind) {
+        SwiftBridge.attachScreen(screenId, kind) { json ->
+            state = decode(JSONObject(json))
+        }
+        onDispose {
+            SwiftBridge.detachScreen(screenId, kind)
+        }
+    }
+    return state
+}
+
+/**
  * 화면 핸들을 만들어 뷰를 붙이고, 화면이 컴포지션을 떠날 때 떼고 핸들의 Swift 메모리(arena)를 푼다.
  * 핸들 타입마다 `init`·`attach`·`detach`가 따로 생성되므로 함수로 받는다. 피처 어댑터 모듈이 쓴다.
  */

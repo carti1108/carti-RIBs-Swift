@@ -1,24 +1,30 @@
 import { ReactScreen } from "../../support/react-screen";
-import type { TodoDetailScreenHandle, TodoDetailViewBridge } from "../../support/swift";
+import type { ChannelHandle, ChannelViewBridge } from "../../support/swift";
+import type { TodoDetailViewAction, TodoDetailViewState } from "../../support/generated/view-state";
 import { TodoDetailView } from "./view";
 
-/** 어댑터(ADR-0027). Swift `TodoDetailViewBridge`(Sources/TodoModularWeb/TodoDetailBridge.swift)를 구현하고 값을 순수 뷰에 넘긴다. */
-export class TodoDetailAdapter implements TodoDetailViewBridge {
-  #screen = new ReactScreen<TodoDetailScreenHandle>();
+function send(handle: ChannelHandle, action: TodoDetailViewAction): void {
+  handle.dispatch(JSON.stringify(action));
+}
 
-  mount(host: Element, handle: TodoDetailScreenHandle): void {
+/** 어댑터(ADR-0027). 단일 채널 `ChannelViewBridge`를 구현하고 생성 타입을 순수 뷰에 넘긴다. */
+export class TodoDetailAdapter implements ChannelViewBridge {
+  #screen = new ReactScreen<ChannelHandle>();
+
+  mount(host: Element, _content: Element | null, handle: ChannelHandle): void {
     this.#screen.mount(host, handle);
   }
 
-  render(title: string, isDone: boolean, notice: string | null): void {
+  render(stateJSON: string): void {
+    const state = JSON.parse(stateJSON) as TodoDetailViewState;
     this.#screen.render((handle) => (
       <TodoDetailView
-        title={title}
-        isDone={isDone}
-        notice={notice}
-        onBack={() => handle.backTapped()}
-        onToggleDone={() => handle.toggleDoneTapped()}
-        onTitleCopied={(succeeded) => handle.titleCopied(succeeded)}
+        title={state.title}
+        isDone={state.isDone}
+        notice={state.notice}
+        onBack={() => send(handle, { kind: "backTapped" })}
+        onToggleDone={() => send(handle, { kind: "toggleDoneTapped" })}
+        onTitleCopied={(succeeded) => send(handle, { kind: "titleCopied", succeeded })}
       />
     ));
   }

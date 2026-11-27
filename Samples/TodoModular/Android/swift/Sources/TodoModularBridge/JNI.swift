@@ -23,6 +23,7 @@ nonisolated(unsafe) private var javaVM: UnsafeMutablePointer<JavaVM?>?
 private struct RenderTarget: @unchecked Sendable {
     let bridgeClass: jclass
     let onRender: jmethodID
+    let onScreenState: jmethodID
 }
 
 @_cdecl("JNI_OnLoad")
@@ -107,6 +108,39 @@ public func nativeStop(env: Env, thiz: jobject) {
     if let target { env.pointee!.pointee.DeleteGlobalRef(env, target.bridgeClass) }
 }
 
+@_cdecl("Java_com_carti_ribs_samples_todomodular_core_SwiftBridge_nativeAttachScreen")
+public func nativeAttachScreen(env: Env, thiz: jobject, screenID: jlong, kind: jbyteArray) {
+    let screenKind = string(env, from: kind)
+    MainActor.assumeIsolated {
+        AndroidScreenChannel.attach(screenID: Int64(screenID), kind: screenKind) { stateJSON in
+            sendScreenStateToKotlin(screenID: Int64(screenID), stateJSON: stateJSON)
+        }
+    }
+}
+
+@_cdecl("Java_com_carti_ribs_samples_todomodular_core_SwiftBridge_nativeDetachScreen")
+public func nativeDetachScreen(env: Env, thiz: jobject, screenID: jlong, kind: jbyteArray) {
+    let screenKind = string(env, from: kind)
+    MainActor.assumeIsolated {
+        AndroidScreenChannel.detach(screenID: Int64(screenID), kind: screenKind)
+    }
+}
+
+@_cdecl("Java_com_carti_ribs_samples_todomodular_core_SwiftBridge_nativeDispatchAction")
+public func nativeDispatchAction(
+    env: Env,
+    thiz: jobject,
+    screenID: jlong,
+    kind: jbyteArray,
+    actionJson: jbyteArray
+) {
+    let screenKind = string(env, from: kind)
+    let json = string(env, from: actionJson)
+    MainActor.assumeIsolated {
+        AndroidScreenChannel.dispatch(screenID: Int64(screenID), kind: screenKind, actionJSON: json)
+    }
+}
+
 // MARK: - Kotlin 호출
 
 private func makeRenderTarget(_ env: Env) -> RenderTarget {
@@ -116,9 +150,10 @@ private func makeRenderTarget(_ env: Env) -> RenderTarget {
     }
     defer { jni.DeleteLocalRef(env, localClass) }
     guard let method = jni.GetStaticMethodID(env, localClass, "onRender", "([B)V"),
+          let screenStateMethod = jni.GetStaticMethodID(env, localClass, "onScreenState", "(J[B)V"),
           let globalClass = jni.NewGlobalRef(env, localClass)
-    else { preconditionFailure("JNI method not found: \(bridgeClassName).onRender([B)V") }
-    return RenderTarget(bridgeClass: globalClass, onRender: method)
+    else { preconditionFailure("JNI method not found on \(bridgeClassName)") }
+    return RenderTarget(bridgeClass: globalClass, onRender: method, onScreenState: screenStateMethod)
 }
 
 /// 렌더러가 트리를 그릴 때마다 메인 스레드에서 불린다.
@@ -133,6 +168,19 @@ private func sendToKotlin(_ tree: String) {
         // Kotlin 예외를 삼키지 않는다. 내용을 logcat에 남기고 앱을 멈춘다.
         env.pointee!.pointee.ExceptionDescribe(env)
         preconditionFailure("SwiftBridge.onRender threw")
+    }
+}
+
+@MainActor
+private func sendScreenStateToKotlin(screenID: Int64, stateJSON: String) {
+    guard let target = renderTarget, let env = currentEnv() else { return }
+    guard let bytes = byteArray(env, from: stateJSON) else { return }
+    defer { env.pointee!.pointee.DeleteLocalRef(env, bytes) }
+    var arguments = [jvalue(j: jlong(screenID)), jvalue(l: bytes)]
+    env.pointee!.pointee.CallStaticVoidMethodA(env, target.bridgeClass, target.onScreenState, &arguments)
+    if env.pointee!.pointee.ExceptionCheck(env) == jboolean(JNI_TRUE) {
+        env.pointee!.pointee.ExceptionDescribe(env)
+        preconditionFailure("SwiftBridge.onScreenState threw")
     }
 }
 

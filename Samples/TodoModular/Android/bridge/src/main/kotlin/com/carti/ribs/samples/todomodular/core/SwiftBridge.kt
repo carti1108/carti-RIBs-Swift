@@ -16,6 +16,7 @@ import org.swift.swiftkit.core.SwiftArena
  */
 object SwiftBridge {
     private var renderListener: ((String) -> Unit)? = null
+    private val screenListeners = mutableMapOf<Long, (String) -> Unit>()
 
     init {
         // 메인 큐를 붙이는 Looper는 호출 스레드의 Looper다. UI 스레드가 아니면 Swift @MainActor 작업이 엉뚱한 스레드에서 돈다.
@@ -63,7 +64,26 @@ object SwiftBridge {
     fun stop() {
         nativeStop()
         renderListener = null
+        screenListeners.clear()
         uninstallHttpTransport()
+    }
+
+    fun attachScreen(screenId: Long, kind: String, onState: (String) -> Unit) {
+        screenListeners[screenId] = onState
+        nativeAttachScreen(screenId, kind.toByteArray(Charsets.UTF_8))
+    }
+
+    fun detachScreen(screenId: Long, kind: String) {
+        screenListeners.remove(screenId)
+        nativeDetachScreen(screenId, kind.toByteArray(Charsets.UTF_8))
+    }
+
+    fun dispatchAction(screenId: Long, kind: String, actionJson: String) {
+        nativeDispatchAction(
+            screenId,
+            kind.toByteArray(Charsets.UTF_8),
+            actionJson.toByteArray(Charsets.UTF_8),
+        )
     }
 
     /**
@@ -93,6 +113,12 @@ object SwiftBridge {
         renderListener?.invoke(tree.toString(Charsets.UTF_8))
     }
 
+    /** Swift가 단일 채널 상태 갱신 시 JNI로 부른다. */
+    @JvmStatic
+    fun onScreenState(screenId: Long, stateJson: ByteArray) {
+        screenListeners[screenId]?.invoke(stateJson.toString(Charsets.UTF_8))
+    }
+
     private external fun nativeAttachMainLooper(): Boolean
     private external fun nativeIsMainQueueDraining(): Boolean
     private external fun nativeStart(savedState: ByteArray?, loginDelayMillis: Long): Boolean
@@ -100,4 +126,7 @@ object SwiftBridge {
     private external fun nativeHandleBackPress(): Boolean
     private external fun nativeSaveState(): ByteArray?
     private external fun nativeStop()
+    private external fun nativeAttachScreen(screenId: Long, kind: ByteArray)
+    private external fun nativeDetachScreen(screenId: Long, kind: ByteArray)
+    private external fun nativeDispatchAction(screenId: Long, kind: ByteArray, actionJson: ByteArray)
 }

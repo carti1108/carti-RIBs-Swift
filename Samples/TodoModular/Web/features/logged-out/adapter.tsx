@@ -1,21 +1,27 @@
 import { ReactScreen } from "../../support/react-screen";
-import type { LoggedOutScreenHandle, LoggedOutViewBridge } from "../../support/swift";
+import type { ChannelHandle, ChannelViewBridge } from "../../support/swift";
+import type { LoggedOutViewAction, LoggedOutViewState } from "../../support/generated/view-state";
 import { LoggedOutView } from "./view";
 
-/** 어댑터(ADR-0027). Swift `LoggedOutViewBridge`(Sources/TodoModularWeb/LoggedOutBridge.swift)를 구현하고 값을 순수 뷰에 넘긴다. */
-export class LoggedOutAdapter implements LoggedOutViewBridge {
-  #screen = new ReactScreen<LoggedOutScreenHandle>();
+function send(handle: ChannelHandle, action: LoggedOutViewAction): void {
+  handle.dispatch(JSON.stringify(action));
+}
 
-  mount(host: Element, handle: LoggedOutScreenHandle): void {
+/** 어댑터(ADR-0027). 단일 채널 `ChannelViewBridge`를 구현하고 생성 타입을 순수 뷰에 넘긴다. */
+export class LoggedOutAdapter implements ChannelViewBridge {
+  #screen = new ReactScreen<ChannelHandle>();
+
+  mount(host: Element, _content: Element | null, handle: ChannelHandle): void {
     this.#screen.mount(host, handle);
   }
 
-  render(errorMessage: string | null, isLoading: boolean): void {
+  render(stateJSON: string): void {
+    const state = JSON.parse(stateJSON) as LoggedOutViewState;
     this.#screen.render((handle) => (
       <LoggedOutView
-        errorMessage={errorMessage}
-        isLoading={isLoading}
-        onLogin={(rawName) => handle.loginTapped(rawName)}
+        errorMessage={state.errorMessage}
+        isLoading={state.isLoading}
+        onLogin={(rawName) => send(handle, { kind: "loginTapped", rawName })}
       />
     ));
   }

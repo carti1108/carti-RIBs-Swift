@@ -5,10 +5,10 @@ import JavaScriptKit
 // 데모는 자기 피처의 뷰 하나만 받는다. 데모 페이지는 다른 피처의 JS를 불러오지 않는다.
 
 @JS func startTodoApp(
-    loggedOutView: any LoggedOutViewBridge,
-    loggedInView: any LoggedInViewBridge,
-    todoListView: any TodoListViewBridge,
-    todoDetailView: any TodoDetailViewBridge
+    loggedOutView: any ChannelViewBridge,
+    loggedInView: any ChannelViewBridge,
+    todoListView: any ChannelViewBridge,
+    todoDetailView: any ChannelViewBridge
 ) {
     nonisolated(unsafe) let (loggedOutView, loggedInView, todoListView, todoDetailView) =
         (loggedOutView, loggedInView, todoListView, todoDetailView)
@@ -22,22 +22,22 @@ import JavaScriptKit
     }
 }
 
-@JS func startLoggedOutDemo(view: any LoggedOutViewBridge) {
+@JS func startLoggedOutDemo(view: any ChannelViewBridge) {
     nonisolated(unsafe) let view = view
     MainActor.assumeIsolated { FeatureDemo.start { $0.loggedOut(ViewMounts.loggedOut(view)) } }
 }
 
-@JS func startLoggedInDemo(view: any LoggedInViewBridge) {
+@JS func startLoggedInDemo(view: any ChannelViewBridge) {
     nonisolated(unsafe) let view = view
     MainActor.assumeIsolated { FeatureDemo.start { $0.loggedIn(ViewMounts.loggedIn(view)) } }
 }
 
-@JS func startTodoListDemo(view: any TodoListViewBridge) {
+@JS func startTodoListDemo(view: any ChannelViewBridge) {
     nonisolated(unsafe) let view = view
     MainActor.assumeIsolated { FeatureDemo.start { $0.todoList(ViewMounts.todoList(view)) } }
 }
 
-@JS func startTodoDetailDemo(view: any TodoDetailViewBridge) {
+@JS func startTodoDetailDemo(view: any ChannelViewBridge) {
     nonisolated(unsafe) let view = view
     MainActor.assumeIsolated { FeatureDemo.start { $0.todoDetail(ViewMounts.todoDetail(view)) } }
 }
