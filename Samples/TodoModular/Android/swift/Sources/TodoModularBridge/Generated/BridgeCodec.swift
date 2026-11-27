@@ -285,11 +285,13 @@ func encodeLoggedInViewStateJSON(_ value: LoggedInViewState) -> String {
 }
 
 private func decodeLoggedInViewAction(from json: BridgeJSONValue) throws -> LoggedInViewAction {
-    guard case .string(let raw) = json else { throw BridgeJSONError.expectedString("LoggedInViewAction") }
-    switch raw {
+    guard case .object(let map) = json, case .string(let kind)? = map["kind"] else {
+        throw BridgeJSONError.expectedObject("LoggedInViewAction")
+    }
+    switch kind {
     case "logoutTapped": return .logoutTapped
     case "detailDismissedByUser": return .detailDismissedByUser
-    default: throw BridgeJSONError.unknownCase(raw)
+    default: throw BridgeJSONError.unknownCase(kind)
     }
 }
 

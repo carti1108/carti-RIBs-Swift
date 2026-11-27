@@ -47,6 +47,7 @@ public enum SwiftChannelGenerator {
                 swiftType: feature.actionTypeName,
                 spec: EnumSpec(fullName: feature.actionTypeName, simpleName: feature.actionTypeName, cases: feature.actions),
                 schema: schema,
+                forceTaggedObject: true,
                 into: &lines
             )
             lines.append("")
@@ -140,10 +141,11 @@ public enum SwiftChannelGenerator {
         swiftType: String,
         spec: EnumSpec,
         schema: BridgeSchema,
+        forceTaggedObject: Bool = false,
         into lines: inout [String]
     ) {
         lines.append("private func \(fnName)(from json: BridgeJSONValue) throws -> \(swiftType) {")
-        if spec.isSimple {
+        if spec.isSimple && !forceTaggedObject {
             lines.append("    guard case .string(let raw) = json else { throw BridgeJSONError.expectedString(\"\(swiftType)\") }")
             lines.append("    switch raw {")
             for c in spec.cases {
