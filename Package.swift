@@ -14,11 +14,14 @@ let package = Package(
         .library(name: "RIBsAndroid", targets: ["RIBsAndroid"]),
         .library(name: "LoginShared", targets: ["LoginShared"]),
         .plugin(name: "NewRib", targets: ["NewRib"]),
+        .plugin(name: "BridgeGen", targets: ["BridgeGen"]),
     ],
     dependencies: [
         // 문서 생성(`swift package generate-documentation`)에만 쓰는 명령 플러그인이다.
         // 라이브러리 타깃은 이 패키지에 의존하지 않으므로 빌드 산출물(Wasm·Android 포함)에 들어가지 않는다(ADR-0012).
         .package(url: "https://github.com/swiftlang/swift-docc-plugin", from: "1.4.0"),
+        // 브리지 코드 생성기(`bridge-gen`) 전용 의존성이다. `Sources/RIBs`를 비롯한 라이브러리 타깃은 의존하지 않는다.
+        .package(url: "https://github.com/swiftlang/swift-syntax", exact: "603.0.2"),
     ],
     targets: [
         .target(name: "RIBs"),
@@ -37,6 +40,17 @@ let package = Package(
         ),
         .target(name: "RIBsAndroid", dependencies: ["RIBs", "CRIBsAndroid"]),
         .target(name: "LoginShared", dependencies: ["RIBs"], path: "Samples/LoginShared/Sources"),
+        .target(
+            name: "BridgeGenCore",
+            dependencies: [
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+            ]
+        ),
+        .executableTarget(
+            name: "bridge-gen",
+            dependencies: ["BridgeGenCore"]
+        ),
         .plugin(
             name: "NewRib",
             capability: .command(
@@ -44,11 +58,20 @@ let package = Package(
                 permissions: [.writeToPackageDirectory(reason: "새 RIB 소스 파일을 만든다.")]
             )
         ),
+        .plugin(
+            name: "BridgeGen",
+            capability: .command(
+                intent: .custom(verb: "bridge-gen", description: "공유 RIB Interface에서 단일 채널 JSON 코덱과 TypeScript/Kotlin 타입을 생성한다."),
+                permissions: [.writeToPackageDirectory(reason: "생성된 브리지 코덱과 타입 파일을 쓴다.")]
+            ),
+            dependencies: ["bridge-gen"]
+        ),
         .testTarget(name: "RIBsTests", dependencies: ["RIBs"]),
         .testTarget(name: "RIBsSwiftUITests", dependencies: ["RIBsSwiftUI"]),
         .testTarget(name: "RIBsUIKitTests", dependencies: ["RIBsUIKit"]),
         .testTarget(name: "RIBsWebTests", dependencies: ["RIBsWeb"]),
         .testTarget(name: "RIBsAndroidTests", dependencies: ["RIBsAndroid"]),
+        .testTarget(name: "BridgeGenTests", dependencies: ["BridgeGenCore"]),
         // new-rib이 만든 뼈대를 임시 패키지에서 실제로 빌드·테스트한다.
         .testTarget(name: "NewRibTests"),
         .testTarget(name: "LoginSharedTests", dependencies: ["LoginShared"], path: "Samples/LoginShared/Tests"),
